@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1150a991f66297c48833ef900c93567a, type: 3}
+  m_Name: Wave1
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Wave.WaveConfig
+  waveNumber: 1
+  label: Wave 1
+  groups:
+  - enemyPrefab: {fileID: 5590736251255346336, guid: 68c53b4241c9c7b42ac655538a617bc8, type: 3}
+    count: 10
+    spawnInterval: 0.5
+    startDelay: 0
+  isBossWave: 0
+  postWaveBreak: 20
