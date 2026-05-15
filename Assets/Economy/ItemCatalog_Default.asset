@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5875e0d6edc352145ae8ed086c1b4721, type: 3}
+  m_Name: ItemCatalog_Default
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Economy.ItemCatalog
+  items:
+  - id: heal_small
+    displayName: "\uC18C\uD615 \uD68C\uBCF5\uD0B7"
+    type: 1
+    price: 30
+    unlockWave: 1
+    value: 30
+    description: 
+  - id: heal_big
+    displayName: "\uB300\uD615 \uD68C\uBCF5\uD0B7"
+    type: 1
+    price: 70
+    unlockWave: 1
+    value: 70
+    description: 
+  - id: ammo_30
+    displayName: "\uD0C4\uC57D 30\uBC1C"
+    type: 2
+    price: 25
+    unlockWave: 1
+    value: 30
+    description: 
+  - id: ammo_90
+    displayName: "\uD0C4\uC57D 90\uBC1C"
+    type: 2
+    price: 60
+    unlockWave: 2
+    value: 90
+    description: 
+  - id: dmg_up
+    displayName: "\uB370\uBBF8\uC9C0 \uAC15\uD654"
+    type: 3
+    price: 200
+    unlockWave: 3
+    value: 5
+    description: 
