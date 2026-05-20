@@ -21,6 +21,8 @@ namespace ProjectM.UI
         [SerializeField] private WeaponController playerWeapon;
         [SerializeField] private GameSessionManager session;
         [SerializeField] private CurrencyWallet wallet;
+        [SerializeField] private KitInventory kitInventory;
+        [SerializeField] private KitEquipper kitEquipper;
 
         [Header("UI 요소 — 비워두면 자동 생성")]
         [SerializeField] private Text waveText;
@@ -29,6 +31,7 @@ namespace ProjectM.UI
         [SerializeField] private Text hpText;
         [SerializeField] private Text ammoText;
         [SerializeField] private Text reloadText;
+        [SerializeField] private Text kitText;
 
         [Header("자동 생성 옵션")]
         [SerializeField] private bool autoBuildMissing = true;
@@ -41,6 +44,8 @@ namespace ProjectM.UI
             if (playerWeapon == null) playerWeapon = FindAnyObjectByType<WeaponController>();
             if (session == null) session = FindAnyObjectByType<GameSessionManager>();
             if (wallet == null) wallet = FindAnyObjectByType<CurrencyWallet>();
+            if (kitInventory == null) kitInventory = FindAnyObjectByType<KitInventory>();
+            if (kitEquipper == null) kitEquipper = FindAnyObjectByType<KitEquipper>();
             bootstrap = FindAnyObjectByType<MatchBootstrapper>();
         }
 
@@ -110,6 +115,16 @@ namespace ProjectM.UI
                 reloadText.color = new Color(1f, 0.85f, 0.4f);
                 reloadText.text = "";
             }
+
+            if (kitText == null)
+            {
+                // 하단 중앙: 키트 보유량 표시
+                var kitBg = UIRoot.CreatePanel("KitBg", root, new Color(0, 0, 0, 0.55f));
+                Anchor(kitBg.rectTransform, new Vector2(0.5f, 0), new Vector2(0.5f, 0), new Vector2(-260, 20), new Vector2(260, 56));
+                kitText = UIRoot.CreateText("KitText", kitBg.rectTransform, 20, TextAnchor.MiddleCenter);
+                Anchor(kitText.rectTransform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+                kitText.color = Color.white;
+            }
         }
 
         private static void Anchor(RectTransform rt, Vector2 aMin, Vector2 aMax, Vector2 offMin, Vector2 offMax)
@@ -130,6 +145,8 @@ namespace ProjectM.UI
             }
             if (session != null) session.OnWaveStarted += HandleWaveStarted;
             if (wallet != null) wallet.OnChanged += HandleCurrencyChanged;
+            if (kitInventory != null) kitInventory.OnCountChanged += HandleKitChanged;
+            if (kitEquipper != null) kitEquipper.OnEquippedChanged += HandleKitEquippedChanged;
         }
 
         private void OnDisable()
@@ -143,12 +160,16 @@ namespace ProjectM.UI
             }
             if (session != null) session.OnWaveStarted -= HandleWaveStarted;
             if (wallet != null) wallet.OnChanged -= HandleCurrencyChanged;
+            if (kitInventory != null) kitInventory.OnCountChanged -= HandleKitChanged;
+            if (kitEquipper != null) kitEquipper.OnEquippedChanged -= HandleKitEquippedChanged;
         }
 
         // ── 핸들러 ────────────────────────────────────────────────
         private void HandleHpChanged(float cur, float max) => RefreshHp();
         private void HandleWaveStarted(int wave) => RefreshWave();
         private void HandleCurrencyChanged(int balance) => RefreshCurrency();
+        private void HandleKitChanged(KitType type, int count) => RefreshKit();
+        private void HandleKitEquippedChanged(KitType type) => RefreshKit();
 
         private void Update()
         {
@@ -168,6 +189,7 @@ namespace ProjectM.UI
             RefreshWave();
             RefreshCurrency();
             RefreshReload();
+            RefreshKit();
         }
 
         private void RefreshHp()
@@ -202,6 +224,27 @@ namespace ProjectM.UI
         {
             if (reloadText == null) return;
             reloadText.text = (playerWeapon != null && playerWeapon.IsReloading) ? "RELOADING..." : "";
+        }
+
+        private void RefreshKit()
+        {
+            if (kitInventory == null || kitText == null) return;
+
+            KitType equipped = kitEquipper != null ? kitEquipper.EquippedKit : KitType.None;
+
+            // 장착 중인 키트는 [대괄호]로 강조
+            string heal   = Format("회복", kitInventory.HealKitCount,   equipped == KitType.HealKit);
+            string repair = Format("수리", kitInventory.RepairKitCount, equipped == KitType.RepairKit);
+            string farm   = Format("밭",   kitInventory.FarmKitCount,   equipped == KitType.FarmKit);
+
+            string hint = equipped == KitType.None ? "  (3번키로 키트 장착)" : "  (좌클릭 사용)";
+            kitText.text = $"{heal}   {repair}   {farm}{hint}";
+        }
+
+        private static string Format(string label, int count, bool equipped)
+        {
+            string body = $"{label}:{count}";
+            return equipped ? $"▶[{body}]" : body;
         }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using ProjectM.Defense;
 
 namespace ProjectM.Player
 {
@@ -66,8 +67,8 @@ namespace ProjectM.Player
             // 커서가 잠겨 있을 때만 입력 수신 (디버그 UI 클릭과 충돌 방지)
             if (Cursor.lockState != CursorLockMode.Locked) return;
 
-            // 키트가 장착되어 있으면 좌클릭은 키트 사용용 — 사격 억제
-            if (kitEquipper != null && kitEquipper.IsKitEquipped) return;
+            // 키트 휠 선택 중이거나 키트가 장착되어 있으면 좌클릭은 키트용 — 사격 억제
+            if (kitEquipper != null && (kitEquipper.IsSelecting || kitEquipper.IsKitEquipped)) return;
 
             bool wantsFire = isAutomatic ? mouse.leftButton.isPressed : mouse.leftButton.wasPressedThisFrame;
             if (wantsFire && CanFire()) Fire();
@@ -87,11 +88,17 @@ namespace ProjectM.Player
             var ray = new Ray(viewCamera.transform.position, viewCamera.transform.forward);
             if (Physics.Raycast(ray, out RaycastHit hit, range, hitMask, QueryTriggerInteraction.Ignore))
             {
-                var dmg = hit.collider.GetComponentInParent<IDamageable>();
-                if (dmg != null && dmg.IsAlive)
+                // 방어 오브젝트(성문/베이스/밭)는 플레이어 공격으로 파괴 불가 — 데미지 적용 안 함
+                bool isDefense = hit.collider.GetComponentInParent<DefenseObject>() != null;
+
+                if (!isDefense)
                 {
-                    dmg.TakeDamage(damage, gameObject);
-                    OnHit?.Invoke(hit.collider.gameObject, damage);
+                    var dmg = hit.collider.GetComponentInParent<IDamageable>();
+                    if (dmg != null && dmg.IsAlive)
+                    {
+                        dmg.TakeDamage(damage, gameObject);
+                        OnHit?.Invoke(hit.collider.gameObject, damage);
+                    }
                 }
                 Debug.DrawLine(ray.origin, hit.point, Color.red, 0.1f);
             }

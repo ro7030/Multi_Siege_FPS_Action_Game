@@ -7,15 +7,15 @@ using ProjectM.Economy;
 namespace ProjectM.Player
 {
     /// <summary>
-    /// 플레이어 키트 장착/사용 시스템.
+    /// 플레이어 키트 장착/사용 시스템 (GTA식 라디얼 휠).
     ///
     /// 동작
-    ///   - 3번키: 보유 중인 키트 중 다음 종류로 사이클 (HealKit → RepairKit → FarmKit → 해제)
-    ///   - 좌클릭: 장착한 키트 사용
-    ///       · HealKit: 자신을 회복
-    ///       · RepairKit: 시선 끝 방어물 수리
-    ///       · FarmKit: 시선 끝 지면에 밭 설치 (정비 시간만)
-    ///   - 키트 장착 중에는 WeaponController 가 사격을 억제 (IsKitEquipped 체크)
+    ///   - 3번키를 "꾹 누른 상태": 라디얼 휠이 열림 (KitWheelView 가 표시)
+    ///       · 마우스를 움직여 방향을 가리킴 (위=회복 / 좌하=수리 / 우하=밭)
+    ///       · 좌클릭 또는 3번키 떼기 → 가리킨 키트 장착 (가운데/이동 없음 = 장착 해제)
+    ///   - 키트 장착 후 좌클릭: 장착한 키트 사용
+    ///       · HealKit: 자신을 회복 / RepairKit: 시선 끝 방어물 수리 / FarmKit: 시선 끝 지면에 밭 설치
+    ///   - 휠이 열려있거나 키트가 장착된 동안 WeaponController 가 사격을 억제
     /// </summary>
     [RequireComponent(typeof(KitInventory))]
     public class KitEquipper : MonoBehaviour
@@ -30,19 +30,34 @@ namespace ProjectM.Player
         [SerializeField] private LayerMask hitMask = ~0;
 
         [Header("효과 수치 (Inspector 조절)")]
-        [Tooltip("HealKit 좌클릭 시 회복량")]
         [SerializeField] private float healAmount = 50f;
-        [Tooltip("RepairKit 좌클릭 시 즉시 수리량 (기획서: 문 HP의 10%)")]
         [SerializeField] private float repairAmount = 50f;
+
+        [Header("라디얼 휠")]
+        [Tooltip("마우스 이동이 이 값을 넘어야 방향이 선택됨 (픽셀)")]
+        [SerializeField] private float selectionDeadzone = 40f;
+        [Tooltip("선택 방향 벡터 누적 최대 크기 (픽셀)")]
+        [SerializeField] private float selectionMaxRadius = 200f;
+        [SerializeField] private float mouseSensitivity = 1f;
 
         [Header("로컬 권한")]
         [SerializeField] private bool isLocalPlayer = true;
 
+        // ── 장착 상태 ──
         public KitType EquippedKit { get; private set; } = KitType.None;
         public bool IsKitEquipped => EquippedKit != KitType.None;
 
+        // ── 휠 선택 상태 (UI 가 폴링) ──
+        public bool IsSelecting { get; private set; }
+        public KitType HighlightedKit { get; private set; } = KitType.None;
+        /// <summary>현재 누적된 선택 방향 (UI 포인터 표시용). 길이 0 ~ selectionMaxRadius.</summary>
+        public Vector2 SelectionDirection { get; private set; }
+        public float SelectionDeadzone => selectionDeadzone;
+        public float SelectionMaxRadius => selectionMaxRadius;
+
         public event Action<KitType> OnEquippedChanged;
-        public event Action<KitType, bool> OnKitUseAttempt; // (kit, success)
+        public event Action<KitType, bool> OnKitUseAttempt;
+        public event Action<bool> OnSelectionStateChanged;
 
         private void Awake()
         {
@@ -63,9 +78,9 @@ namespace ProjectM.Player
 
         private void HandleInventoryChanged(KitType type, int newCount)
         {
-            // 사용 중인 키트가 0이 되면 다음 가능한 키트로 자동 이동
+            // 사용 중인 키트가 0이 되면 자동 해제
             if (EquippedKit == type && newCount <= 0)
-                CycleKit();
+                SetEquipped(KitType.None);
         }
 
         // ─────────────────────────────────────────────────────────────
@@ -75,47 +90,84 @@ namespace ProjectM.Player
 
             var kb = Keyboard.current;
             var mouse = Mouse.current;
+            if (kb == null) return;
 
-            // 3번키: 키트 사이클
-            if (kb != null && kb.digit3Key.wasPressedThisFrame)
-                CycleKit();
+            // 휠 열기
+            if (kb.digit3Key.wasPressedThisFrame)
+                BeginSelection();
 
+            if (IsSelecting)
+            {
+                UpdateSelection(mouse);
+
+                bool confirm = (mouse != null && mouse.leftButton.wasPressedThisFrame)
+                               || kb.digit3Key.wasReleasedThisFrame;
+                if (confirm) EndSelection();
+                return; // 선택 중에는 일반 키트 사용 입력 무시
+            }
+
+            // 일반 키트 사용 (휠 닫힘 + 키트 장착 상태)
             if (!IsKitEquipped) return;
             if (mouse == null) return;
-            if (Cursor.lockState != CursorLockMode.Locked) return; // UI 열려있을 땐 무시
+            if (Cursor.lockState != CursorLockMode.Locked) return;
 
             if (mouse.leftButton.wasPressedThisFrame)
                 UseEquippedKit();
         }
 
         // ─────────────────────────────────────────────────────────────
-        // 사이클
+        // 라디얼 휠 선택
         // ─────────────────────────────────────────────────────────────
 
-        /// <summary>보유 중인 다음 키트 종류로 이동. 모두 없으면 해제(None).</summary>
-        public void CycleKit()
+        private void BeginSelection()
         {
-            // 순서: 현재 → HealKit → RepairKit → FarmKit → None
-            KitType[] order = { KitType.HealKit, KitType.RepairKit, KitType.FarmKit };
+            IsSelecting = true;
+            SelectionDirection = Vector2.zero;
+            HighlightedKit = KitType.None; // 이동 없이 확정하면 장착 해제
+            OnSelectionStateChanged?.Invoke(true);
+        }
 
-            int startIdx = Array.IndexOf(order, EquippedKit);
-            // None 이면 -1, 다음은 0부터 시작
-            for (int step = 1; step <= order.Length; step++)
+        private void UpdateSelection(Mouse mouse)
+        {
+            if (mouse != null)
             {
-                int idx = (startIdx + step) % (order.Length + 1); // +1 = None 슬롯
-                if (idx >= order.Length)
-                {
-                    // None 슬롯
-                    SetEquipped(KitType.None);
-                    return;
-                }
-                if (inventory != null && inventory.Has(order[idx]))
-                {
-                    SetEquipped(order[idx]);
-                    return;
-                }
+                Vector2 delta = mouse.delta.ReadValue() * mouseSensitivity;
+                Vector2 v = SelectionDirection + delta;
+                if (v.magnitude > selectionMaxRadius)
+                    v = v.normalized * selectionMaxRadius;
+                SelectionDirection = v;
             }
-            SetEquipped(KitType.None);
+
+            if (SelectionDirection.magnitude >= selectionDeadzone)
+                HighlightedKit = DirectionToKit(SelectionDirection);
+            else
+                HighlightedKit = KitType.None;
+        }
+
+        private void EndSelection()
+        {
+            IsSelecting = false;
+            OnSelectionStateChanged?.Invoke(false);
+
+            // 가리킨 키트가 보유 중이면 장착, 아니면 해제
+            if (HighlightedKit != KitType.None && inventory != null && inventory.Has(HighlightedKit))
+                SetEquipped(HighlightedKit);
+            else
+                SetEquipped(KitType.None);
+        }
+
+        /// <summary>방향 벡터 → 키트. 위=Heal, 좌하=Repair, 우하=Farm (120°씩).</summary>
+        public static KitType DirectionToKit(Vector2 dir)
+        {
+            float ang = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg; // -180..180
+            if (ang < 0) ang += 360f;                              // 0..360
+
+            // Heal: 위(90°) 중심 30~150
+            if (ang >= 30f && ang < 150f) return KitType.HealKit;
+            // Repair: 좌하(210°) 중심 150~270
+            if (ang >= 150f && ang < 270f) return KitType.RepairKit;
+            // Farm: 우하(330°) 중심 270~360, 0~30
+            return KitType.FarmKit;
         }
 
         private void SetEquipped(KitType type)
@@ -139,15 +191,12 @@ namespace ProjectM.Player
                 KitType.FarmKit   => UseFarmKit(),
                 _ => false
             };
-
             OnKitUseAttempt?.Invoke(EquippedKit, ok);
         }
 
         private bool UseHealKit()
         {
-            if (playerHealth == null) { Debug.LogWarning("[Kit] HealKit: HealthSystem 없음"); return false; }
-            if (!playerHealth.IsAlive) return false;
-
+            if (playerHealth == null || !playerHealth.IsAlive) return false;
             if (!inventory.TryConsume(KitType.HealKit)) return false;
             playerHealth.Heal(healAmount);
             Debug.Log($"[Kit] HealKit 사용 (+{healAmount} HP)");
@@ -157,7 +206,6 @@ namespace ProjectM.Player
         private bool UseRepairKit()
         {
             if (!TryRaycastFromView(out RaycastHit hit)) return false;
-
             var defense = hit.collider.GetComponentInParent<DefenseObject>();
             if (defense == null) { Debug.Log("[Kit] RepairKit: 방어물이 없음"); return false; }
 
@@ -175,7 +223,6 @@ namespace ProjectM.Player
                 Debug.LogWarning("[Kit] FarmKit: 정비 시간이 아니거나 최대 개수 도달");
                 return false;
             }
-
             if (!TryRaycastFromView(out RaycastHit hit)) return false;
 
             Vector3 placePos = hit.point;
@@ -188,12 +235,8 @@ namespace ProjectM.Player
                 Debug.Log($"[Kit] FarmKit 사용 — 밭 설치 @ {placePos}");
                 return true;
             }
-            else
-            {
-                // 매니저 거부 시 키트 환불
-                inventory.Add(KitType.FarmKit, 1);
-                return false;
-            }
+            inventory.Add(KitType.FarmKit, 1); // 거부 시 환불
+            return false;
         }
 
         private bool TryRaycastFromView(out RaycastHit hit)

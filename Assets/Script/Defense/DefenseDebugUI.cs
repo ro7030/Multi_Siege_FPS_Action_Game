@@ -58,11 +58,10 @@ namespace ProjectM.Defense
             foreach (var f in farms)
             {
                 if (f == null) continue;
-                GUILayout.Label($"{f.name}  step={f.GrowthStep}/{f.MaxGrowthStep} {(f.CanHarvest ? "(READY)" : "")}");
-                if (f.CanHarvest && GUILayout.Button("Harvest"))
+                GUILayout.Label($"{f.name}  누적={f.AccumulatedYield} (웨이브당 +{f.YieldPerWave}) {(f.HasYieldToHarvest ? "(READY)" : "")} {(f.State == FarmPlot.FarmState.Destroyed ? "(DESTROYED)" : "")}");
+                if (f.HasYieldToHarvest && GUILayout.Button("Harvest (팀 분배)"))
                 {
-                    int yield = f.Harvest();
-                    Debug.Log($"[Debug Harvest] {f.name} +{yield}");
+                    Economy.FarmManager.Instance?.HarvestFarm(f);
                 }
             }
 

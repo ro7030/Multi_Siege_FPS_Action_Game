@@ -25,6 +25,16 @@ namespace ProjectM.Enemy
         [SerializeField] private float eyeHeight = 1.0f;
         [SerializeField] private float targetHeightOffset = 1.0f;
 
+        [Header("막힌 경로 폴백 (방어물 공격용)")]
+        [Tooltip("NavMeshObstacle 등으로 경로가 막혀 더 못 갈 때, attackRange 위에 더해줄 허용 거리. 방어물(priorityTargetTag) 타깃에만 적용된다.")]
+        [SerializeField] private float blockedAttackTolerance = 0.3f;
+        [Tooltip("'경로가 사실상 끝났다'고 볼 속도 임계값. 이 값 이하 & 남은거리 ≈ stoppingDistance 면 정지로 본다.")]
+        [SerializeField] private float blockedSpeedThreshold = 0.05f;
+
+        [Header("디버그")]
+        [Tooltip("타깃 선정/공격 진입 시 로그를 콘솔에 출력. 문제 진단용. 평소엔 꺼두기.")]
+        [SerializeField] private bool debugLogTargeting = false;
+
         public EnemyStats Stats => stats;
         public EnemyStateMachine FSM { get; private set; }
         public Transform Target { get; private set; }
@@ -36,6 +46,7 @@ namespace ProjectM.Enemy
         private HealthSystem health;
         private float nextTargetSearchTime;
         private float nextAttackTime;
+        private Collider targetCollider;
 
         private void Awake()
         {
@@ -93,8 +104,18 @@ namespace ProjectM.Enemy
 
             if (agent.isOnNavMesh) agent.SetDestination(Target.position);
 
-            float dist = Vector3.Distance(transform.position, Target.position);
-            if (dist <= stats.attackRange) FSM.ChangeState(EnemyState.Attack);
+            float dist = DistanceToTargetSurface();
+            if (dist <= stats.attackRange)
+            {
+                FSM.ChangeState(EnemyState.Attack);
+                return;
+            }
+
+            // NavMesh가 막혀 더 이상 진행 못 하는데 타깃이 방어물이면 표면 거리 + 약간의 허용치로 공격 진입
+            if (TargetIsDefense() && IsAgentBlocked() && dist <= stats.attackRange + blockedAttackTolerance)
+            {
+                FSM.ChangeState(EnemyState.Attack);
+            }
         }
 
         private void OnChaseExit()
@@ -106,6 +127,13 @@ namespace ProjectM.Enemy
         {
             if (agent.isOnNavMesh) agent.isStopped = true;
             nextAttackTime = Time.time;
+
+            if (debugLogTargeting && Target != null)
+            {
+                float pivot = Vector3.Distance(transform.position, Target.position);
+                float surf = DistanceToTargetSurface();
+                Debug.Log($"[EnemyAI] {name} ENTER Attack → target='{Target.name}' surfaceDist={surf:F2} pivotDist={pivot:F2} attackRange={stats.attackRange:F2}");
+            }
         }
 
         private void OnAttackTick()
@@ -116,8 +144,12 @@ namespace ProjectM.Enemy
             Vector3 dir = Target.position - transform.position; dir.y = 0;
             if (dir.sqrMagnitude > 0.01f) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * 8f);
 
-            float dist = Vector3.Distance(transform.position, Target.position);
-            if (dist > stats.attackRange * 1.15f) { FSM.ChangeState(EnemyState.Chase); return; }
+            float dist = DistanceToTargetSurface();
+            float keepRange = stats.attackRange * 1.15f;
+            // 방어물이 NavMeshObstacle로 막혀있는 상황에서는 허용치만큼 유지 사거리 확장
+            if (TargetIsDefense()) keepRange += blockedAttackTolerance;
+
+            if (dist > keepRange) { FSM.ChangeState(EnemyState.Chase); return; }
 
             if (Time.time >= nextAttackTime)
             {
@@ -146,7 +178,97 @@ namespace ProjectM.Enemy
         {
             if (Time.time < nextTargetSearchTime) return;
             nextTargetSearchTime = Time.time + targetRefreshInterval;
-            Target = FindBestTarget();
+
+            var newTarget = FindBestTarget();
+            if (newTarget != Target)
+            {
+                Target = newTarget;
+                targetCollider = newTarget != null ? PickTargetCollider(newTarget) : null;
+
+                if (debugLogTargeting)
+                {
+                    if (newTarget != null)
+                    {
+                        string colInfo = targetCollider != null
+                            ? $"{targetCollider.name}(trigger={targetCollider.isTrigger}, extents={targetCollider.bounds.extents})"
+                            : "<no collider>";
+                        Debug.Log($"[EnemyAI] {name} → target='{newTarget.name}' pivotDist={Vector3.Distance(transform.position, newTarget.position):F2} col={colInfo}");
+                    }
+                    else
+                    {
+                        Debug.Log($"[EnemyAI] {name} → target cleared");
+                    }
+                }
+            }
+        }
+
+        /// <summary>거리 판정에 쓸 콜라이더를 고른다. 트리거(상호작용 영역 등)는 제외하고 본체에 가까운 콜라이더를 우선한다.</summary>
+        private static Collider PickTargetCollider(Transform t)
+        {
+            // 1순위: 같은 GameObject의 비-트리거 콜라이더 (DefenseObject 본체)
+            if (t.TryGetComponent<Collider>(out var self) && self.enabled && !self.isTrigger)
+                return self;
+
+            // 2순위: 자식 트리 안의 비-트리거 콜라이더
+            var all = t.GetComponentsInChildren<Collider>(includeInactive: false);
+            foreach (var c in all)
+            {
+                if (c == null || !c.enabled) continue;
+                if (c.isTrigger) continue;
+                return c;
+            }
+
+            // 3순위(폴백): 트리거라도 있으면 쓴다 (콜라이더가 트리거뿐일 때)
+            foreach (var c in all)
+            {
+                if (c != null && c.enabled) return c;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 적 → 타깃 표면까지의 거리.
+        /// Collider.ClosestPoint는 입력 위치가 콜라이더 내부에 있을 때 그 위치를 그대로 반환하므로
+        /// pivot 거리에서 AABB 반지름을 뺀 값을 하한선으로 둬서 0/근접 오판정을 막는다.
+        /// </summary>
+        private float DistanceToTargetSurface()
+        {
+            if (Target == null) return float.MaxValue;
+            Vector3 myPos = transform.position;
+            float pivotDist = Vector3.Distance(myPos, Target.position);
+
+            if (targetCollider == null) return pivotDist;
+
+            float surfaceDist = Vector3.Distance(myPos, targetCollider.ClosestPoint(myPos));
+            // pivot 기준 도달 가능한 최소 표면 거리. 콜라이더가 비정상적으로 크거나 enemy가 내부에 있을 때 발생하는 0-거리 오판정을 막는다.
+            float lowerBound = Mathf.Max(0f, pivotDist - targetCollider.bounds.extents.magnitude);
+            return Mathf.Max(surfaceDist, lowerBound);
+        }
+
+        /// <summary>현재 타깃이 방어물(priorityTargetTag)인지.</summary>
+        private bool TargetIsDefense()
+        {
+            if (Target == null || string.IsNullOrEmpty(priorityTargetTag)) return false;
+            try { return Target.CompareTag(priorityTargetTag); }
+            catch (UnityException) { return false; }
+        }
+
+        /// <summary>NavMeshAgent가 더 이상 진행하지 못하는 상태(부분/무효 경로 또는 목적지 도달 후 정지).</summary>
+        private bool IsAgentBlocked()
+        {
+            if (agent == null || !agent.isOnNavMesh) return false;
+            if (agent.pathPending) return false;
+
+            if (agent.pathStatus == NavMeshPathStatus.PathPartial ||
+                agent.pathStatus == NavMeshPathStatus.PathInvalid)
+                return true;
+
+            // 경로가 완전(complete)이라도 끝까지 가서 멈췄으면 막힌 것으로 간주
+            if (agent.remainingDistance <= agent.stoppingDistance + 0.05f &&
+                agent.velocity.sqrMagnitude <= blockedSpeedThreshold * blockedSpeedThreshold)
+                return true;
+
+            return false;
         }
 
         private Transform FindBestTarget()
@@ -231,12 +353,13 @@ namespace ProjectM.Enemy
             Transform best = null;
             float bestDist = float.MaxValue;
 
-            var hits = Physics.OverlapSphere(transform.position, stats.detectRange);
+            // 트리거 콜라이더(수리 영역 등 방어물의 자식 트리거)는 어그로 후보에서 제외
+            var hits = Physics.OverlapSphere(transform.position, stats.detectRange, ~0, QueryTriggerInteraction.Ignore);
             foreach (var h in hits)
             {
                 if (h.gameObject == gameObject) continue;
                 if (h.GetComponentInParent<EnemyAIController>() != null) continue; // 다른 적 제외
-                if (!string.IsNullOrEmpty(priorityTargetTag) && h.CompareTag(priorityTargetTag)) continue; // 방어물 제외
+                if (IsDefenseOrChild(h.transform)) continue;                        // 방어물 본체 + 그 자식 콜라이더 모두 제외
 
                 var dmg = h.GetComponentInParent<IDamageable>();
                 if (dmg == null || !dmg.IsAlive) continue;
@@ -245,6 +368,21 @@ namespace ProjectM.Enemy
                 if (d < bestDist) { bestDist = d; best = h.transform; }
             }
             return best;
+        }
+
+        /// <summary>해당 Transform 또는 그 부모 중 하나라도 priorityTargetTag(방어물 태그)면 true.</summary>
+        private bool IsDefenseOrChild(Transform t)
+        {
+            if (t == null || string.IsNullOrEmpty(priorityTargetTag)) return false;
+            try
+            {
+                for (var cur = t; cur != null; cur = cur.parent)
+                {
+                    if (cur.CompareTag(priorityTargetTag)) return true;
+                }
+            }
+            catch (UnityException) { /* 태그 미정의 시 무시 */ }
+            return false;
         }
     }
 }

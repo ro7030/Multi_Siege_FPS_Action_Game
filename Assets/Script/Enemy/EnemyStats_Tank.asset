@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: EnemyStats_Tank
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Enemy.EnemyStats
   displayName: Enemy
-  tier: 0
+  tier: 1
   maxHp: 1800
   moveSpeed: 2.5
   attackDamage: 30
   attackRange: 1.8
   attackInterval: 2
-  detectRange: 10
+  detectRange: 4
   targetPriority: 0
-  currencyReward: 5
+  currencyReward: 0
   scoreReward: 10

@@ -5,14 +5,14 @@ using ProjectM.Player;
 namespace ProjectM.Defense
 {
     /// <summary>
-    /// 플레이어가 트리거 안에서 E키를 길게 눌러 방어 오브젝트를 수리하거나 작물을 수확한다.
-    /// 같은 GameObject 또는 부모에 DefenseObject / FarmPlot이 있어야 한다.
+    /// 플레이어가 트리거 안에서 키를 길게 눌러 방어 오브젝트를 수리한다.
+    /// (밭 수확은 FarmPlot 이 자체적으로 F키 + FarmManager 팀 분배로 처리하므로 여기서 다루지 않는다.)
+    /// 같은 GameObject 또는 부모에 DefenseObject 가 있어야 한다.
     /// </summary>
     [RequireComponent(typeof(Collider))]
     public class DefenseInteractable : MonoBehaviour
     {
         [SerializeField] private DefenseObject defense;
-        [SerializeField] private FarmPlot farm;
         [SerializeField] private InteractKey interactKey = InteractKey.E;
 
         public enum InteractKey { E, F }
@@ -21,12 +21,10 @@ namespace ProjectM.Defense
 
         public bool PlayerInRange => playerInRange;
         public bool CanRepair => defense != null && !defense.IsDestroyed && defense.Health.CurrentHp < defense.Health.MaxHp;
-        public bool CanHarvest => farm != null && farm.CanHarvest;
 
         private void Awake()
         {
             if (defense == null) defense = GetComponentInParent<DefenseObject>();
-            if (farm == null) farm = GetComponentInParent<FarmPlot>();
 
             var col = GetComponent<Collider>();
             if (col != null && !col.isTrigger)
@@ -55,12 +53,6 @@ namespace ProjectM.Defense
             var kb = Keyboard.current;
             if (kb == null) return;
 
-            bool pressedNow = interactKey switch
-            {
-                InteractKey.E => kb.eKey.wasPressedThisFrame,
-                InteractKey.F => kb.fKey.wasPressedThisFrame,
-                _ => false
-            };
             bool held = interactKey switch
             {
                 InteractKey.E => kb.eKey.isPressed,
@@ -68,13 +60,7 @@ namespace ProjectM.Defense
                 _ => false
             };
 
-            // 수확은 단발 입력, 수리는 길게 누름
-            if (pressedNow && CanHarvest)
-            {
-                int yield = farm.Harvest();
-                Debug.Log($"[Harvest] +{yield}");
-            }
-
+            // 수리는 길게 누름 (밭 수확은 FarmPlot 이 별도 처리)
             if (held && CanRepair)
             {
                 defense.Repair(Time.deltaTime);

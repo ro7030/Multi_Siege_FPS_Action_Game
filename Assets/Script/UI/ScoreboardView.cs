@@ -7,14 +7,15 @@ using ProjectM.Network;
 namespace ProjectM.UI
 {
     /// <summary>
-    /// 인게임 스코어보드. 기본 H키 길게 누름으로 표시 (TAB은 커서 토글과 충돌하므로 별도 키).
+    /// 인게임 스코어보드. Tab 키 길게 누름으로 표시.
+    /// (상점이 H 키를 사용하므로 스코어보드는 Tab 으로 이동. 커서 토글은 PlayerController 에서 F1 로 변경됨)
     /// 현재는 RoomManager의 플레이어 목록만 표시. Phase 8에서 PlayerStatsTracker 데이터와 결합.
     /// </summary>
     public class ScoreboardView : MonoBehaviour
     {
         [SerializeField] private RoomManager room;
         [SerializeField] private GameSessionManager session;
-        [SerializeField] private Key holdKey = Key.H;
+        [SerializeField] private Key holdKey = Key.Tab;
 
         private GameObject panelGo;
         private Text bodyText;

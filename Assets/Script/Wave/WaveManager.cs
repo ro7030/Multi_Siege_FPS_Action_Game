@@ -83,7 +83,7 @@ namespace ProjectM.Wave
                     if (group.startDelay > 0f) yield return new WaitForSeconds(group.startDelay);
                     for (int i = 0; i < group.count; i++)
                     {
-                        spawner?.Spawn(group.enemyPrefab);
+                        spawner?.Spawn(group.enemyPrefab, group.spawnPointIndex);
                         SpawnedCount++;
                         if (group.spawnInterval > 0f) yield return new WaitForSeconds(group.spawnInterval);
                     }

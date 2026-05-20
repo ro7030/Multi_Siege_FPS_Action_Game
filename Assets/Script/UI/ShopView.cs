@@ -2,19 +2,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using ProjectM.Core;
 using ProjectM.Economy;
 
 namespace ProjectM.UI
 {
     /// <summary>
-    /// 상점 UI 패널. B키로 토글. 열려 있는 동안 커서 자유, 닫으면 다시 잠금.
+    /// 상점 UI 패널. H키로 토글. 정비 시간(Preparation)에만 열 수 있다.
+    /// 웨이브가 시작되면 자동으로 닫힌다. 열려 있는 동안 커서 자유, 닫으면 다시 잠금.
     /// 카탈로그 항목을 버튼으로 나열, 클릭 시 ShopController.TryPurchase 호출.
     /// </summary>
     public class ShopView : MonoBehaviour
     {
         [SerializeField] private ShopController shop;
         [SerializeField] private CurrencyWallet wallet;
-        [SerializeField] private Key toggleKey = Key.B;
+        [SerializeField] private GameSessionManager session;
+        [SerializeField] private Key toggleKey = Key.H;
 
         private GameObject panelGo;
         private RectTransform listParent;
@@ -29,6 +32,7 @@ namespace ProjectM.UI
         {
             if (shop == null) shop = FindAnyObjectByType<ShopController>();
             if (wallet == null) wallet = FindAnyObjectByType<CurrencyWallet>();
+            if (session == null) session = FindAnyObjectByType<GameSessionManager>();
         }
 
         private void Start()
@@ -43,6 +47,25 @@ namespace ProjectM.UI
                 shop.OnPurchaseFailed += (_, __) => Refresh();
             }
             if (wallet != null) wallet.OnChanged += _ => Refresh();
+            // 웨이브가 시작되면 상점 강제 종료
+            if (session != null) session.OnWaveStarted += HandleWaveStarted;
+        }
+
+        private void OnDisable()
+        {
+            if (session != null) session.OnWaveStarted -= HandleWaveStarted;
+        }
+
+        private void HandleWaveStarted(int _)
+        {
+            if (isOpen) Hide();
+        }
+
+        /// <summary>상점을 열 수 있는 시점인지 (정비 시간만).</summary>
+        private bool CanOpenShop()
+        {
+            if (session == null) return true; // 세션 없으면 제한 없음 (테스트용)
+            return session.State.CurrentPhase == GamePhase.Preparation;
         }
 
         private void Update()
@@ -62,6 +85,11 @@ namespace ProjectM.UI
         public void Show()
         {
             if (panelGo == null) return;
+            if (!CanOpenShop())
+            {
+                Debug.Log("[Shop] 정비 시간에만 상점을 열 수 있습니다.");
+                return;
+            }
             panelGo.SetActive(true);
             isOpen = true;
             Cursor.lockState = CursorLockMode.None;
@@ -114,7 +142,7 @@ namespace ProjectM.UI
             vlg.childForceExpandWidth = true;
 
             // Close button
-            var closeBtn = UIRoot.CreateButton("CloseBtn", rt, "Close (B)");
+            var closeBtn = UIRoot.CreateButton("CloseBtn", rt, "Close (H)");
             var crt = closeBtn.GetComponent<RectTransform>();
             crt.anchorMin = new Vector2(0.5f, 0); crt.anchorMax = new Vector2(0.5f, 0);
             crt.pivot = new Vector2(0.5f, 0); crt.sizeDelta = new Vector2(160, 44);

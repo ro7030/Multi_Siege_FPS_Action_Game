@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 51164078248757224}
   - component: {fileID: 6241858638892478513}
   m_Layer: 0
-  m_Name: Enemy_Normal
+  m_Name: Enemy_Boss
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32,7 +32,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -29.27154, y: 0, z: -8.18859}
-  m_LocalScale: {x: 1, y: 0.7, z: 1}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -127,7 +127,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 3
+  m_Speed: 2.5
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -151,8 +151,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a641812b77c5e244ae8eca7058c2761, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.HealthSystem
-  maxHp: 100
-  currentHp: 100
+  maxHp: 300
+  currentHp: 300
   destroyOnDeath: 1
 --- !u!114 &6241858638892478513
 MonoBehaviour:
@@ -166,7 +166,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a24fc2168788914caa403f116320b35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Enemy.EnemyAIController
-  stats: {fileID: 11400000, guid: b559c5afeb2b45a49863c0cd435d4596, type: 2}
+  stats: {fileID: 11400000, guid: ac1b115041863304685657d80df03094, type: 2}
   priorityTargetTag: DefenseObject
   targetRefreshInterval: 0.5
   hostAuthoritative: 1
+  sightBlockMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  eyeHeight: 1
+  targetHeightOffset: 1

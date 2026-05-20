@@ -8,6 +8,8 @@ namespace ProjectM.Wave
     {
         public GameObject enemyPrefab;
         public int count = 5;
+        [Tooltip("EnemySpawner의 Spawn Points 배열 인덱스. 이 그룹은 해당 위치에서 스폰된다.\n0=첫 번째 스폰포인트, 1=두 번째 ... (-1이면 랜덤)")]
+        public int spawnPointIndex = 0;
         [Tooltip("그룹 내 적 사이의 스폰 간격(초)")]
         public float spawnInterval = 0.4f;
         [Tooltip("이전 그룹과의 시작 지연(초)")]

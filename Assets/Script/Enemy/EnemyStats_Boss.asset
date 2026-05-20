@@ -19,6 +19,7 @@ MonoBehaviour:
   attackDamage: 10
   attackRange: 1.8
   attackInterval: 1.2
-  detectRange: 25
-  currencyReward: 5
+  detectRange: 6
+  targetPriority: 0
+  currencyReward: 0
   scoreReward: 10
