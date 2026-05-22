@@ -12,6 +12,9 @@ namespace ProjectM.Economy
         HealKit,        // 인벤토리 추가 → 3번키 후 좌클릭으로 자가 회복
         RepairKit,      // 인벤토리 추가 → 3번키 후 좌클릭으로 방어물 수리
         FarmKit,        // 인벤토리 추가 → 3번키 후 좌클릭으로 밭 설치
+        Grenade,        // 투척: 수류탄
+        Molotov,        // 투척: 화염병
+        Flash,          // 투척: 섬광탄
     }
 
     [Serializable]

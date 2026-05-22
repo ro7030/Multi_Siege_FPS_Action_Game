@@ -1,79 +1,61 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace ProjectM.Player
 {
     /// <summary>
-    /// 다운된 동료에게 다가가 E키를 길게 눌러 부활시킨다.
-    /// 자기 자신은 부활 불가. 트리거 콜라이더 안에 들어와야 인터랙션 가능.
+    /// 다운된 동료 부활 상호작용 (홀드형). PlayerInteractor 가 F키 입력을 전달한다.
+    /// 자기 자신은 부활 불가. 다운 상태일 때만 프롬프트가 뜬다.
     /// </summary>
-    [RequireComponent(typeof(Collider))]
-    public class ReviveInteractable : MonoBehaviour
+    public class ReviveInteractable : MonoBehaviour, IInteractable
     {
         [SerializeField] private ReviveSystem target;
-        [SerializeField] private KeyboardKey reviveKey = KeyboardKey.E;
 
-        private bool localPlayerInRange;
-        private GameObject localRescuer;
-
-        public enum KeyboardKey { E, F, Space }
+        [Header("프롬프트")]
+        [Tooltip("{name} 은 대상 이름으로 치환된다. 예: \"{name} 부활\"")]
+        [SerializeField] private string promptFormat = "{name} 부활";
+        [SerializeField] private Sprite promptIcon;
+        [SerializeField] private Transform promptAnchor; // 비우면 자기 위치
 
         private void Awake()
         {
             if (target == null) target = GetComponentInParent<ReviveSystem>();
-            var col = GetComponent<Collider>();
-            if (col != null && !col.isTrigger)
-                Debug.LogWarning("[Revive] Collider가 Trigger가 아닙니다. isTrigger=true 권장.", this);
         }
 
-        private void OnTriggerEnter(Collider other)
+        // ── IInteractable ──
+        public bool CanInteract(GameObject interactor)
         {
-            if (!IsLocalPlayer(other)) return;
-            localPlayerInRange = true;
-            localRescuer = other.gameObject;
+            if (target == null || !target.IsDown || target.IsDead) return false;
+            // 자기 자신은 부활 불가
+            if (interactor == target.gameObject) return false;
+            return true;
         }
 
-        private void OnTriggerExit(Collider other)
+        public string PromptText
         {
-            if (!IsLocalPlayer(other)) return;
-            localPlayerInRange = false;
-            localRescuer = null;
-            target?.CancelRevive();
-        }
-
-        private static bool IsLocalPlayer(Collider c)
-        {
-            var pc = c.GetComponentInParent<PlayerController>();
-            return pc != null && pc.IsLocalPlayer;
-        }
-
-        private void Update()
-        {
-            if (!localPlayerInRange || target == null) return;
-            if (!target.IsDown || target.IsDead) return;
-            if (IsSelf()) return;
-
-            var kb = Keyboard.current;
-            if (kb == null) return;
-
-            bool pressed = reviveKey switch
+            get
             {
-                KeyboardKey.E => kb.eKey.isPressed,
-                KeyboardKey.F => kb.fKey.isPressed,
-                KeyboardKey.Space => kb.spaceKey.isPressed,
-                _ => false
-            };
-
-            if (pressed) target.ProgressRevive(Time.deltaTime);
-            else target.CancelRevive();
+                string n = target != null ? target.gameObject.name : "Player";
+                return promptFormat.Replace("{name}", n);
+            }
         }
 
-        private bool IsSelf()
+        public Sprite PromptIcon => promptIcon;
+        public bool IsHold => true;
+        public float HoldProgress01 =>
+            (target != null && target.ReviveDuration > 0f) ? Mathf.Clamp01(target.ReviveProgress / target.ReviveDuration) : 0f;
+        public Transform PromptAnchor => promptAnchor != null ? promptAnchor : transform;
+
+        public void Interact(GameObject interactor) { } // 홀드형이므로 사용 안 함
+
+        public void InteractHold(GameObject interactor, float deltaTime)
         {
-            // 부활 대상이 같은 오브젝트의 ReviveSystem이라면 본인.
-            return localRescuer != null
-                && target != null
-                && target.gameObject == localRescuer;
+            if (target == null) return;
+            target.ProgressRevive(deltaTime);
+        }
+
+        public void InteractHoldCancel()
+        {
+            target?.CancelRevive();
         }
     }
 }

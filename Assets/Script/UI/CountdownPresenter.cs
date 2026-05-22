@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace ProjectM.UI
 {
@@ -24,7 +25,7 @@ namespace ProjectM.UI
         [Header("UI 연결 (비워두면 자동 생성)")]
         [SerializeField] private GameObject countdownPanel;
         [SerializeField] private Image backgroundImage;   // 이미지를 넣을 슬롯
-        [SerializeField] private Text countdownText;
+        [SerializeField] private TMP_Text countdownText;
 
         /// <summary>카운트다운 완료 시 발생. MatchBootstrapper 가 구독한다.</summary>
         public event Action OnCountdownFinished;
@@ -120,12 +121,12 @@ namespace ProjectM.UI
                 rect.sizeDelta = new Vector2(300f, 150f);
                 rect.anchoredPosition = new Vector2(0f, -80f);  // 이미지 아래
 
-                countdownText = textObj.AddComponent<Text>();
-                countdownText.alignment  = TextAnchor.MiddleCenter;
+                countdownText = textObj.AddComponent<TextMeshProUGUI>();
+                countdownText.alignment  = TextAlignmentOptions.Center;
                 countdownText.fontSize   = 100;
-                countdownText.fontStyle  = FontStyle.Bold;
+                countdownText.fontStyle  = FontStyles.Bold;
                 countdownText.color      = Color.white;
-                countdownText.font       = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+                // 폰트는 TMP_Settings.defaultFontAsset 사용
             }
 
             countdownPanel.SetActive(true);

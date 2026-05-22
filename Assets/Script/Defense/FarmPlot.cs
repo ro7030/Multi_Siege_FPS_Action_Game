@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using ProjectM.Player;
 
 namespace ProjectM.Defense
 {
@@ -8,11 +8,11 @@ namespace ProjectM.Defense
     /// 농작물 밭. 기획서 7-3 + 10-2 + 사용자 보정 기준.
     /// - 적 공격 대상 (DefenseObject + HealthSystem)
     /// - 매 웨이브 종료 시 yieldPerWave 만큼 1인당 수익이 누적됨
-    /// - 플레이어가 밭 근처에서 F 키 → 누적분을 팀 전체 분배 (FarmManager.HarvestFarm 호출)
+    /// - 플레이어가 밭 근처에서 F 키(PlayerInteractor) → 누적분을 팀 전체 분배 (FarmManager.HarvestFarm)
     /// - 파괴되면 누적분은 0 으로 손실
     /// </summary>
     [RequireComponent(typeof(DefenseObject))]
-    public class FarmPlot : MonoBehaviour
+    public class FarmPlot : MonoBehaviour, IInteractable
     {
         public enum FarmState { Active, Destroyed }
 
@@ -20,10 +20,11 @@ namespace ProjectM.Defense
         [Tooltip("웨이브 1회 통과 시 1인당 누적되는 재화량")]
         [SerializeField] private int yieldPerWave = 25;
 
-        [Header("상호작용")]
-        [Tooltip("플레이어가 이 거리 안에서 F 키를 누르면 수확")]
-        [SerializeField] private float interactRange = 2.5f;
-        [SerializeField] private string playerTag = "Player";
+        [Header("상호작용 프롬프트")]
+        [Tooltip("F 프롬프트에 표시할 메시지")]
+        [SerializeField] private string promptText = "수확";
+        [SerializeField] private Sprite promptIcon;
+        [SerializeField] private Transform promptAnchor; // 비우면 자기 위치
 
         [Header("외형 (선택)")]
         [Tooltip("[0]=비어있음, [1]=수확물 있음 등 자유 배치. AccumulatedYield 가 0보다 크면 마지막 인덱스로 전환")]
@@ -42,7 +43,6 @@ namespace ProjectM.Defense
         public event Action<FarmPlot> OnDestroyedByEnemy;
 
         private DefenseObject defense;
-        private Transform playerCache;
 
         // ─────────────────────────────────────────────────────────────
         private void Awake()
@@ -69,16 +69,24 @@ namespace ProjectM.Defense
             OnDestroyedByEnemy?.Invoke(this);
         }
 
-        private void Update()
-        {
-            if (State != FarmState.Active) return;
-            if (!HasYieldToHarvest) return;
-            if (!IsPlayerNear()) return;
-            if (!IsHarvestKeyPressed()) return;
+        // ─────────────────────────────────────────────────────────────
+        // IInteractable (F키 수확)
+        // ─────────────────────────────────────────────────────────────
+        public bool CanInteract(GameObject interactor) => HasYieldToHarvest;
+        public string PromptText => $"{promptText} (+{AccumulatedYield})";
+        public Sprite PromptIcon => promptIcon;
+        public bool IsHold => false;
+        public float HoldProgress01 => 0f;
+        public Transform PromptAnchor => promptAnchor != null ? promptAnchor : transform;
 
+        public void Interact(GameObject interactor)
+        {
             // FarmManager 에 위임 (실제 지급은 매니저가 팀 분배)
             Economy.FarmManager.Instance?.HarvestFarm(this);
         }
+
+        public void InteractHold(GameObject interactor, float deltaTime) { }
+        public void InteractHoldCancel() { }
 
         // ─────────────────────────────────────────────────────────────
         // FarmManager 가 호출
@@ -107,28 +115,6 @@ namespace ProjectM.Defense
         // 내부 헬퍼
         // ─────────────────────────────────────────────────────────────
 
-        private bool IsPlayerNear()
-        {
-            if (playerCache == null)
-            {
-                try
-                {
-                    var go = GameObject.FindGameObjectWithTag(playerTag);
-                    if (go != null) playerCache = go.transform;
-                }
-                catch (UnityException) { /* 태그 미정의 */ }
-            }
-            if (playerCache == null) return false;
-            return Vector3.Distance(playerCache.position, transform.position) <= interactRange;
-        }
-
-        private bool IsHarvestKeyPressed()
-        {
-            var kb = Keyboard.current;
-            if (kb != null) return kb.fKey.wasPressedThisFrame;
-            return Input.GetKeyDown(KeyCode.F);
-        }
-
         private void ApplyVisual()
         {
             if (stageVisuals == null || stageVisuals.Length == 0) return;
@@ -140,12 +126,6 @@ namespace ProjectM.Defense
 
             for (int i = 0; i < stageVisuals.Length; i++)
                 if (stageVisuals[i] != null) stageVisuals[i].SetActive(i == idx);
-        }
-
-        private void OnDrawGizmosSelected()
-        {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(transform.position, interactRange);
         }
     }
 }

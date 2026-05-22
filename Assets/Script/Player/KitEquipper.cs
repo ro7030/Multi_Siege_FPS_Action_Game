@@ -43,6 +43,9 @@ namespace ProjectM.Player
         [Header("로컬 권한")]
         [SerializeField] private bool isLocalPlayer = true;
 
+        [Header("연동")]
+        [SerializeField] private ThrowableEquipper throwableEquipper; // 키트 장착 시 투척 내려놓기
+
         // ── 장착 상태 ──
         public KitType EquippedKit { get; private set; } = KitType.None;
         public bool IsKitEquipped => EquippedKit != KitType.None;
@@ -64,6 +67,7 @@ namespace ProjectM.Player
             if (inventory == null) inventory = GetComponent<KitInventory>();
             if (viewCamera == null) viewCamera = GetComponentInChildren<Camera>();
             if (playerHealth == null) playerHealth = GetComponent<HealthSystem>();
+            if (throwableEquipper == null) throwableEquipper = GetComponent<ThrowableEquipper>();
         }
 
         private void OnEnable()
@@ -174,9 +178,13 @@ namespace ProjectM.Player
         {
             if (EquippedKit == type) return;
             EquippedKit = type;
+            if (type != KitType.None) throwableEquipper?.Holster(); // 투척과 배타
             OnEquippedChanged?.Invoke(type);
             Debug.Log($"[Kit] 장착: {type}");
         }
+
+        /// <summary>키트를 내려놓는다(무기로 복귀). 무기 전환 시 PlayerArsenal 이 호출.</summary>
+        public void Holster() => SetEquipped(KitType.None);
 
         // ─────────────────────────────────────────────────────────────
         // 사용

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using ProjectM.Core;
 using ProjectM.Economy;
 
@@ -16,8 +17,8 @@ namespace ProjectM.UI
         [SerializeField] private RewardCalculator reward;
 
         private GameObject panelGo;
-        private Text titleText;
-        private Text statsText;
+        private TMP_Text titleText;
+        private TMP_Text statsText;
 
         private void Awake()
         {
@@ -86,7 +87,7 @@ namespace ProjectM.UI
             rt.sizeDelta = new Vector2(640, 480);
 
             titleText = UIRoot.CreateText("Title", rt, 56, TextAnchor.UpperCenter);
-            titleText.fontStyle = FontStyle.Bold;
+            titleText.fontStyle = FontStyles.Bold;
             var trt = titleText.rectTransform;
             trt.anchorMin = new Vector2(0, 1); trt.anchorMax = new Vector2(1, 1);
             trt.offsetMin = new Vector2(0, -120); trt.offsetMax = new Vector2(0, -20);

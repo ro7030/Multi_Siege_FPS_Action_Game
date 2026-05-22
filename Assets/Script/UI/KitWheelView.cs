@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using ProjectM.Player;
 
 namespace ProjectM.UI
@@ -26,7 +27,7 @@ namespace ProjectM.UI
         private RectTransform pointerRt;
 
         // 칸: Heal(위), Repair(좌하), Farm(우하)
-        private Text healLabel, repairLabel, farmLabel;
+        private TMP_Text healLabel, repairLabel, farmLabel;
         private Image healSlot, repairSlot, farmSlot;
 
         private static readonly Color Normal = new(0.15f, 0.18f, 0.25f, 0.85f);
@@ -102,7 +103,7 @@ namespace ProjectM.UI
             hrt.anchoredPosition = new Vector2(0, -wheelRadius - 40f);
         }
 
-        private (Image slot, Text label) CreateSlot(RectTransform center, string name, float angleDeg)
+        private (Image slot, TMP_Text label) CreateSlot(RectTransform center, string name, float angleDeg)
         {
             float rad = angleDeg * Mathf.Deg2Rad;
             Vector2 pos = new(Mathf.Cos(rad) * wheelRadius, Mathf.Sin(rad) * wheelRadius);
@@ -134,7 +135,7 @@ namespace ProjectM.UI
             UpdateSlot(farmSlot,   farmLabel,   "밭",   KitType.FarmKit,   hi);
         }
 
-        private void UpdateSlot(Image slot, Text label, string name, KitType type, KitType highlighted)
+        private void UpdateSlot(Image slot, TMP_Text label, string name, KitType type, KitType highlighted)
         {
             int count = inventory != null ? inventory.GetCount(type) : 0;
             bool owned = count > 0;

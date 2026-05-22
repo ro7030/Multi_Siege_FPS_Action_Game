@@ -1,8 +1,11 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using ProjectM.Core;
 using ProjectM.Economy;
 using ProjectM.Player;
+using ProjectM.Wave;
+using ProjectM.Enemy;
 
 namespace ProjectM.UI
 {
@@ -20,18 +23,19 @@ namespace ProjectM.UI
         [SerializeField] private HealthSystem playerHealth;
         [SerializeField] private WeaponController playerWeapon;
         [SerializeField] private GameSessionManager session;
-        [SerializeField] private CurrencyWallet wallet;
         [SerializeField] private KitInventory kitInventory;
         [SerializeField] private KitEquipper kitEquipper;
+        [SerializeField] private WaveManager waveManager;
+        [SerializeField] private EnemySpawner enemySpawner;
 
         [Header("UI 요소 — 비워두면 자동 생성")]
-        [SerializeField] private Text waveText;
-        [SerializeField] private Text currencyText;
+        [SerializeField] private TMP_Text waveText;
+        [SerializeField] private TMP_Text enemyCountText;   // 좌상단 적 수 (현재/최대)
         [SerializeField] private Image hpFill;
-        [SerializeField] private Text hpText;
-        [SerializeField] private Text ammoText;
-        [SerializeField] private Text reloadText;
-        [SerializeField] private Text kitText;
+        [SerializeField] private TMP_Text hpText;
+        [SerializeField] private TMP_Text ammoText;
+        [SerializeField] private TMP_Text reloadText;
+        [SerializeField] private TMP_Text kitText;
 
         [Header("자동 생성 옵션")]
         [SerializeField] private bool autoBuildMissing = true;
@@ -43,9 +47,10 @@ namespace ProjectM.UI
             if (playerHealth == null) playerHealth = FindAnyObjectByType<HealthSystem>();
             if (playerWeapon == null) playerWeapon = FindAnyObjectByType<WeaponController>();
             if (session == null) session = FindAnyObjectByType<GameSessionManager>();
-            if (wallet == null) wallet = FindAnyObjectByType<CurrencyWallet>();
             if (kitInventory == null) kitInventory = FindAnyObjectByType<KitInventory>();
             if (kitEquipper == null) kitEquipper = FindAnyObjectByType<KitEquipper>();
+            if (waveManager == null) waveManager = FindAnyObjectByType<WaveManager>();
+            if (enemySpawner == null) enemySpawner = FindAnyObjectByType<EnemySpawner>();
             bootstrap = FindAnyObjectByType<MatchBootstrapper>();
         }
 
@@ -73,12 +78,16 @@ namespace ProjectM.UI
                 waveText.color = new Color(1, 0.9f, 0.4f);
             }
 
-            if (currencyText == null)
+            if (enemyCountText == null)
             {
-                currencyText = UIRoot.CreateText("CurrencyText", root, 28, TextAnchor.UpperRight);
-                Anchor(currencyText.rectTransform, new Vector2(1, 1), new Vector2(1, 1), new Vector2(-360, -20), new Vector2(-20, -60));
-                currencyText.color = new Color(0.6f, 1f, 0.6f);
+                // 좌상단, 웨이브 텍스트 아래 — 적 수 (현재/최대)
+                enemyCountText = UIRoot.CreateText("EnemyCountText", root, 32, TextAnchor.UpperLeft);
+                Anchor(enemyCountText.rectTransform, new Vector2(0, 1), new Vector2(0, 1), new Vector2(20, -64), new Vector2(360, -110));
+                enemyCountText.color = new Color(1f, 0.5f, 0.5f);
+                enemyCountText.fontStyle = FontStyles.Bold;
             }
+
+            // 재화는 인게임 HUD 에 표시하지 않음 (상점 팝업에서만 표시)
 
             if (hpFill == null || hpText == null)
             {
@@ -144,7 +153,6 @@ namespace ProjectM.UI
                 playerWeapon.OnReloadEnd += RefreshReload;
             }
             if (session != null) session.OnWaveStarted += HandleWaveStarted;
-            if (wallet != null) wallet.OnChanged += HandleCurrencyChanged;
             if (kitInventory != null) kitInventory.OnCountChanged += HandleKitChanged;
             if (kitEquipper != null) kitEquipper.OnEquippedChanged += HandleKitEquippedChanged;
         }
@@ -159,7 +167,6 @@ namespace ProjectM.UI
                 playerWeapon.OnReloadEnd -= RefreshReload;
             }
             if (session != null) session.OnWaveStarted -= HandleWaveStarted;
-            if (wallet != null) wallet.OnChanged -= HandleCurrencyChanged;
             if (kitInventory != null) kitInventory.OnCountChanged -= HandleKitChanged;
             if (kitEquipper != null) kitEquipper.OnEquippedChanged -= HandleKitEquippedChanged;
         }
@@ -167,7 +174,6 @@ namespace ProjectM.UI
         // ── 핸들러 ────────────────────────────────────────────────
         private void HandleHpChanged(float cur, float max) => RefreshHp();
         private void HandleWaveStarted(int wave) => RefreshWave();
-        private void HandleCurrencyChanged(int balance) => RefreshCurrency();
         private void HandleKitChanged(KitType type, int count) => RefreshKit();
         private void HandleKitEquippedChanged(KitType type) => RefreshKit();
 
@@ -180,6 +186,8 @@ namespace ProjectM.UI
             }
             if (session != null && session.State.CurrentPhase == GamePhase.Preparation)
                 RefreshWave();
+
+            RefreshEnemyCount(); // 적 수는 실시간으로 변하므로 매 프레임 갱신
         }
 
         private void RefreshAll()
@@ -187,9 +195,23 @@ namespace ProjectM.UI
             RefreshHp();
             RefreshAmmo();
             RefreshWave();
-            RefreshCurrency();
             RefreshReload();
             RefreshKit();
+            RefreshEnemyCount();
+        }
+
+        private void RefreshEnemyCount()
+        {
+            if (enemyCountText == null || waveManager == null) return;
+
+            int total = waveManager.TotalToSpawn;          // 이번 웨이브 총 적 수
+            int spawned = waveManager.SpawnedCount;         // 지금까지 스폰된 수
+            int alive = enemySpawner != null ? enemySpawner.AliveCount : 0;
+
+            // 남은 적 = 아직 안 나온 적 + 살아있는 적
+            int remaining = Mathf.Max(0, (total - spawned) + alive);
+
+            enemyCountText.text = $"{remaining} / {total}";
         }
 
         private void RefreshHp()
@@ -208,16 +230,7 @@ namespace ProjectM.UI
         private void RefreshWave()
         {
             if (session == null || waveText == null) return;
-            string phaseLabel = session.State.CurrentPhase.ToString();
-            if (bootstrap != null && session.State.CurrentPhase == GamePhase.Preparation && bootstrap.PreparationRemaining > 0f)
-                phaseLabel = $"Preparation  {bootstrap.PreparationRemaining:F0}s";
-            waveText.text = $"Wave {session.State.CurrentWave} / {session.State.MaxWave}\n[{phaseLabel}]";
-        }
-
-        private void RefreshCurrency()
-        {
-            if (wallet == null || currencyText == null) return;
-            currencyText.text = $"₩ {wallet.Balance}";
+            waveText.text = $"Wave {session.State.CurrentWave}";
         }
 
         private void RefreshReload()

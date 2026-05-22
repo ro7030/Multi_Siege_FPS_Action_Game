@@ -20,6 +20,8 @@ namespace ProjectM.Economy
         [SerializeField] private HealthSystem playerHealth;
         [SerializeField] private WeaponController playerWeapon;
         [SerializeField] private KitInventory playerKitInventory;
+        [SerializeField] private ThrowableInventory playerThrowableInventory;
+        [SerializeField] private PlayerArsenal playerArsenal;
 
         public ItemCatalog Catalog => catalog;
         public int CurrentWave => session != null ? session.State.CurrentWave : 1;
@@ -34,6 +36,32 @@ namespace ProjectM.Economy
             if (playerHealth == null) playerHealth = FindAnyObjectByType<HealthSystem>();
             if (playerWeapon == null) playerWeapon = FindAnyObjectByType<WeaponController>();
             if (playerKitInventory == null) playerKitInventory = FindAnyObjectByType<KitInventory>();
+            if (playerThrowableInventory == null) playerThrowableInventory = FindAnyObjectByType<ThrowableInventory>();
+            if (playerArsenal == null) playerArsenal = FindAnyObjectByType<PlayerArsenal>();
+        }
+
+        // ── 무기 업그레이드 ────────────────────────────────────────
+        public bool CanUpgradeWeapon(WeaponSlot slot) => playerArsenal != null && playerArsenal.CanUpgrade(slot);
+
+        public int WeaponUpgradePrice(WeaponSlot slot) => playerArsenal != null ? playerArsenal.NextUpgradePrice(slot) : 0;
+
+        public string WeaponUpgradeName(WeaponSlot slot)
+        {
+            var d = playerArsenal != null ? playerArsenal.NextTier(slot) : null;
+            return d != null ? d.displayName : "MAX";
+        }
+
+        public bool TryUpgradeWeapon(WeaponSlot slot)
+        {
+            if (playerArsenal == null || !playerArsenal.CanUpgrade(slot)) { Fail(null, "업그레이드 불가"); return false; }
+            int price = playerArsenal.NextUpgradePrice(slot);
+            if (wallet == null) { Fail(null, "지갑 없음"); return false; }
+            if (!wallet.TrySpend(price)) { Fail(null, "잔액 부족"); return false; }
+
+            playerArsenal.TryUpgrade(slot);
+            OnPurchased?.Invoke(null); // UI 갱신 (item null 허용)
+            Debug.Log($"[Shop] {slot} 무기 업그레이드 (-{price}, 잔액 {wallet.Balance})");
+            return true;
         }
 
         public IEnumerable<ItemData> GetUnlockedItems()
@@ -102,7 +130,30 @@ namespace ProjectM.Economy
                 case ItemType.FarmKit:
                     AddKit(KitType.FarmKit, item);
                     break;
+
+                // 투척무기: ThrowableInventory 에 추가
+                case ItemType.Grenade:
+                    AddThrowable(ThrowableType.Grenade, item);
+                    break;
+                case ItemType.Molotov:
+                    AddThrowable(ThrowableType.Molotov, item);
+                    break;
+                case ItemType.Flash:
+                    AddThrowable(ThrowableType.Flash, item);
+                    break;
             }
+        }
+
+        private void AddThrowable(ThrowableType type, ItemData item)
+        {
+            if (playerThrowableInventory == null)
+            {
+                Debug.LogWarning($"[Shop] {type} 구매했지만 ThrowableInventory 가 없음 — 효과 미적용");
+                return;
+            }
+            int count = Mathf.Max(1, Mathf.RoundToInt(item.value));
+            playerThrowableInventory.Add(type, count);
+            Debug.Log($"[Shop] {type} +{count} (총 {playerThrowableInventory.GetCount(type)})");
         }
 
         private void AddKit(KitType type, ItemData item)

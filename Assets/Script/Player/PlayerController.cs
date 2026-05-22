@@ -29,6 +29,7 @@ namespace ProjectM.Player
         private CharacterController cc;
         private HealthSystem health;
         private KitEquipper kitEquipper;
+        private ThrowableEquipper throwableEquipper;
         private Vector3 velocity;
         private float pitch;
         private bool canControl = true;
@@ -41,6 +42,7 @@ namespace ProjectM.Player
             cc = GetComponent<CharacterController>();
             health = GetComponent<HealthSystem>();
             kitEquipper = GetComponent<KitEquipper>();
+            throwableEquipper = GetComponent<ThrowableEquipper>();
             if (cameraPivot == null)
             {
                 var cam = GetComponentInChildren<Camera>();
@@ -84,8 +86,9 @@ namespace ProjectM.Player
 
             // 커서가 잠겨 있을 때만 시점 회전
             if (Cursor.lockState != CursorLockMode.Locked) return;
-            // 키트 휠이 열려있으면 마우스는 휠 선택용 — 시점 회전 억제
+            // 키트/투척 휠이 열려있으면 마우스는 휠 선택용 — 시점 회전 억제
             if (kitEquipper != null && kitEquipper.IsSelecting) return;
+            if (throwableEquipper != null && throwableEquipper.IsSelecting) return;
 
             Vector2 delta = mouse.delta.ReadValue() * lookSensitivity;
             transform.Rotate(0f, delta.x, 0f, Space.Self);

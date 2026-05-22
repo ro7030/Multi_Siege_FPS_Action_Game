@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using TMPro;
 
 namespace ProjectM.UI
 {
@@ -56,17 +57,32 @@ namespace ProjectM.UI
             return go;
         }
 
-        public static Text CreateText(string name, RectTransform parent, int fontSize = 24, TextAnchor anchor = TextAnchor.MiddleCenter)
+        public static TMP_Text CreateText(string name, RectTransform parent, int fontSize = 24, TextAnchor anchor = TextAnchor.MiddleCenter)
         {
             var go = CreateChild(name, parent);
-            var txt = go.AddComponent<Text>();
-            txt.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            var txt = go.AddComponent<TextMeshProUGUI>();
+            // 폰트는 TMP_Settings.defaultFontAsset 사용 (Project Settings > TextMeshPro). 따로 지정 안 함.
             txt.fontSize = fontSize;
-            txt.alignment = anchor;
+            txt.alignment = ToTMPAlign(anchor);
             txt.color = Color.white;
             txt.raycastTarget = false;
             return txt;
         }
+
+        /// <summary>레거시 TextAnchor → TMP TextAlignmentOptions 변환.</summary>
+        public static TextAlignmentOptions ToTMPAlign(TextAnchor anchor) => anchor switch
+        {
+            TextAnchor.UpperLeft    => TextAlignmentOptions.TopLeft,
+            TextAnchor.UpperCenter  => TextAlignmentOptions.Top,
+            TextAnchor.UpperRight   => TextAlignmentOptions.TopRight,
+            TextAnchor.MiddleLeft   => TextAlignmentOptions.Left,
+            TextAnchor.MiddleCenter => TextAlignmentOptions.Center,
+            TextAnchor.MiddleRight  => TextAlignmentOptions.Right,
+            TextAnchor.LowerLeft    => TextAlignmentOptions.BottomLeft,
+            TextAnchor.LowerCenter  => TextAlignmentOptions.Bottom,
+            TextAnchor.LowerRight   => TextAlignmentOptions.BottomRight,
+            _                       => TextAlignmentOptions.Center
+        };
 
         public static Image CreatePanel(string name, RectTransform parent, Color color)
         {

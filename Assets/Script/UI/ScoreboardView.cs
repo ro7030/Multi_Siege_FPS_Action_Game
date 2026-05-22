@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using TMPro;
 using ProjectM.Core;
 using ProjectM.Network;
 
@@ -18,7 +19,7 @@ namespace ProjectM.UI
         [SerializeField] private Key holdKey = Key.Tab;
 
         private GameObject panelGo;
-        private Text bodyText;
+        private TMP_Text bodyText;
 
         private void Awake()
         {
@@ -54,7 +55,7 @@ namespace ProjectM.UI
             rt.sizeDelta = new Vector2(720, 480);
 
             var header = UIRoot.CreateText("Header", rt, 32, TextAnchor.UpperCenter);
-            header.fontStyle = FontStyle.Bold;
+            header.fontStyle = FontStyles.Bold;
             header.color = new Color(1, 0.9f, 0.4f);
             header.text = "SCOREBOARD";
             var hrt = header.rectTransform;

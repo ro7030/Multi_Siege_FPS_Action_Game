@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4e12b691e024ad49b50b0181442f71e, type: 3}
+  m_Name: WeaponProgression
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.WeaponProgression
+  primaryTiers:
+  - {fileID: 11400000, guid: f1e72af6e60b9f046a40c35f92cab530, type: 2}
+  - {fileID: 11400000, guid: e03fa1635ba2c49478f8692fdef3eb3b, type: 2}
+  - {fileID: 11400000, guid: 8ed337d72d335524db3c58a2eae4a05a, type: 2}
+  - {fileID: 11400000, guid: c42c13163220cfe46bc05b319d3e11e0, type: 2}
+  secondaryTiers:
+  - {fileID: 11400000, guid: c9604347b9b9b194b95c278ed6356dd9, type: 2}
+  - {fileID: 11400000, guid: 3ca80cdf88f654b46a2aa62b2530ad36, type: 2}
+  - {fileID: 11400000, guid: 279310d27be8ced44a0bb2fc1a514588, type: 2}
+  - {fileID: 11400000, guid: 80562197473347747807970b88ee3dc5, type: 2}
