@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78a5b43fb42e5124e921c4214cc27d3a, type: 3}
   m_Name: Primary_PumpStriker
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.WeaponDefinition
-  displayName: PumpStriker
+  displayName: "\uD38C\uD504 \uC2A4\uD2B8\uB77C\uC774\uCEE4"
   slot: 0
   kind: 0
   price: 180
   damage: 27
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: b8fd452795523d64d97e82559b83cd31, type: 3}
   fireRate: 6
   magazineSize: 36
   reloadDuration: 2.6

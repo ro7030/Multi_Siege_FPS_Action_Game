@@ -13,13 +13,6 @@ MonoBehaviour:
   m_Name: ItemCatalog_Default
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Economy.ItemCatalog
   items:
-  - id: Healt_kit
-    displayName: "\uD68C\uBCF5\uD0B7"
-    type: 1
-    price: 50
-    unlockWave: 0
-    value: 1
-    description: 
   - id: Grenade
     displayName: "\uC218\uB958\uD0C4"
     type: 8
@@ -27,6 +20,8 @@ MonoBehaviour:
     unlockWave: 0
     value: 1
     description: 
+    shopTop: 0
+    shopSub: 2
   - id: Molotov
     displayName: "\uD654\uC5FC\uBCD1"
     type: 9
@@ -34,6 +29,8 @@ MonoBehaviour:
     unlockWave: 0
     value: 1
     description: 
+    shopTop: 0
+    shopSub: 2
   - id: Flash
     displayName: "\uC12C\uAD11\uD0C4"
     type: 10
@@ -41,6 +38,53 @@ MonoBehaviour:
     unlockWave: 0
     value: 1
     description: 
+    shopTop: 0
+    shopSub: 2
+  - id: Ammo_Refill
+    displayName: "\uD55C \uD0C4\uCC3D"
+    type: 2
+    price: 15
+    unlockWave: 0
+    value: 30
+    description: 
+    shopTop: 0
+    shopSub: 3
+  - id: Ammo_Full
+    displayName: "\uAC00\uB4DD \uCC44\uC6B0\uAE30"
+    type: 2
+    price: 40
+    unlockWave: 0
+    value: 90
+    description: 
+    shopTop: 0
+    shopSub: 3
+  - id: HealKit_50
+    displayName: "50 \uD68C\uBCF5 \uD0A4\uD2B8"
+    type: 5
+    price: 50
+    unlockWave: 0
+    value: 1
+    description: 
+    shopTop: 1
+    shopSub: 10
+  - id: HealKit_100
+    displayName: "100 \uD68C\uBCF5 \uD0A4\uD2B8"
+    type: 5
+    price: 90
+    unlockWave: 0
+    value: 1
+    description: 
+    shopTop: 1
+    shopSub: 10
+  - id: Gate_Kit
+    displayName: "\uAC8C\uC774\uD2B8 \uC124\uCE58 \uD0A4\uD2B8"
+    type: 6
+    price: 180
+    unlockWave: 0
+    value: 1
+    description: 
+    shopTop: 2
+    shopSub: 20
   - id: Farm_Kit
     displayName: "\uBC2D \uC124\uCE58 \uD0A4\uD2B8"
     type: 7
@@ -48,24 +92,5 @@ MonoBehaviour:
     unlockWave: 0
     value: 1
     description: 
-  - id: Repair_Kit
-    displayName: "\uBB38 \uC124\uCE58 \uD0A4\uD2B8"
-    type: 6
-    price: 180
-    unlockWave: 0
-    value: 1
-    description: 
-  - id: Ammo_Refill
-    displayName: "\uD0C4\uCC3D1\uAC1C"
-    type: 2
-    price: 15
-    unlockWave: 0
-    value: 30
-    description: 
-  - id: 3Ammo_Refill
-    displayName: "\uD0C4\uCC3D 3\uBB36\uC74C"
-    type: 2
-    price: 40
-    unlockWave: 0
-    value: 90
-    description: 
+    shopTop: 2
+    shopSub: 21

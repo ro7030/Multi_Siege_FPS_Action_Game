@@ -29,6 +29,9 @@ namespace ProjectM.Player
         /// <summary>대상이 바뀔 때 발생 (UI 가 구독).</summary>
         public event Action<IInteractable> OnTargetChanged;
 
+        [Header("디버그")]
+        [SerializeField] private bool debugLog = false;
+
         private readonly Collider[] buffer = new Collider[16];
 
         private void Awake()
@@ -47,6 +50,12 @@ namespace ProjectM.Player
                 Current?.InteractHoldCancel();
                 Current = best;
                 OnTargetChanged?.Invoke(Current);
+
+                if (debugLog)
+                {
+                    string name = (best as MonoBehaviour) != null ? ((MonoBehaviour)best).name : "null";
+                    Debug.Log($"[Interactor] 대상 변경: {name}");
+                }
             }
 
             HandleInput();
@@ -72,6 +81,8 @@ namespace ProjectM.Player
             }
         }
 
+        private float nextDebugTime;
+
         private IInteractable FindBest()
         {
             int count = Physics.OverlapSphereNonAlloc(transform.position, interactRange, buffer, interactMask, QueryTriggerInteraction.Collide);
@@ -81,6 +92,9 @@ namespace ProjectM.Player
             Vector3 fwd = viewCamera != null ? viewCamera.transform.forward : transform.forward;
             fwd.y = 0; fwd.Normalize();
 
+            int interactableFound = 0;
+            int canInteractFound = 0;
+
             for (int i = 0; i < count; i++)
             {
                 var col = buffer[i];
@@ -89,7 +103,9 @@ namespace ProjectM.Player
 
                 var inter = col.GetComponentInParent<IInteractable>();
                 if (inter == null) continue;
+                interactableFound++;
                 if (!inter.CanInteract(gameObject)) continue;
+                canInteractFound++;
 
                 Vector3 to = col.bounds.center - transform.position;
                 float dist = to.magnitude;
@@ -100,6 +116,12 @@ namespace ProjectM.Player
                 float score = dist + angle * 0.01f * facingWeight;
 
                 if (score < bestScore) { bestScore = score; best = inter; }
+            }
+
+            if (debugLog && Time.time >= nextDebugTime)
+            {
+                nextDebugTime = Time.time + 1f;
+                Debug.Log($"[Interactor] 범위내 콜라이더 {count}개 / IInteractable {interactableFound}개 / 상호작용가능 {canInteractFound}개 (range={interactRange})");
             }
 
             return best;

@@ -31,10 +31,10 @@ namespace ProjectM.Economy
 
         private void Awake()
         {
-            if (wallet == null) wallet = FindAnyObjectByType<CurrencyWallet>();
+            if (wallet == null) wallet = LocalPlayerUtility.FindLocalCurrencyWallet();
             if (session == null) session = FindAnyObjectByType<GameSessionManager>();
-            if (playerHealth == null) playerHealth = FindAnyObjectByType<HealthSystem>();
-            if (playerWeapon == null) playerWeapon = FindAnyObjectByType<WeaponController>();
+            if (playerHealth == null) playerHealth = LocalPlayerUtility.FindLocalHealthSystem();
+            if (playerWeapon == null) playerWeapon = LocalPlayerUtility.FindLocalWeaponController();
             if (playerKitInventory == null) playerKitInventory = FindAnyObjectByType<KitInventory>();
             if (playerThrowableInventory == null) playerThrowableInventory = FindAnyObjectByType<ThrowableInventory>();
             if (playerArsenal == null) playerArsenal = FindAnyObjectByType<PlayerArsenal>();
@@ -53,14 +53,30 @@ namespace ProjectM.Economy
 
         public bool TryUpgradeWeapon(WeaponSlot slot)
         {
-            if (playerArsenal == null || !playerArsenal.CanUpgrade(slot)) { Fail(null, "업그레이드 불가"); return false; }
-            int price = playerArsenal.NextUpgradePrice(slot);
-            if (wallet == null) { Fail(null, "지갑 없음"); return false; }
-            if (!wallet.TrySpend(price)) { Fail(null, "잔액 부족"); return false; }
+            if (playerArsenal == null) { Fail(null, "무기고 없음"); return false; }
+            int next = playerArsenal.CurrentTierIndex(slot) + 1;
+            return TryPurchaseWeaponTier(slot, next);
+        }
 
-            playerArsenal.TryUpgrade(slot);
-            OnPurchased?.Invoke(null); // UI 갱신 (item null 허용)
-            Debug.Log($"[Shop] {slot} 무기 업그레이드 (-{price}, 잔액 {wallet.Balance})");
+        /// <summary>원하는 무기 티어를 바로 구매(순서 무관, 미보유 티어만).</summary>
+        public bool TryPurchaseWeaponTier(WeaponSlot slot, int tierIndex)
+        {
+            if (playerArsenal == null) { Fail(null, "무기고 없음"); return false; }
+            if (!playerArsenal.CanPurchaseTier(slot, tierIndex)) { Fail(null, "구매 불가"); return false; }
+
+            int price = playerArsenal.GetTierPrice(slot, tierIndex);
+            if (wallet == null) { Fail(null, "지갑 없음"); return false; }
+            if (price > 0 && !wallet.TrySpend(price)) { Fail(null, "잔액 부족"); return false; }
+
+            if (!playerArsenal.TrySetTier(slot, tierIndex))
+            {
+                if (price > 0) wallet.Add(price);
+                Fail(null, "적용 실패");
+                return false;
+            }
+
+            OnPurchased?.Invoke(null);
+            Debug.Log($"[Shop] {slot} 티어 {tierIndex} 구매 (-{price}, 잔액 {wallet.Balance})");
             return true;
         }
 

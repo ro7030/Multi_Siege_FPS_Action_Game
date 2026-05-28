@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78a5b43fb42e5124e921c4214cc27d3a, type: 3}
   m_Name: Primary_CoreYellow
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.WeaponDefinition
-  displayName: CoreYellow
+  displayName: "\uCF54\uC5B4 \uC610\uB85C\uC6B0"
   slot: 0
   kind: 0
   price: 320
   damage: 35
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: dfdbb1cb53e567b4190a426a051e682e, type: 3}
   fireRate: 7
   magazineSize: 40
   reloadDuration: 2.8

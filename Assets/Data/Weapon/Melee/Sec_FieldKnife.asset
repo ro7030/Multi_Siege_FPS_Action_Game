@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78a5b43fb42e5124e921c4214cc27d3a, type: 3}
   m_Name: Sec_FieldKnife
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.WeaponDefinition
-  displayName: FieldKnife
+  displayName: "\uD544\uB4DC \uB098\uC774\uD504"
   slot: 1
   kind: 1
   price: 0
   damage: 100
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 40802069c708c9a43a5b6105dd831776, type: 3}
   fireRate: 5
   magazineSize: 30
   reloadDuration: 2.5

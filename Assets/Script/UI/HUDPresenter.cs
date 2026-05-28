@@ -10,17 +10,11 @@ using ProjectM.Enemy;
 namespace ProjectM.UI
 {
     /// <summary>
-    /// 화면에 항상 표시되는 HUD. HP/탄약/웨이브/잔액을 게임 상태에 구독하여 표시한다.
-    ///
-    /// 두 가지 사용법:
-    ///   1) Inspector 필드를 모두 비워두면 코드로 자동 UI 생성 (MVP 기본값)
-    ///   2) 직접 Canvas 안에 UI 요소를 만들고 Inspector에 드래그하면 그것을 사용
-    ///   3) 일부만 연결해도 됨 — null인 요소만 자동 생성됨
+    /// 인게임 HUD. 로컬 플레이어 체력 1칸 + 팀원/더미 등 추가 체력 슬롯을 인스펙터에서 연결한다.
     /// </summary>
     public class HUDPresenter : MonoBehaviour
     {
         [Header("게임 상태 참조 (자동 탐색)")]
-        [SerializeField] private HealthSystem playerHealth;
         [SerializeField] private WeaponController playerWeapon;
         [SerializeField] private GameSessionManager session;
         [SerializeField] private KitInventory kitInventory;
@@ -28,11 +22,15 @@ namespace ProjectM.UI
         [SerializeField] private WaveManager waveManager;
         [SerializeField] private EnemySpawner enemySpawner;
 
+        [Header("로컬 플레이어 체력 (화면 UI 1칸)")]
+        [SerializeField] private HealthBarSlot playerHealthBar = new();
+
+        [Header("팀원·더미 등 추가 체력 슬롯 (칸마다 Health + Fill 연결)")]
+        [SerializeField] private HealthBarSlot[] teamHealthBars;
+
         [Header("UI 요소 — 비워두면 자동 생성")]
         [SerializeField] private TMP_Text waveText;
-        [SerializeField] private TMP_Text enemyCountText;   // 좌상단 적 수 (현재/최대)
-        [SerializeField] private Image hpFill;
-        [SerializeField] private TMP_Text hpText;
+        [SerializeField] private TMP_Text enemyCountText;
         [SerializeField] private TMP_Text ammoText;
         [SerializeField] private TMP_Text reloadText;
         [SerializeField] private TMP_Text kitText;
@@ -40,18 +38,19 @@ namespace ProjectM.UI
         [Header("자동 생성 옵션")]
         [SerializeField] private bool autoBuildMissing = true;
 
-        private MatchBootstrapper bootstrap;
-
         private void Awake()
         {
-            if (playerHealth == null) playerHealth = FindAnyObjectByType<HealthSystem>();
-            if (playerWeapon == null) playerWeapon = FindAnyObjectByType<WeaponController>();
+            if (playerHealthBar.health == null)
+                playerHealthBar.health = LocalPlayerUtility.FindLocalHealthSystem();
+
+            if (playerWeapon == null) playerWeapon = LocalPlayerUtility.FindLocalWeaponController();
             if (session == null) session = FindAnyObjectByType<GameSessionManager>();
             if (kitInventory == null) kitInventory = FindAnyObjectByType<KitInventory>();
             if (kitEquipper == null) kitEquipper = FindAnyObjectByType<KitEquipper>();
             if (waveManager == null) waveManager = FindAnyObjectByType<WaveManager>();
             if (enemySpawner == null) enemySpawner = FindAnyObjectByType<EnemySpawner>();
-            bootstrap = FindAnyObjectByType<MatchBootstrapper>();
+
+            ResolveTeamBarUiFromChildren();
         }
 
         private void Start()
@@ -61,7 +60,26 @@ namespace ProjectM.UI
             RefreshAll();
         }
 
-        // ── 누락된 UI 요소만 자동 생성 ──────────────────────────────
+        /// <summary>팀 슬롯에 UI만 비어 있으면 HUD 자식 DummyHpBg 등을 0번 슬롯에 연결.</summary>
+        private void ResolveTeamBarUiFromChildren()
+        {
+            if (teamHealthBars == null || teamHealthBars.Length == 0) return;
+
+            var slot = teamHealthBars[0];
+            if (slot == null || slot.fillImage != null) return;
+
+            var barRoot = transform.Find("DummyHpBg") ?? transform.Find("HpBg");
+            if (barRoot == null) return;
+
+            var fillT = barRoot.Find("HpFill");
+            if (fillT == null) return;
+
+            slot.root = barRoot.gameObject;
+            slot.fillImage = fillT.GetComponent<Image>();
+            if (slot.labelText == null)
+                slot.labelText = barRoot.GetComponentInChildren<TMP_Text>(true);
+        }
+
         private void BuildMissingElements()
         {
             if (UIRoot.Instance == null)
@@ -70,6 +88,7 @@ namespace ProjectM.UI
                 return;
             }
             var root = UIRoot.Instance.RootTransform;
+            if (root == null) return;
 
             if (waveText == null)
             {
@@ -80,34 +99,14 @@ namespace ProjectM.UI
 
             if (enemyCountText == null)
             {
-                // 좌상단, 웨이브 텍스트 아래 — 적 수 (현재/최대)
                 enemyCountText = UIRoot.CreateText("EnemyCountText", root, 32, TextAnchor.UpperLeft);
                 Anchor(enemyCountText.rectTransform, new Vector2(0, 1), new Vector2(0, 1), new Vector2(20, -64), new Vector2(360, -110));
                 enemyCountText.color = new Color(1f, 0.5f, 0.5f);
                 enemyCountText.fontStyle = FontStyles.Bold;
             }
 
-            // 재화는 인게임 HUD 에 표시하지 않음 (상점 팝업에서만 표시)
-
-            if (hpFill == null || hpText == null)
-            {
-                var hpBg = UIRoot.CreatePanel("HpBg", root, new Color(0, 0, 0, 0.55f));
-                Anchor(hpBg.rectTransform, new Vector2(0, 0), new Vector2(0, 0), new Vector2(20, 20), new Vector2(420, 60));
-
-                if (hpFill == null)
-                {
-                    hpFill = UIRoot.CreatePanel("HpFill", hpBg.rectTransform, new Color(0.85f, 0.25f, 0.25f, 0.95f));
-                    hpFill.type = Image.Type.Filled;
-                    hpFill.fillMethod = Image.FillMethod.Horizontal;
-                    hpFill.fillOrigin = (int)Image.OriginHorizontal.Left;
-                    Anchor(hpFill.rectTransform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
-                }
-                if (hpText == null)
-                {
-                    hpText = UIRoot.CreateText("HpText", hpBg.rectTransform, 22);
-                    Anchor(hpText.rectTransform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
-                }
-            }
+            if (!playerHealthBar.HasFill || playerHealthBar.labelText == null)
+                BuildPlayerHealthBarUi(root);
 
             if (ammoText == null)
             {
@@ -127,7 +126,6 @@ namespace ProjectM.UI
 
             if (kitText == null)
             {
-                // 하단 중앙: 키트 보유량 표시
                 var kitBg = UIRoot.CreatePanel("KitBg", root, new Color(0, 0, 0, 0.55f));
                 Anchor(kitBg.rectTransform, new Vector2(0.5f, 0), new Vector2(0.5f, 0), new Vector2(-260, 20), new Vector2(260, 56));
                 kitText = UIRoot.CreateText("KitText", kitBg.rectTransform, 20, TextAnchor.MiddleCenter);
@@ -136,16 +134,44 @@ namespace ProjectM.UI
             }
         }
 
-        private static void Anchor(RectTransform rt, Vector2 aMin, Vector2 aMax, Vector2 offMin, Vector2 offMax)
+        private void BuildPlayerHealthBarUi(RectTransform root)
         {
-            rt.anchorMin = aMin; rt.anchorMax = aMax;
-            rt.offsetMin = offMin; rt.offsetMax = offMax;
+            var hpBg = UIRoot.CreatePanel("PlayerHpBg", root, new Color(0, 0, 0, 0.55f));
+            Anchor(hpBg.rectTransform, new Vector2(0, 0), new Vector2(0, 0), new Vector2(20, 20), new Vector2(420, 60));
+            playerHealthBar.root = hpBg.gameObject;
+
+            if (!playerHealthBar.HasFill)
+            {
+                playerHealthBar.fillImage = UIRoot.CreatePanel("HpFill", hpBg.rectTransform, new Color(0.85f, 0.25f, 0.25f, 0.95f));
+                playerHealthBar.fillImage.type = Image.Type.Filled;
+                playerHealthBar.fillImage.fillMethod = Image.FillMethod.Horizontal;
+                playerHealthBar.fillImage.fillOrigin = (int)Image.OriginHorizontal.Left;
+                Anchor(playerHealthBar.fillImage.rectTransform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            }
+
+            if (playerHealthBar.labelText == null)
+            {
+                playerHealthBar.labelText = UIRoot.CreateText("HpText", hpBg.rectTransform, 22);
+                Anchor(playerHealthBar.labelText.rectTransform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            }
+
+            if (string.IsNullOrWhiteSpace(playerHealthBar.displayName))
+                playerHealthBar.displayName = "HP";
         }
 
-        // ── 이벤트 바인딩 ─────────────────────────────────────────
+        private static void Anchor(RectTransform rt, Vector2 aMin, Vector2 aMax, Vector2 offMin, Vector2 offMax)
+        {
+            rt.anchorMin = aMin;
+            rt.anchorMax = aMax;
+            rt.offsetMin = offMin;
+            rt.offsetMax = offMax;
+        }
+
         private void BindEvents()
         {
-            if (playerHealth != null) playerHealth.OnHpChanged += HandleHpChanged;
+            playerHealthBar.Bind(RefreshPlayerHp);
+            BindTeamBars();
+
             if (playerWeapon != null)
             {
                 playerWeapon.OnFired += RefreshAmmo;
@@ -159,7 +185,9 @@ namespace ProjectM.UI
 
         private void OnDisable()
         {
-            if (playerHealth != null) playerHealth.OnHpChanged -= HandleHpChanged;
+            playerHealthBar.Unbind();
+            UnbindTeamBars();
+
             if (playerWeapon != null)
             {
                 playerWeapon.OnFired -= RefreshAmmo;
@@ -171,8 +199,23 @@ namespace ProjectM.UI
             if (kitEquipper != null) kitEquipper.OnEquippedChanged -= HandleKitEquippedChanged;
         }
 
-        // ── 핸들러 ────────────────────────────────────────────────
-        private void HandleHpChanged(float cur, float max) => RefreshHp();
+        private void BindTeamBars()
+        {
+            if (teamHealthBars == null) return;
+            foreach (var slot in teamHealthBars)
+            {
+                if (slot == null) continue;
+                slot.Bind(RefreshTeamBars);
+            }
+        }
+
+        private void UnbindTeamBars()
+        {
+            if (teamHealthBars == null) return;
+            foreach (var slot in teamHealthBars)
+                slot?.Unbind();
+        }
+
         private void HandleWaveStarted(int wave) => RefreshWave();
         private void HandleKitChanged(KitType type, int count) => RefreshKit();
         private void HandleKitEquippedChanged(KitType type) => RefreshKit();
@@ -187,12 +230,13 @@ namespace ProjectM.UI
             if (session != null && session.State.CurrentPhase == GamePhase.Preparation)
                 RefreshWave();
 
-            RefreshEnemyCount(); // 적 수는 실시간으로 변하므로 매 프레임 갱신
+            RefreshEnemyCount();
         }
 
         private void RefreshAll()
         {
-            RefreshHp();
+            RefreshPlayerHp();
+            RefreshTeamBars();
             RefreshAmmo();
             RefreshWave();
             RefreshReload();
@@ -200,25 +244,25 @@ namespace ProjectM.UI
             RefreshEnemyCount();
         }
 
+        private void RefreshPlayerHp() => playerHealthBar.Refresh();
+
+        private void RefreshTeamBars()
+        {
+            if (teamHealthBars == null) return;
+            foreach (var slot in teamHealthBars)
+                slot?.Refresh();
+        }
+
         private void RefreshEnemyCount()
         {
             if (enemyCountText == null || waveManager == null) return;
 
-            int total = waveManager.TotalToSpawn;          // 이번 웨이브 총 적 수
-            int spawned = waveManager.SpawnedCount;         // 지금까지 스폰된 수
+            int total = waveManager.TotalToSpawn;
+            int spawned = waveManager.SpawnedCount;
             int alive = enemySpawner != null ? enemySpawner.AliveCount : 0;
-
-            // 남은 적 = 아직 안 나온 적 + 살아있는 적
             int remaining = Mathf.Max(0, (total - spawned) + alive);
 
             enemyCountText.text = $"{remaining} / {total}";
-        }
-
-        private void RefreshHp()
-        {
-            if (playerHealth == null) return;
-            if (hpText != null) hpText.text = $"HP  {playerHealth.CurrentHp:F0} / {playerHealth.MaxHp:F0}";
-            if (hpFill != null) hpFill.fillAmount = playerHealth.HpRatio;
         }
 
         private void RefreshAmmo()
@@ -245,10 +289,9 @@ namespace ProjectM.UI
 
             KitType equipped = kitEquipper != null ? kitEquipper.EquippedKit : KitType.None;
 
-            // 장착 중인 키트는 [대괄호]로 강조
-            string heal   = Format("회복", kitInventory.HealKitCount,   equipped == KitType.HealKit);
+            string heal = Format("회복", kitInventory.HealKitCount, equipped == KitType.HealKit);
             string repair = Format("수리", kitInventory.RepairKitCount, equipped == KitType.RepairKit);
-            string farm   = Format("밭",   kitInventory.FarmKitCount,   equipped == KitType.FarmKit);
+            string farm = Format("밭", kitInventory.FarmKitCount, equipped == KitType.FarmKit);
 
             string hint = equipped == KitType.None ? "  (3번키로 키트 장착)" : "  (좌클릭 사용)";
             kitText.text = $"{heal}   {repair}   {farm}{hint}";

@@ -6,6 +6,7 @@ using UnityEngine;
 using ProjectM.Core;
 using ProjectM.Economy;
 using ProjectM.Network;
+using ProjectM.Player;
 
 namespace ProjectM.Data
 {
@@ -33,7 +34,7 @@ namespace ProjectM.Data
         private void Awake()
         {
             if (session == null) session = FindAnyObjectByType<GameSessionManager>();
-            if (wallet == null) wallet = FindAnyObjectByType<CurrencyWallet>();
+            if (wallet == null) wallet = LocalPlayerUtility.FindLocalCurrencyWallet();
             if (room == null) room = FindAnyObjectByType<RoomManager>();
             if (stats == null) stats = FindAnyObjectByType<PlayerStatsTracker>();
             if (apiClient == null) apiClient = FindAnyObjectByType<DbApiClient>();

@@ -1,5 +1,6 @@
 using UnityEngine;
 using ProjectM.Core;
+using ProjectM.Player;
 
 namespace ProjectM.Economy
 {
@@ -23,7 +24,7 @@ namespace ProjectM.Economy
         private void Awake()
         {
             if (session == null) session = FindAnyObjectByType<GameSessionManager>();
-            if (wallet == null) wallet = FindAnyObjectByType<CurrencyWallet>();
+            if (wallet == null) wallet = LocalPlayerUtility.FindLocalCurrencyWallet();
         }
 
         private void OnEnable()

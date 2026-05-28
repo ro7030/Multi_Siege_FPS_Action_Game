@@ -19,6 +19,8 @@ namespace ProjectM.Player
         [Header("데이터")]
         [SerializeField] private WeaponProgression progression;
 
+        public WeaponProgression Progression => progression;
+
         [Header("무기 컴포넌트")]
         [SerializeField] private WeaponController rangedWeapon; // 주무기
         [SerializeField] private MeleeWeapon meleeWeapon;       // 보조무기
@@ -108,14 +110,36 @@ namespace ProjectM.Player
         public bool TryUpgrade(WeaponSlot slot)
         {
             if (!CanUpgrade(slot)) return false;
+            return TrySetTier(slot, CurrentTierIndex(slot) + 1);
+        }
 
-            if (slot == WeaponSlot.Primary) primaryTierIndex++;
-            else                            secondaryTierIndex++;
+        /// <summary>지정 단계로 바로 설정(상점에서 임의 티어 구매).</summary>
+        public bool TrySetTier(WeaponSlot slot, int tierIndex)
+        {
+            if (progression == null) return false;
+            if (progression.GetTier(slot, tierIndex) == null) return false;
+
+            if (slot == WeaponSlot.Primary) primaryTierIndex = tierIndex;
+            else                            secondaryTierIndex = tierIndex;
 
             ApplySlot(slot);
             OnTierChanged?.Invoke(slot, CurrentTierIndex(slot));
-            Debug.Log($"[Arsenal] {slot} 업그레이드 → {CurrentDefinition(slot)?.displayName}");
+            Debug.Log($"[Arsenal] {slot} → 티어 {tierIndex} ({CurrentDefinition(slot)?.displayName})");
             return true;
+        }
+
+        public int GetTierPrice(WeaponSlot slot, int tierIndex)
+        {
+            var def = progression != null ? progression.GetTier(slot, tierIndex) : null;
+            return def != null ? def.price : 0;
+        }
+
+        /// <summary>아직 보유하지 않은 티어만 구매 가능 (0티어는 기본 지급).</summary>
+        public bool CanPurchaseTier(WeaponSlot slot, int tierIndex)
+        {
+            if (progression == null || tierIndex <= 0) return false;
+            if (tierIndex <= CurrentTierIndex(slot)) return false;
+            return progression.GetTier(slot, tierIndex) != null;
         }
 
         // ── 적용 ──────────────────────────────────────────────────

@@ -24,8 +24,18 @@ namespace ProjectM.Core
 
         [Header("상태 (읽기 전용)")]
         [SerializeField] private float preparationRemaining;
+        [SerializeField] private float preparationTotal;
 
+        /// <summary>현재 준비 구간 남은 시간(초). UI 카운트다운용.</summary>
         public float PreparationRemaining => preparationRemaining;
+
+        /// <summary>현재 준비 구간 전체 시간(초). 시작 시점 기준.</summary>
+        public float PreparationTotal => preparationTotal;
+
+        public float PreparationDuration => preparationDuration;
+
+        /// <summary>준비 시간 카운트다운이 진행 중일 때 true.</summary>
+        public bool IsPreparationCounting => preparationRemaining > 0f;
 
         private void Awake()
         {
@@ -86,6 +96,7 @@ namespace ProjectM.Core
 
         private IEnumerator RunPreparation(float duration)
         {
+            preparationTotal = duration;
             preparationRemaining = duration;
             while (preparationRemaining > 0f)
             {
@@ -93,6 +104,7 @@ namespace ProjectM.Core
                 yield return null;
             }
             preparationRemaining = 0f;
+            preparationTotal = 0f;
         }
     }
 }

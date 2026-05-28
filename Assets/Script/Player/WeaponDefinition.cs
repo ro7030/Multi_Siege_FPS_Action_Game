@@ -21,7 +21,7 @@ namespace ProjectM.Player
         [Tooltip("상점 업그레이드 가격. 0이면 기본 지급(1단계).")]
         public int price = 0;
         public float damage = 14f;
-        public Sprite icon;   // UI 표시용 (선택)
+        public Sprite icon;   // UI 표시용 (상점 상세 등)
 
         [Header("원거리 (Ranged 전용)")]
         public float fireRate = 5f;       // 초당 발사

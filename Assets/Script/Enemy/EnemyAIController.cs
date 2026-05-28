@@ -138,6 +138,7 @@ namespace ProjectM.Enemy
 
         private void OnAttackTick()
         {
+            RefreshTargetIfNeeded();
             if (Target == null) { FSM.ChangeState(EnemyState.Idle); return; }
 
             // 타깃을 바라본다
@@ -176,6 +177,14 @@ namespace ProjectM.Enemy
         // ── 타깃 선정 ──────────────────────────────────────────────
         private void RefreshTargetIfNeeded()
         {
+            // 사망/다운 등으로 타깃이 더 이상 유효하지 않으면 즉시 해제 (다음 줄에서 바로 재탐색)
+            if (Target != null && !IsTargetDamageableAlive(Target))
+            {
+                Target = null;
+                targetCollider = null;
+                nextTargetSearchTime = 0f;
+            }
+
             if (Time.time < nextTargetSearchTime) return;
             nextTargetSearchTime = Time.time + targetRefreshInterval;
 
@@ -269,6 +278,13 @@ namespace ProjectM.Enemy
                 return true;
 
             return false;
+        }
+
+        private static bool IsTargetDamageableAlive(Transform t)
+        {
+            if (t == null) return false;
+            var dmg = t.GetComponent<IDamageable>() ?? t.GetComponentInParent<IDamageable>();
+            return dmg != null && dmg.IsAlive;
         }
 
         private Transform FindBestTarget()

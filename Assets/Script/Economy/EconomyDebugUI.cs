@@ -1,4 +1,5 @@
 using UnityEngine;
+using ProjectM.Player;
 
 namespace ProjectM.Economy
 {
@@ -14,7 +15,7 @@ namespace ProjectM.Economy
 
         private void Awake()
         {
-            if (wallet == null) wallet = FindAnyObjectByType<CurrencyWallet>();
+            if (wallet == null) wallet = LocalPlayerUtility.FindLocalCurrencyWallet();
             if (shop == null) shop = FindAnyObjectByType<ShopController>();
         }
 

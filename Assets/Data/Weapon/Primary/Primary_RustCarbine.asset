@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78a5b43fb42e5124e921c4214cc27d3a, type: 3}
   m_Name: Primary_RustCarbine
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.WeaponDefinition
-  displayName: RustCarbine
+  displayName: "\uB7EC\uC2A4\uD2B8 \uCE74\uBE48"
   slot: 0
   kind: 0
   price: 0
   damage: 14
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: ee627ee340559cd498a33a1b15274266, type: 3}
   fireRate: 5
   magazineSize: 30
   reloadDuration: 2.5

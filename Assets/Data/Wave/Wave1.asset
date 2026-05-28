@@ -16,9 +16,9 @@ MonoBehaviour:
   label: Wave 1
   groups:
   - enemyPrefab: {fileID: 9125259333789829230, guid: 0c9d1185a31b42c44b28a8a1e7718e85, type: 3}
-    count: 10
+    count: 15
     spawnPointIndex: 0
     spawnInterval: 0.5
     startDelay: 0
   isBossWave: 0
-  postWaveBreak: 20
+  postWaveBreak: 60

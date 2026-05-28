@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78a5b43fb42e5124e921c4214cc27d3a, type: 3}
   m_Name: Primary_BreakRifle
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.WeaponDefinition
-  displayName: BreakRifle
+  displayName: "\uBE0C\uB808\uC774\uD06C \uB77C\uC774\uD50C"
   slot: 0
   kind: 0
   price: 80
   damage: 20
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: b049fda8233dba0448b639e33c9fe953, type: 3}
   fireRate: 5
   magazineSize: 30
   reloadDuration: 2.4

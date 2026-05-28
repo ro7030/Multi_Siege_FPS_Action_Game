@@ -73,17 +73,24 @@ namespace ProjectM.Core
                 return;
             }
 
-            OnWaveEnded?.Invoke(State.CurrentWave);
+            bool isFinal = State.CurrentWave >= State.MaxWave;
 
-            if (State.CurrentWave >= State.MaxWave)
-            {
-                EndMatch(true);
-            }
-            else
+            // 페이즈를 먼저 전환한 뒤 OnWaveEnded 를 발화한다.
+            // (구독자 MatchBootstrapper / BannerEventBridge 등이 CurrentPhase == Preparation 을
+            //  검사해 정비 코루틴 시작·정비 안내 배너 표시 등을 결정하기 때문)
+            if (!isFinal)
             {
                 Phase.ChangePhase(GamePhase.WaveCleared);
                 Phase.ChangePhase(GamePhase.Preparation);
                 Debug.Log($"[GameSession] Wave {State.CurrentWave} cleared. Next preparation.");
+            }
+
+            OnWaveEnded?.Invoke(State.CurrentWave);
+
+            if (isFinal)
+            {
+                // 마지막 웨이브: OnWaveEnded 보상 처리가 끝난 뒤 매치 종료 (Result 페이즈로 전환).
+                EndMatch(true);
             }
         }
 

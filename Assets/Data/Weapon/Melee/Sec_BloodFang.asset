@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78a5b43fb42e5124e921c4214cc27d3a, type: 3}
   m_Name: Sec_BloodFang
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.WeaponDefinition
-  displayName: BloodFang
+  displayName: "\uBE14\uB7EC\uB4DC \uD33D"
   slot: 1
   kind: 1
   price: 140
   damage: 30
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 798e578423d3ffa43bb9cfea0d11c725, type: 3}
   fireRate: 5
   magazineSize: 30
   reloadDuration: 2.5

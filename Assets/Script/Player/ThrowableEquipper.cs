@@ -5,8 +5,10 @@ using UnityEngine.InputSystem;
 namespace ProjectM.Player
 {
     /// <summary>
-    /// 투척무기 장착/투척 (GTA식 휠 + 빠른 투척).
-    ///   - 4번키 홀드: 라디얼 휠 (위=수류탄 / 좌하=화염병 / 우하=섬광탄), 떼기/클릭으로 선택
+    /// 투척무기 장착/투척 (배그식 탭 사이클 + 빠른 투척).
+    ///   - 4번키 "한 번 누름": cycleOrder 순서대로 보유 투척무기를 순환 장착
+    ///       · 미장착 상태에서 누르면 첫 번째 보유 종류를 장착
+    ///       · 이미 장착된 상태에서 누르면 다음 보유 종류로 교체 (한 종류만 있으면 그대로)
     ///   - 좌클릭(투척 장착 중): 선택한 투척무기를 던짐
     ///   - G키: 어느 상태든 마지막 선택 투척무기를 즉시 던짐 (빠른 투척)
     /// 키트와 상호 배타 (하나 들면 다른 건 내려놓음).
@@ -31,26 +33,31 @@ namespace ProjectM.Player
 
         [Header("입력")]
         [SerializeField] private bool isLocalPlayer = true;
-        [SerializeField] private Key selectKey = Key.Digit4;
+        [SerializeField] private Key cycleKey = Key.Digit4;
         [SerializeField] private Key quickThrowKey = Key.G;
 
-        [Header("휠")]
-        [SerializeField] private float selectionDeadzone = 40f;
-        [SerializeField] private float selectionMaxRadius = 200f;
-        [SerializeField] private float mouseSensitivity = 1f;
+        [Header("탭 사이클")]
+        [Tooltip("4번키를 누를 때마다 이 순서대로 보유 투척무기를 순환 장착합니다. (Inspector 에서 자유롭게 재정렬)")]
+        [SerializeField] private ThrowableType[] cycleOrder = new ThrowableType[]
+        {
+            ThrowableType.Grenade,
+            ThrowableType.Flash,
+            ThrowableType.Molotov,
+        };
 
         // 상태
         public ThrowableType EquippedThrowable { get; private set; } = ThrowableType.None;
         public bool IsThrowableEquipped => EquippedThrowable != ThrowableType.None;
-        public bool IsSelecting { get; private set; }
-        public ThrowableType HighlightedType { get; private set; } = ThrowableType.None;
-        public Vector2 SelectionDirection { get; private set; }
-        public float SelectionDeadzone => selectionDeadzone;
-        public float SelectionMaxRadius => selectionMaxRadius;
         public ThrowableType LastSelected { get; private set; } = ThrowableType.Grenade;
 
+        // ── (구) 휠 호환용 — 항상 비활성. 기존 ThrowableWheelView 가 컴파일/실행은 되지만 표시되지 않음. ──
+        public bool IsSelecting => false;
+        public ThrowableType HighlightedType => ThrowableType.None;
+        public Vector2 SelectionDirection => Vector2.zero;
+        public float SelectionDeadzone => 0f;
+        public float SelectionMaxRadius => 1f;
+
         public event Action<ThrowableType> OnEquippedChanged;
-        public event Action<bool> OnSelectionStateChanged;
 
         private void Awake()
         {
@@ -82,17 +89,8 @@ namespace ProjectM.Player
             var mouse = Mouse.current;
             if (kb == null) return;
 
-            // 휠 열기
-            if (kb[selectKey].wasPressedThisFrame) BeginSelection();
-
-            if (IsSelecting)
-            {
-                UpdateSelection(mouse);
-                bool confirm = (mouse != null && mouse.leftButton.wasPressedThisFrame)
-                               || kb[selectKey].wasReleasedThisFrame;
-                if (confirm) EndSelection();
-                return;
-            }
+            // 4번 키 한 번 누름: 보유 투척무기 사이클
+            if (kb[cycleKey].wasPressedThisFrame) CycleEquipped();
 
             // G 빠른 투척 (어느 상태든)
             if (kb[quickThrowKey].wasPressedThisFrame)
@@ -107,48 +105,37 @@ namespace ProjectM.Player
             }
         }
 
-        // ── 휠 선택 ──
-        private void BeginSelection()
+        /// <summary>
+        /// cycleOrder 에 정의된 순서대로, 현재 장착 종류 다음 칸부터 한 바퀴 돌며
+        /// 보유 중(인벤토리 ≥ 1)인 첫 투척무기를 장착한다.
+        /// 보유 투척무기가 하나도 없으면 변경 없음.
+        /// </summary>
+        public void CycleEquipped()
         {
-            IsSelecting = true;
-            SelectionDirection = Vector2.zero;
-            HighlightedType = ThrowableType.None;
-            OnSelectionStateChanged?.Invoke(true);
-        }
-
-        private void UpdateSelection(Mouse mouse)
-        {
-            if (mouse != null)
+            if (inventory == null || cycleOrder == null || cycleOrder.Length == 0)
             {
-                Vector2 v = SelectionDirection + mouse.delta.ReadValue() * mouseSensitivity;
-                if (v.magnitude > selectionMaxRadius) v = v.normalized * selectionMaxRadius;
-                SelectionDirection = v;
+                Debug.Log("[Throw] 사이클 순서가 비어 있습니다.");
+                return;
             }
-            HighlightedType = SelectionDirection.magnitude >= selectionDeadzone
-                ? DirectionToThrowable(SelectionDirection) : ThrowableType.None;
-        }
 
-        private void EndSelection()
-        {
-            IsSelecting = false;
-            OnSelectionStateChanged?.Invoke(false);
+            int startIdx = -1;
+            for (int i = 0; i < cycleOrder.Length; i++)
+                if (cycleOrder[i] == EquippedThrowable) { startIdx = i; break; }
 
-            if (HighlightedType != ThrowableType.None && inventory != null && inventory.Has(HighlightedType))
+            for (int step = 1; step <= cycleOrder.Length; step++)
             {
-                LastSelected = HighlightedType;
-                SetEquipped(HighlightedType);
+                int idx = ((startIdx + step) % cycleOrder.Length + cycleOrder.Length) % cycleOrder.Length;
+                var next = cycleOrder[idx];
+                if (next == ThrowableType.None) continue;
+                if (inventory.Has(next))
+                {
+                    LastSelected = next;
+                    SetEquipped(next);
+                    return;
+                }
             }
-            else SetEquipped(ThrowableType.None);
-        }
 
-        /// <summary>위=수류탄, 좌하=화염병, 우하=섬광탄.</summary>
-        public static ThrowableType DirectionToThrowable(Vector2 dir)
-        {
-            float ang = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-            if (ang < 0) ang += 360f;
-            if (ang >= 30f && ang < 150f) return ThrowableType.Grenade;
-            if (ang >= 150f && ang < 270f) return ThrowableType.Molotov;
-            return ThrowableType.Flash;
+            Debug.Log("[Throw] 보유한 투척무기가 없습니다.");
         }
 
         private void SetEquipped(ThrowableType type)

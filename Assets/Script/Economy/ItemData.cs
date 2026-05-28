@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace ProjectM.Economy
 {
@@ -30,5 +31,13 @@ namespace ProjectM.Economy
         public float value = 50f;  // 효과 수치 (회복량, 탄약 수, 데미지 증가량 등)
 
         public string description = "";
+
+        [Header("상점 탭")]
+        public ShopTopTab shopTop = ShopTopTab.Kit;
+        public ShopSubTab shopSub = ShopSubTab.Heal;
+
+        [Header("상점 UI")]
+        [Tooltip("상점 상세 패널 등에 쓸 스프라이트")]
+        public Sprite listIcon;
     }
 }

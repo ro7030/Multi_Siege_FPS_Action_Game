@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using ProjectM.Core;
 using ProjectM.Economy;
+using ProjectM.Player;
 
 namespace ProjectM.UI
 {
@@ -23,7 +24,7 @@ namespace ProjectM.UI
         private void Awake()
         {
             if (session == null) session = FindAnyObjectByType<GameSessionManager>();
-            if (wallet == null) wallet = FindAnyObjectByType<CurrencyWallet>();
+            if (wallet == null) wallet = LocalPlayerUtility.FindLocalCurrencyWallet();
             if (reward == null) reward = FindAnyObjectByType<RewardCalculator>();
         }
 

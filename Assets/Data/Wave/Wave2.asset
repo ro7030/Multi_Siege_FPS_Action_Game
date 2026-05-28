@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1150a991f66297c48833ef900c93567a, type: 3}
   m_Name: Wave2
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Wave.WaveConfig
-  waveNumber: 1
-  label: Wave 1
+  waveNumber: 2
+  label: Wave 2
   groups:
   - enemyPrefab: {fileID: 9125259333789829230, guid: 0c9d1185a31b42c44b28a8a1e7718e85, type: 3}
     count: 15
@@ -21,4 +21,4 @@ MonoBehaviour:
     spawnInterval: 0.4
     startDelay: 0
   isBossWave: 0
-  postWaveBreak: 20
+  postWaveBreak: 60
