@@ -76,6 +76,9 @@ namespace ProjectM.UI
         [Tooltip("투척 슬롯이 미장착일 때도 마지막 선택(LastSelected) 종류의 아이콘을 보여줄지")]
         [SerializeField] private bool throwableShowLastSelectedWhenIdle = true;
 
+        [Tooltip("키트 슬롯이 미장착일 때도 마지막 선택(LastSelected) 종류의 아이콘을 보여줄지")]
+        [SerializeField] private bool kitShowLastSelectedWhenIdle = true;
+
         private void Awake()
         {
             if (arsenal == null) arsenal = FindAnyObjectByType<PlayerArsenal>();
@@ -117,14 +120,23 @@ namespace ProjectM.UI
                 secondarySlot.SetHighlight(active);
             }
 
-            // 슬롯 3: 키트 (키트 장착 시 강조 + 개수 + 종류별 아이콘 교체)
+            // 슬롯 3: 키트 — 장착 시 강조, 미장착이어도 LastSelected 종류의 normal 아이콘을 유지
             if (kitSlot != null)
             {
-                KitType eq = kitEquipper != null ? kitEquipper.EquippedKit : KitType.None;
-                int count = (kitInventory != null && eq != KitType.None) ? kitInventory.GetCount(eq) : 0;
-                ApplyKitSlotIcon(eq);
+                KitType iconType = KitType.None;
+                if (kitEquipper != null)
+                {
+                    if (kitEquipped) iconType = kitEquipper.EquippedKit;
+                    else if (kitShowLastSelectedWhenIdle) iconType = kitEquipper.LastSelected;
+                }
+                ApplyKitSlotIcon(iconType);
                 kitSlot.SetHighlight(kitEquipped);
-                kitSlot.SetInfo(eq != KitType.None ? $"{count}" : "");
+
+                if (kitInventory != null && kitEquipper != null)
+                {
+                    var t = kitEquipper.IsKitEquipped ? kitEquipper.EquippedKit : kitEquipper.LastSelected;
+                    kitSlot.SetInfo(t != KitType.None ? $"{kitInventory.GetCount(t)}" : "");
+                }
             }
 
             // 슬롯 4: 투척무기 — 장착(선택) 시 강조 + 현재 선택 종류의 개수 + 종류별 아이콘 교체

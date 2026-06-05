@@ -25,6 +25,10 @@ namespace ProjectM.Defense
         [SerializeField] private string promptText = "수확";
         [SerializeField] private Sprite promptIcon;
         [SerializeField] private Transform promptAnchor; // 비우면 자기 위치
+        [Tooltip("F키를 누르고 있어야 하는 시간(초). 완료되면 수확된다.")]
+        [SerializeField] private float holdDuration = 1f;
+
+        private float holdProgress;
 
         [Header("외형 (선택)")]
         [Tooltip("[0]=비어있음, [1]=수확물 있음 등 자유 배치. AccumulatedYield 가 0보다 크면 마지막 인덱스로 전환")]
@@ -83,18 +87,24 @@ namespace ProjectM.Defense
         public bool CanInteract(GameObject interactor) => HasYieldToHarvest;
         public string PromptText => $"{promptText} (+{AccumulatedYield})";
         public Sprite PromptIcon => promptIcon;
-        public bool IsHold => false;
-        public float HoldProgress01 => 0f;
+        public bool IsHold => true;
+        public float HoldProgress01 => holdDuration > 0f ? Mathf.Clamp01(holdProgress / holdDuration) : 0f;
         public Transform PromptAnchor => promptAnchor != null ? promptAnchor : transform;
 
-        public void Interact(GameObject interactor)
+        public void Interact(GameObject interactor) { } // 홀드형이므로 단발 입력은 사용 안 함
+
+        public void InteractHold(GameObject interactor, float deltaTime)
         {
-            // FarmManager 에 위임 (실제 지급은 매니저가 팀 분배)
+            if (!HasYieldToHarvest) { holdProgress = 0f; return; }
+            holdProgress += deltaTime;
+            if (holdProgress < holdDuration) return;
+
+            // 완료 — FarmManager 에 위임 (실제 지급은 매니저가 팀 분배)
+            holdProgress = 0f;
             Economy.FarmManager.Instance?.HarvestFarm(this);
         }
 
-        public void InteractHold(GameObject interactor, float deltaTime) { }
-        public void InteractHoldCancel() { }
+        public void InteractHoldCancel() { holdProgress = 0f; }
 
         // ─────────────────────────────────────────────────────────────
         // FarmManager 가 호출

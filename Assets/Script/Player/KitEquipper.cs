@@ -54,6 +54,8 @@ namespace ProjectM.Player
         // ── 장착 상태 ──
         public KitType EquippedKit { get; private set; } = KitType.None;
         public bool IsKitEquipped => EquippedKit != KitType.None;
+        /// <summary>최근에 장착했던 키트 종류. 무기로 전환해도 유지되어 HUD 슬롯3 아이콘 복귀에 사용.</summary>
+        public KitType LastSelected { get; private set; } = KitType.FarmKit;
 
         // ── (구) 휠 호환용 — 항상 비활성. 기존 KitWheelView 가 컴파일/실행은 되지만 표시되지 않음. ──
         public bool IsSelecting => false;
@@ -136,6 +138,7 @@ namespace ProjectM.Player
                 if (next == KitType.None) continue;
                 if (inventory.Has(next))
                 {
+                    LastSelected = next;
                     SetEquipped(next);
                     return;
                 }
@@ -183,14 +186,10 @@ namespace ProjectM.Player
 
         private bool UseRepairKit()
         {
-            if (!TryRaycastFromView(out RaycastHit hit)) return false;
-            var defense = hit.collider.GetComponentInParent<DefenseObject>();
-            if (defense == null) { Debug.Log("[Kit] RepairKit: 방어물이 없음"); return false; }
-
-            if (!inventory.TryConsume(KitType.RepairKit)) return false;
-            defense.RepairInstant(repairAmount);
-            Debug.Log($"[Kit] RepairKit 사용 (+{repairAmount} → {defense.DisplayName})");
-            return true;
+            // RepairKit 은 게이트 설치 전용. 좌클릭 사용(방어물 즉시 수리)은 비활성화됨.
+            // 게이트 슬롯 앞에서 F 키를 길게 누르면 KitInventory 에서 직접 소모된다.
+            Debug.Log("[Kit] RepairKit 은 게이트 슬롯 앞에서 F 키로만 사용 가능합니다.");
+            return false;
         }
 
         private bool UseFarmKit()

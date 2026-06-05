@@ -101,7 +101,11 @@ namespace ProjectM.Player
                 if (col == null) continue;
                 if (col.transform.IsChildOf(transform)) continue; // 자기 자신 제외
 
-                var inter = col.GetComponentInParent<IInteractable>();
+                // 콜라이더와 같은 GameObject에 있는 IInteractable 만 인식.
+                // 과거에는 GetComponentInParent 였으나, 자식 콜라이더(예: 게이트의 RepairZone Sphere r=2.5,
+                // 부모 스케일 20 → 월드 반경 50m)가 부모의 IInteractable 까지 거슬러 잡혀
+                // 의도치 않게 먼 거리에서 프롬프트가 떠버리는 문제가 있었음.
+                var inter = col.GetComponent<IInteractable>();
                 if (inter == null) continue;
                 interactableFound++;
                 if (!inter.CanInteract(gameObject)) continue;

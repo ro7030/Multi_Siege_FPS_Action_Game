@@ -361,7 +361,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 0.5, y: 0.5, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &66922211
 MeshRenderer:
@@ -1289,7 +1289,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 0.5, y: 0.5, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &249252131
 MeshRenderer:
@@ -1780,7 +1780,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &323196996
 Transform:
   m_ObjectHideFlags: 0
@@ -1879,7 +1879,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &349929951
 Transform:
   m_ObjectHideFlags: 0
@@ -2984,6 +2984,7 @@ MonoBehaviour:
   promptIcon: {fileID: 0}
   promptAnchor: {fileID: 0}
   reAllowAfterDestroyed: 1
+  holdDuration: 1.5
 --- !u!65 &465430822
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6699,7 +6700,7 @@ MonoBehaviour:
   outlineAlwaysVisible: 0
   outlineNonHoldFill: 1
   debugLog: 0
-  followTarget: 1
+  followTarget: 0
   worldHeightOffset: 1.6
   screenOffset: {x: 0, y: 0}
 --- !u!1 &957427662
@@ -8180,6 +8181,7 @@ MonoBehaviour:
   promptIcon: {fileID: 0}
   promptAnchor: {fileID: 0}
   reAllowAfterDestroyed: 1
+  holdDuration: 1.5
 --- !u!65 &1248360289
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8525,7 +8527,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1365019563
 Transform:
   m_ObjectHideFlags: 0
@@ -9096,7 +9098,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1468634827
 Transform:
   m_ObjectHideFlags: 0
@@ -9584,7 +9586,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 0.5, y: 0.5, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &1540781576
 MeshRenderer:
@@ -9711,6 +9713,7 @@ MonoBehaviour:
   promptIcon: {fileID: 0}
   promptAnchor: {fileID: 0}
   reAllowAfterDestroyed: 1
+  holdDuration: 1.5
 --- !u!65 &1574365156
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9785,6 +9788,7 @@ MonoBehaviour:
   promptIcon: {fileID: 0}
   promptAnchor: {fileID: 0}
   reAllowAfterDestroyed: 1
+  holdDuration: 1.5
 --- !u!65 &1582469549
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -10001,8 +10005,8 @@ MonoBehaviour:
   secondarySlot: {fileID: 119053790}
   kitSlot: {fileID: 758744003}
   throwableSlot: {fileID: 1075320571}
-  kitEmptyNormal: {fileID: 0}
-  kitEmptySelected: {fileID: 0}
+  kitEmptyNormal: {fileID: 21300000, guid: ae8729b50332f19469d106e1dc79b8b7, type: 3}
+  kitEmptySelected: {fileID: 21300000, guid: 9f6c55e37e8013641bd1ee4fab1fee0a, type: 3}
   kitIcons:
   - type: 1
     normal: {fileID: 21300000, guid: ae8729b50332f19469d106e1dc79b8b7, type: 3}
@@ -10025,7 +10029,8 @@ MonoBehaviour:
   - type: 3
     normal: {fileID: 21300000, guid: cf484a530e9977c4abbb1227155312ea, type: 3}
     selected: {fileID: 21300000, guid: cf484a530e9977c4abbb1227155312ea, type: 3}
-  throwableShowLastSelectedWhenIdle: 0
+  throwableShowLastSelectedWhenIdle: 1
+  kitShowLastSelectedWhenIdle: 1
 --- !u!1 &1626040309
 GameObject:
   m_ObjectHideFlags: 0
@@ -10210,7 +10215,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1704888820
 RectTransform:
   m_ObjectHideFlags: 0
@@ -11248,7 +11253,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72cda54e95d999a42bdd44dac8101bb7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.KitInventory
-  startingHealKit: 0
+  startingHealKit: 1
   startingRepairKit: 1
   startingFarmKit: 1
   healKitCount: 0
@@ -11316,9 +11321,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c06f83f1250c7e40bc4cf4cbb226022, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.ThrowableInventory
-  startingGrenade: 0
-  startingMolotov: 0
-  startingFlash: 0
+  startingGrenade: 1
+  startingMolotov: 1
+  startingFlash: 1
   grenadeCount: 0
   molotovCount: 0
   flashCount: 0
@@ -12015,7 +12020,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 0.5, y: 0.5, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &1937472543
 MeshRenderer:
@@ -13126,7 +13131,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2089030343
 Transform:
   m_ObjectHideFlags: 0

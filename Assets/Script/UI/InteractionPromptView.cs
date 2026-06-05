@@ -122,10 +122,19 @@ namespace ProjectM.UI
             }
 
             // 진행바 (홀드형만)
+            // 부모 컨테이너(진행바 배경 등)를 토글하되, 부모가 promptRoot 또는 이 오브젝트 자체면
+            // 프롬프트 UI 전체가 꺼져버리므로 progressFill 자기 자신만 토글한다.
             if (progressFill != null)
             {
                 bool hold = target.IsHold;
-                progressFill.transform.parent.gameObject.SetActive(hold);
+                var parentGo = progressFill.transform.parent != null
+                    ? progressFill.transform.parent.gameObject
+                    : null;
+                bool parentSafe = parentGo != null
+                    && parentGo != promptRoot
+                    && parentGo != gameObject;
+                var togglee = parentSafe ? parentGo : progressFill.gameObject;
+                if (togglee.activeSelf != hold) togglee.SetActive(hold);
                 if (hold) progressFill.fillAmount = Mathf.Clamp01(target.HoldProgress01);
             }
 

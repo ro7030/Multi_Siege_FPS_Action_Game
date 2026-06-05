@@ -29,9 +29,12 @@ namespace ProjectM.Defense
         [Header("옵션")]
         [Tooltip("게이트가 적에게 파괴되면 다시 설치 가능하게 할지")]
         [SerializeField] private bool reAllowAfterDestroyed = true;
+        [Tooltip("F키를 누르고 있어야 하는 시간(초). 완료되면 설치된다.")]
+        [SerializeField] private float holdDuration = 1.5f;
 
         private bool installed;
         private DefenseObject gateDefense;
+        private float holdProgress;
 
         private void Awake()
         {
@@ -64,20 +67,35 @@ namespace ProjectM.Defense
         public bool CanInteract(GameObject interactor)
         {
             if (installed || gateObject == null) return false;
-            var inv = interactor != null ? interactor.GetComponent<KitInventory>() : null;
-            return inv != null && inv.Has(requiredKit);   // 문 키트 보유 시에만 프롬프트
+            if (interactor == null) return false;
+            // 단순 보유가 아니라 "장착(EquippedKit)" 상태에서만 프롬프트가 뜨도록 한다.
+            var equipper = interactor.GetComponent<KitEquipper>();
+            return equipper != null && equipper.EquippedKit == requiredKit;
         }
 
         public string PromptText => promptText;
         public Sprite PromptIcon => promptIcon;
-        public bool IsHold => false;
-        public float HoldProgress01 => 0f;
+        public bool IsHold => true;
+        public float HoldProgress01 => holdDuration > 0f ? Mathf.Clamp01(holdProgress / holdDuration) : 0f;
         public Transform PromptAnchor => promptAnchor != null ? promptAnchor : transform;
 
-        public void Interact(GameObject interactor)
+        public void Interact(GameObject interactor) { } // 홀드형이므로 단발 입력은 사용 안 함
+
+        public void InteractHold(GameObject interactor, float deltaTime)
         {
             if (installed || gateObject == null) return;
-            var inv = interactor != null ? interactor.GetComponent<KitInventory>() : null;
+            if (interactor == null) { holdProgress = 0f; return; }
+
+            // 홀드 도중에도 키트가 장착 해제되면 진행도 리셋
+            var equipper = interactor.GetComponent<KitEquipper>();
+            if (equipper == null || equipper.EquippedKit != requiredKit) { holdProgress = 0f; return; }
+
+            holdProgress += deltaTime;
+            if (holdProgress < holdDuration) return;
+
+            // 완료 — 인벤토리에서 키트 소모 + 설치
+            holdProgress = 0f;
+            var inv = interactor.GetComponent<KitInventory>();
             if (inv == null || !inv.TryConsume(requiredKit)) return;
 
             gateObject.SetActive(true);   // 게이트 설치(활성화)
@@ -85,7 +103,6 @@ namespace ProjectM.Defense
             Debug.Log($"[GateInstaller] 문 설치됨 ({gateObject.name})");
         }
 
-        public void InteractHold(GameObject interactor, float deltaTime) { }
-        public void InteractHoldCancel() { }
+        public void InteractHoldCancel() { holdProgress = 0f; }
     }
 }

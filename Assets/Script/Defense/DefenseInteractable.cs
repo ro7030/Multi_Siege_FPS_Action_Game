@@ -20,7 +20,16 @@ namespace ProjectM.Defense
         private bool playerInRange;
 
         public bool PlayerInRange => playerInRange;
-        public bool CanRepair => defense != null && !defense.IsDestroyed && defense.Health.CurrentHp < defense.Health.MaxHp;
+        public bool CanRepair
+        {
+            get
+            {
+                if (defense == null || defense.IsDestroyed) return false;
+                // 게이트처럼 시작 시 비활성된 DefenseObject 는 Awake 가 아직 안 돌아 Health 가 null 일 수 있음.
+                var h = defense.Health;
+                return h != null && h.CurrentHp < h.MaxHp;
+            }
+        }
 
         private void Awake()
         {
