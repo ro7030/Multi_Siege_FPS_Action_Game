@@ -23,6 +23,12 @@ namespace ProjectM.Network
         public int LocalClientId { get; private set; } = -1;
         public string LocalNickname { get; private set; } = "Player";
 
+        // ── 방 메타데이터 (생성 시 결정) ──────────────────────────
+        public string RoomName { get; private set; } = "";
+        public bool IsPublic { get; private set; } = true;
+        public bool HasPassword { get; private set; } = false;
+        public string RoomPassword { get; private set; } = "";
+
         private readonly Dictionary<int, PlayerInfo> players = new();
         public IReadOnlyDictionary<int, PlayerInfo> Players => players;
 
@@ -57,6 +63,15 @@ namespace ProjectM.Network
         // ─── Host 측 API ──────────────────────────────────────────
         public bool CreateRoom(string nickname)
         {
+            return CreateRoom(nickname, roomName: "", isPublic: true, password: "");
+        }
+
+        /// <summary>
+        /// 방 생성. roomName/isPublic/password는 로비 메타데이터.
+        /// password는 비어 있으면 비밀번호 없는 방. (최대 4자리 숫자 권장)
+        /// </summary>
+        public bool CreateRoom(string nickname, string roomName, bool isPublic, string password)
+        {
             if (IsInRoom) return false;
             LocalNickname = string.IsNullOrEmpty(nickname) ? "Host" : nickname;
             if (!host.StartHost(defaultPort)) return false;
@@ -65,11 +80,17 @@ namespace ProjectM.Network
             IsInRoom = true;
             RoomCode = GenerateRoomCode();
             LocalClientId = 0;
+
+            RoomName = string.IsNullOrEmpty(roomName) ? $"{LocalNickname}의 방" : roomName;
+            IsPublic = isPublic;
+            RoomPassword = password ?? "";
+            HasPassword = !string.IsNullOrEmpty(RoomPassword);
+
             players.Clear();
             players[0] = new PlayerInfo { clientId = 0, nickname = LocalNickname, isHost = true, isReady = false };
 
             OnRoomStateChanged?.Invoke();
-            Debug.Log($"[Room] 방 생성됨. Code = {RoomCode}");
+            Debug.Log($"[Room] 방 생성됨. Name='{RoomName}' Public={IsPublic} HasPw={HasPassword} Code={RoomCode}");
             return true;
         }
 
@@ -134,6 +155,12 @@ namespace ProjectM.Network
                         return;
                     }
 
+                    if (HasPassword && (dto.password ?? "") != RoomPassword)
+                    {
+                        Debug.LogWarning($"[Room/Host] 비밀번호 불일치로 입장 거부 (connId={connId})");
+                        return;
+                    }
+
                     var info = new PlayerInfo
                     {
                         clientId = connId,
@@ -186,13 +213,22 @@ namespace ProjectM.Network
         // ─── Client 측 API ────────────────────────────────────────
         public bool JoinRoom(string ip, string nickname)
         {
+            return JoinRoom(ip, nickname, password: "");
+        }
+
+        public bool JoinRoom(string ip, string nickname, string password)
+        {
             if (IsInRoom) return false;
             LocalNickname = string.IsNullOrEmpty(nickname) ? "Guest" : nickname;
             if (!client.Connect(ip, defaultPort)) return false;
 
             IsHost = false;
             IsInRoom = true;
-            client.Send(Packet.Make(PacketType.JoinRequest, 0, new JoinRequestDto { nickname = LocalNickname }));
+            client.Send(Packet.Make(PacketType.JoinRequest, 0, new JoinRequestDto
+            {
+                nickname = LocalNickname,
+                password = password ?? ""
+            }));
             OnRoomStateChanged?.Invoke();
             return true;
         }
@@ -210,6 +246,10 @@ namespace ProjectM.Network
             IsHost = false;
             RoomCode = "";
             LocalClientId = -1;
+            RoomName = "";
+            IsPublic = true;
+            HasPassword = false;
+            RoomPassword = "";
             players.Clear();
             OnRoomStateChanged?.Invoke();
         }

@@ -14,11 +14,16 @@ namespace ProjectM.UI
     {
         [Header("연결 (전부 선택)")]
         [SerializeField] private TMP_Text infoText;            // 탄약/개수
-        [SerializeField] private Image highlightTargetImage;   // 상태에 따라 이미지가 바뀔 대상 (보통 슬롯 배경/프레임)
+        [SerializeField] private Image highlightTargetImage;   // 아래 아이콘 (무기/키트/투척 종류 표시) — SetSpritePair 로 교체됨
 
-        [Header("강조 이미지 (Inspector 에서 연결)")]
+        [Header("아이콘 스프라이트 (SetSpritePair 미호출 시 폴백)")]
         [SerializeField] private Sprite normalSprite;          // 평소 이미지
         [SerializeField] private Sprite selectedSprite;        // 선택 시 이미지
+
+        [Header("번호 뱃지 (1/2/3) — 선택 시 함께 교체")]
+        [SerializeField] private Image badgeImage;             // 위 1/2/3 번호 뱃지 (비워두면 미사용)
+        [SerializeField] private Sprite badgeNormalSprite;
+        [SerializeField] private Sprite badgeSelectedSprite;
 
         private bool isHighlighted;
 
@@ -30,6 +35,9 @@ namespace ProjectM.UI
             // normalSprite 미지정 시 현재 슬롯 이미지를 평소 상태로 기억
             if (normalSprite == null && highlightTargetImage != null)
                 normalSprite = highlightTargetImage.sprite;
+
+            if (badgeNormalSprite == null && badgeImage != null)
+                badgeNormalSprite = badgeImage.sprite;
         }
 
         public void SetInfo(string text)
@@ -58,9 +66,17 @@ namespace ProjectM.UI
 
         private void ApplyCurrentSprite()
         {
-            if (highlightTargetImage == null) return;
-            var sprite = isHighlighted ? selectedSprite : normalSprite;
-            if (sprite != null) highlightTargetImage.sprite = sprite;
+            if (highlightTargetImage != null)
+            {
+                var sprite = isHighlighted ? selectedSprite : normalSprite;
+                if (sprite != null) highlightTargetImage.sprite = sprite;
+            }
+
+            if (badgeImage != null)
+            {
+                var sprite = isHighlighted ? badgeSelectedSprite : badgeNormalSprite;
+                if (sprite != null) badgeImage.sprite = sprite;
+            }
         }
 
         /// <summary>슬롯 전체 표시/숨김 (힐 키트 보유 여부 등).</summary>

@@ -53,7 +53,7 @@ namespace ProjectM.Network
     }
 
     // ─── 페이로드 DTO ──────────────────────────────────────────────
-    [Serializable] public class JoinRequestDto      { public string nickname; }
+    [Serializable] public class JoinRequestDto      { public string nickname; public string password; }
     [Serializable] public class JoinAcceptedDto     { public int clientId; }
     [Serializable] public class PlayerInfo          { public int clientId; public string nickname; public bool isReady; public bool isHost; }
     [Serializable] public class PlayerListDto       { public PlayerInfo[] players; }
