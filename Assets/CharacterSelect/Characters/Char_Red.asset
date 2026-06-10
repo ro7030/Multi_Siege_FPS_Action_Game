@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b943f36a2a9878d48bcab2a441ecd9e7, type: 3}
+  m_Name: Char_Red
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.CharacterSelect.CharacterData
+  displayName: Red
+  previewPrefab: {fileID: 6325612980646036171, guid: 6602d6fad6f54d84980fdc5b16b71728, type: 3}
+  gameplayPrefab: {fileID: 6325612980646036171, guid: 6602d6fad6f54d84980fdc5b16b71728, type: 3}
