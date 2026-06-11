@@ -2405,7 +2405,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5898b6134a19104692d3b8d488f1c1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.UI.MainMenuController
-  gameplaySceneName: Gameplay
+  gameplaySceneName: CharacterSelect
   createRoomPanel: {fileID: 268100978}
   characterSelectPanel: {fileID: 0}
   roomListPanel: {fileID: 0}

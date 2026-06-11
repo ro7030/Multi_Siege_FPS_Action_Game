@@ -15,6 +15,7 @@ namespace ProjectM.CharacterSelect
 
         public int LocalSlotIndex => 0;
         public int MaxSlots => maxSlots;
+        public bool IsLocalHost => true;
 
         public event Action<int> OnPlayerChanged;
         public event Action OnAllPlayersReady;

@@ -6,6 +6,7 @@ namespace ProjectM.CharacterSelect
     {
         int LocalSlotIndex { get; }
         int MaxSlots { get; }
+        bool IsLocalHost { get; }
 
         RoomPlayerData GetPlayer(int slotIndex);
 

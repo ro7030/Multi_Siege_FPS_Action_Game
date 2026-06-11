@@ -23,6 +23,9 @@ namespace ProjectM.CharacterSelect
 
         [Header("Scene Flow")]
         [SerializeField] private string gameplaySceneName = "GamePlay";
+
+        [Header("Button Labels")]
+        [SerializeField] private string startLabel = "Start";
         [SerializeField] private string readyLabel = "Ready";
         [SerializeField] private string cancelLabel = "Cancel";
 
@@ -108,7 +111,8 @@ namespace ProjectM.CharacterSelect
         {
             if (readyButtonLabel == null) return;
             var data = _room.GetPlayer(_room.LocalSlotIndex);
-            readyButtonLabel.text = data.IsReady ? cancelLabel : readyLabel;
+            if (data.IsReady) { readyButtonLabel.text = cancelLabel; return; }
+            readyButtonLabel.text = _room.IsLocalHost ? startLabel : readyLabel;
         }
 
         private void HandleAllReady()
