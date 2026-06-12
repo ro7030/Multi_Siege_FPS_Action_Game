@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ProjectM.Auth;
 using UnityEngine;
 using ProjectM.Core;
 using ProjectM.Defense;
@@ -46,6 +47,13 @@ namespace ProjectM.Data
                 var pc = FindAnyObjectByType<PlayerController>();
                 if (pc != null) localPlayer = pc.gameObject;
             }
+        }
+
+        private void Start()
+        {
+            string nickname = AuthSessionManager.ResolveNickname(localNickname);
+            if (!string.IsNullOrEmpty(nickname))
+                localNickname = nickname;
         }
 
         private void OnEnable()

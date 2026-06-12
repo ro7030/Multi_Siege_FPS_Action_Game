@@ -149,11 +149,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 860714520}
   - {fileID: 165262764}
   - {fileID: 234100501}
   - {fileID: 1061471790}
   - {fileID: 1197800743}
+  - {fileID: 860714520}
   m_Father: {fileID: 1977114760}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -435,6 +435,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 155270520}
+  - component: {fileID: 155270521}
+  - component: {fileID: 155270522}
   m_Layer: 5
   m_Name: Content
   m_TagString: Untagged
@@ -459,8 +461,48 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0.00048198854}
-  m_SizeDelta: {x: 0, y: 300}
+  m_SizeDelta: {x: 0, y: 16}
   m_Pivot: {x: 0, y: 1}
+--- !u!114 &155270521
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 155270519}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.VerticalLayoutGroup
+  m_Padding:
+    m_Left: 8
+    m_Right: 8
+    m_Top: 8
+    m_Bottom: 8
+  m_ChildAlignment: 0
+  m_Spacing: 8
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 1
+  m_ChildControlHeight: 1
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
+--- !u!114 &155270522
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 155270519}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
 --- !u!1 &165262763
 GameObject:
   m_ObjectHideFlags: 0
@@ -1986,23 +2028,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.UI.JoinRoomPanelController
   mainMenu: {fileID: 936088679}
-  roomManager: {fileID: 1372051932}
+  lobbyRelayService: {fileID: 0}
   rowPrefab: {fileID: 168961954872780251, guid: d1f8a745cbf432046adac78267b64320, type: 3}
-  listContent: {fileID: 860714520}
+  listContent: {fileID: 155270520}
+  scrollRect: {fileID: 860714521}
   passwordSection: {fileID: 0}
   passwordInput: {fileID: 234100504}
   showPasswordToggle: {fileID: 1061471791}
   nicknameInput: {fileID: 0}
   joinButton: {fileID: 1197800740}
   cancelButton: {fileID: 0}
-  passwordMaxLength: 4
-  sampleEntries:
-  - roomName: 123
-    currentPlayers: 2
-    maxPlayers: 4
-    hasPassword: 0
-    hostIp: 
-    hostPort: 0
+  statusText: {fileID: 0}
 --- !u!4 &766862783
 Transform:
   m_ObjectHideFlags: 0
@@ -2306,7 +2342,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ScrollRect
   m_Content: {fileID: 155270520}
-  m_Horizontal: 1
+  m_Horizontal: 0
   m_Vertical: 1
   m_MovementType: 1
   m_Elasticity: 0.1
@@ -2405,7 +2441,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5898b6134a19104692d3b8d488f1c1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.UI.MainMenuController
-  gameplaySceneName: CharacterSelect
+  characterSelectSceneName: CharacterSelect
+  loginSceneName: Login
   createRoomPanel: {fileID: 268100978}
   characterSelectPanel: {fileID: 0}
   roomListPanel: {fileID: 0}
@@ -2924,7 +2961,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC885\uB8CC"
+  m_text: "\uB85C\uADF8\uC544\uC6C3"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d9c3847de03d37948bf1e3d46f58ebbc, type: 2}
   m_sharedMaterial: {fileID: 5028249470243527467, guid: d9c3847de03d37948bf1e3d46f58ebbc, type: 2}
@@ -3004,6 +3041,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1124006907}
   m_CullTransparentMesh: 1
+--- !u!1 &1146640285
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1146640287}
+  - component: {fileID: 1146640286}
+  m_Layer: 0
+  m_Name: NetworkBootstrapper
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1146640286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1146640285}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c3574d50d3a147608d665636eea22ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Network.NetworkBootstrapper
+  networkManagerPrefab: {fileID: 4575265924059931448, guid: d5fd962cd06f846aa9470ee5994dc4b9, type: 3}
+  createLobbyRelayService: 1
+--- !u!4 &1146640287
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1146640285}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1167545930
 GameObject:
   m_ObjectHideFlags: 0
@@ -3341,7 +3424,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281479730
+    rgba: 4278190080
   m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -3813,7 +3896,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.UI.CreateRoomPanelController
   mainMenu: {fileID: 936088679}
-  roomManager: {fileID: 1372051932}
+  lobbyRelayService: {fileID: 0}
   roomNameInput: {fileID: 1687298903}
   passwordInput: {fileID: 1024520315}
   nicknameInput: {fileID: 0}
@@ -3822,7 +3905,8 @@ MonoBehaviour:
   showPasswordToggle: {fileID: 750659069}
   createButton: {fileID: 1857140264}
   cancelButton: {fileID: 0}
-  passwordMaxLength: 4
+  statusText: {fileID: 0}
+  passwordMaxLength: 8
 --- !u!4 &1374546963
 Transform:
   m_ObjectHideFlags: 0
@@ -5444,6 +5528,7 @@ GameObject:
   - component: {fileID: 1977114759}
   - component: {fileID: 1977114758}
   - component: {fileID: 1977114757}
+  - component: {fileID: 1977114761}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -5540,6 +5625,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1977114761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1977114756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7a72c35705c14f98a94e34b6d88bdc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.UI.MainMenuFontBinder
+  uiFont: {fileID: 11400000, guid: d9c3847de03d37948bf1e3d46f58ebbc, type: 2}
+  includeInactive: 1
 --- !u!1 &2053058807
 GameObject:
   m_ObjectHideFlags: 0
@@ -5890,3 +5989,4 @@ SceneRoots:
   - {fileID: 1374546963}
   - {fileID: 1372051933}
   - {fileID: 766862783}
+  - {fileID: 1146640287}

@@ -43,6 +43,13 @@ namespace ProjectM.UI
         public void SetSelected(bool selected)
         {
             if (selectedHighlight != null) selectedHighlight.SetActive(selected);
+
+            if (selectButton != null)
+            {
+                var colors = selectButton.colors;
+                colors.normalColor = selected ? new Color(0.85f, 0.92f, 1f, 1f) : Color.white;
+                selectButton.colors = colors;
+            }
         }
 
         private void HandleClick() => OnSelected?.Invoke(this);

@@ -14,7 +14,10 @@ namespace ProjectM.UI
         public int maxPlayers;
         public bool hasPassword;
 
-        // 직접 접속용 (MVP). 매치메이킹 서버가 들어가면 roomId로 대체될 수 있다.
+        public string lobbyId;
+        public string lobbyCode;
+
+        // Legacy TCP fields (deprecated)
         public string hostIp;
         public int hostPort;
 

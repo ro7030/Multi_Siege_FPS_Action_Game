@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
+using ProjectM.Auth;
 using ProjectM.Network;
 using TMPro;
 using UnityEngine;
@@ -8,26 +9,20 @@ using UnityEngine.UI;
 namespace ProjectM.UI
 {
     /// <summary>
-    /// 방 참여 패널.
-    /// - 목록에 RoomListEntry들을 행으로 표시.
-    /// - 행을 클릭하면 그 방이 선택되고, 비밀번호가 있는 방이면 비밀번호 입력 영역이 활성화된다.
-    /// - "번호 표시" 토글로 마스킹 on/off (이 패널 안에서만, 닫으면 자동 마스킹).
-    /// - "참여"는 선택된 방에 RoomManager.JoinRoom으로 접속한 뒤 게임플레이 씬을 로드.
+    /// 방 참여 패널 — Lobby 목록 + ScrollView + 비밀번호 검증 + Relay Client.
     /// </summary>
     public class JoinRoomPanelController : MonoBehaviour
     {
         [Header("연결")]
         [SerializeField] private MainMenuController mainMenu;
-        [SerializeField] private RoomManager roomManager;
+        [SerializeField] private LobbyRelayService lobbyRelayService;
 
         [Header("목록")]
-        [Tooltip("행 프리팹. JoinRoomItem 컴포넌트가 부착되어 있어야 한다.")]
         [SerializeField] private JoinRoomItem rowPrefab;
-        [Tooltip("프리팹 인스턴스가 들어갈 부모 (Content). VerticalLayoutGroup 권장.")]
         [SerializeField] private Transform listContent;
+        [SerializeField] private ScrollRect scrollRect;
 
         [Header("비밀번호 영역")]
-        [Tooltip("비밀번호 입력 영역 전체. 비밀번호 있는 방을 선택했을 때만 활성화.")]
         [SerializeField] private GameObject passwordSection;
         [SerializeField] private TMP_InputField passwordInput;
         [SerializeField] private Toggle showPasswordToggle;
@@ -39,29 +34,35 @@ namespace ProjectM.UI
         [SerializeField] private Button joinButton;
         [SerializeField] private Button cancelButton;
 
-        [Header("옵션")]
-        [SerializeField] private int passwordMaxLength = 4;
-        [Tooltip("테스트용 더미 데이터. 실제 매치메이킹이 들어가기 전까지 목록을 비우면 이걸로 채운다.")]
-        [SerializeField] private List<RoomListEntry> sampleEntries = new();
+        [Header("상태")]
+        [SerializeField] private TMP_Text statusText;
 
-        private const TMP_InputField.ContentType MaskedContent  = TMP_InputField.ContentType.Pin;
+        private const TMP_InputField.ContentType MaskedContent = TMP_InputField.ContentType.Pin;
         private const TMP_InputField.ContentType VisibleContent = TMP_InputField.ContentType.IntegerNumber;
 
         private readonly List<JoinRoomItem> spawnedRows = new();
         private JoinRoomItem selectedRow;
+        private string selectedLobbyId;
+        private bool isBusy;
+
+        private static int PasswordLength => LobbyRelayService.LobbyPasswordLength;
 
         private void Awake()
         {
-            if (roomManager == null) roomManager = FindObjectOfType<RoomManager>();
-            if (mainMenu == null)    mainMenu    = FindObjectOfType<MainMenuController>();
+            if (lobbyRelayService == null) lobbyRelayService = LobbyRelayService.Instance;
+            if (mainMenu == null) mainMenu = FindAnyObjectByType<MainMenuController>();
+            EnsureListContentLayout();
         }
+
+        /// <summary>방 참여 패널이 열릴 때 MainMenuController에서 호출.</summary>
+        public void RefreshNow() => RefreshLobbyListAsync();
 
         private void OnEnable()
         {
-            // 비밀번호 입력 초기화
+            EnsureListContentLayout();
             if (passwordInput != null)
             {
-                passwordInput.characterLimit = passwordMaxLength;
+                passwordInput.characterLimit = PasswordLength;
                 passwordInput.contentType = MaskedContent;
                 passwordInput.text = "";
                 passwordInput.onValueChanged.RemoveListener(OnPasswordValueChanged);
@@ -75,7 +76,6 @@ namespace ProjectM.UI
                 showPasswordToggle.onValueChanged.AddListener(OnShowPasswordToggleChanged);
             }
 
-            // 버튼
             if (joinButton != null)
             {
                 joinButton.onClick.RemoveListener(OnJoinClicked);
@@ -87,17 +87,22 @@ namespace ProjectM.UI
                 cancelButton.onClick.AddListener(OnCancelClicked);
             }
 
-            // 목록이 비어 있다면 sampleEntries로 채워서 UI 테스트 가능
-            if (spawnedRows.Count == 0 && sampleEntries != null && sampleEntries.Count > 0)
-                SetEntries(sampleEntries);
-
+            PrefillNicknameFromSession();
             UpdatePasswordSection();
             UpdateJoinButton();
+            RefreshLobbyListAsync();
+        }
+
+        private void PrefillNicknameFromSession()
+        {
+            if (nicknameInput == null) return;
+            string nickname = AuthSessionManager.ResolveNickname(string.Empty);
+            if (!string.IsNullOrEmpty(nickname))
+                nicknameInput.text = nickname;
         }
 
         private void OnDisable()
         {
-            // 닫으면 마스킹 상태로 되돌리고 비밀번호 비우기
             if (passwordInput != null)
             {
                 passwordInput.contentType = MaskedContent;
@@ -107,22 +112,127 @@ namespace ProjectM.UI
             if (showPasswordToggle != null) showPasswordToggle.SetIsOnWithoutNotify(false);
         }
 
-        // ── 외부에서 목록 채우기 ───────────────────────────────────
+        private void EnsureListContentLayout()
+        {
+            if (listContent == null) return;
+
+            var contentRect = listContent as RectTransform;
+            if (contentRect != null)
+            {
+                contentRect.anchorMin = new Vector2(0f, 1f);
+                contentRect.anchorMax = new Vector2(1f, 1f);
+                contentRect.pivot = new Vector2(0.5f, 1f);
+                contentRect.anchoredPosition = Vector2.zero;
+            }
+
+            var layout = listContent.GetComponent<VerticalLayoutGroup>();
+            if (layout == null)
+            {
+                layout = listContent.gameObject.AddComponent<VerticalLayoutGroup>();
+                layout.spacing = 8f;
+                layout.padding = new RectOffset(8, 8, 8, 8);
+                layout.childControlWidth = true;
+                layout.childControlHeight = true;
+                layout.childForceExpandWidth = true;
+                layout.childForceExpandHeight = false;
+            }
+
+            if (listContent.GetComponent<ContentSizeFitter>() == null)
+            {
+                var fitter = listContent.gameObject.AddComponent<ContentSizeFitter>();
+                fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            }
+
+            if (scrollRect != null)
+            {
+                scrollRect.horizontal = false;
+                scrollRect.vertical = true;
+                if (scrollRect.content == null && contentRect != null)
+                    scrollRect.content = contentRect;
+            }
+        }
+
+        private async void RefreshLobbyListAsync()
+        {
+            if (lobbyRelayService == null)
+            {
+                lobbyRelayService = LobbyRelayService.Instance;
+                if (lobbyRelayService == null)
+                {
+                    SetStatus("네트워크 서비스를 찾을 수 없습니다.");
+                    return;
+                }
+            }
+
+            SetBusy(true, "방 목록 불러오는 중...");
+            try
+            {
+                var entries = await lobbyRelayService.QueryLobbiesAsync();
+                SetEntries(entries);
+                SetStatus(entries.Count == 0 ? "참여 가능한 방이 없습니다." : string.Empty);
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogException(ex);
+                SetStatus($"목록 조회 실패: {ex.Message}");
+                ClearRows();
+            }
+            finally
+            {
+                SetBusy(false);
+            }
+        }
+
         public void SetEntries(IList<RoomListEntry> entries)
         {
+            string reselectId = selectedLobbyId;
             ClearRows();
-            if (entries == null || rowPrefab == null || listContent == null) { UpdateJoinButton(); return; }
+            if (entries == null || rowPrefab == null || listContent == null)
+            {
+                UpdateJoinButton();
+                return;
+            }
 
             foreach (var e in entries)
             {
                 var row = Instantiate(rowPrefab, listContent);
+                row.gameObject.SetActive(true);
                 row.Bind(e);
                 row.OnSelected += HandleRowSelected;
                 spawnedRows.Add(row);
             }
+
+            RebuildListLayout();
+            Debug.Log($"[JoinRoomPanel] Scroll list updated: {spawnedRows.Count} row(s).");
+
             selectedRow = null;
+            if (!string.IsNullOrEmpty(reselectId))
+            {
+                foreach (var row in spawnedRows)
+                {
+                    if (row.Entry != null && row.Entry.lobbyId == reselectId)
+                    {
+                        selectedRow = row;
+                        selectedLobbyId = reselectId;
+                        row.SetSelected(true);
+                        break;
+                    }
+                }
+            }
+
             UpdatePasswordSection();
             UpdateJoinButton();
+        }
+
+        private void RebuildListLayout()
+        {
+            if (listContent is RectTransform contentRect)
+                LayoutRebuilder.ForceRebuildLayoutImmediate(contentRect);
+
+            Canvas.ForceUpdateCanvases();
+
+            if (scrollRect != null)
+                scrollRect.verticalNormalizedPosition = 1f;
         }
 
         private void ClearRows()
@@ -137,15 +247,16 @@ namespace ProjectM.UI
             selectedRow = null;
         }
 
-        // ── 선택 ──────────────────────────────────────────────────
         private void HandleRowSelected(JoinRoomItem row)
         {
             if (selectedRow == row) return;
             if (selectedRow != null) selectedRow.SetSelected(false);
             selectedRow = row;
+            selectedLobbyId = row.Entry?.lobbyId;
             if (selectedRow != null) selectedRow.SetSelected(true);
 
             if (passwordInput != null) passwordInput.text = "";
+            SetStatus(string.Empty);
             UpdatePasswordSection();
             UpdateJoinButton();
         }
@@ -153,7 +264,15 @@ namespace ProjectM.UI
         private void UpdatePasswordSection()
         {
             bool needsPassword = selectedRow != null && selectedRow.Entry != null && selectedRow.Entry.hasPassword;
-            if (passwordSection != null) passwordSection.SetActive(needsPassword);
+            if (passwordSection != null)
+            {
+                passwordSection.SetActive(needsPassword);
+            }
+            else
+            {
+                if (passwordInput != null) passwordInput.gameObject.SetActive(needsPassword);
+                if (showPasswordToggle != null) showPasswordToggle.gameObject.SetActive(needsPassword);
+            }
             if (passwordInput != null) passwordInput.interactable = needsPassword;
             if (showPasswordToggle != null) showPasswordToggle.interactable = needsPassword;
         }
@@ -163,14 +282,14 @@ namespace ProjectM.UI
             if (joinButton == null) return;
             bool hasSelection = selectedRow != null && selectedRow.Entry != null;
             bool needsPw = hasSelection && selectedRow.Entry.hasPassword;
-            bool pwOk = !needsPw || (passwordInput != null && SanitizeDigits(passwordInput.text, passwordMaxLength).Length > 0);
-            joinButton.interactable = hasSelection && pwOk;
+            bool pwOk = !needsPw || (passwordInput != null
+                && SanitizeDigits(passwordInput.text, PasswordLength).Length == PasswordLength);
+            joinButton.interactable = hasSelection && pwOk && !isBusy;
         }
 
-        // ── 비밀번호 입력 동작 ────────────────────────────────────
         private void OnPasswordValueChanged(string value)
         {
-            string sanitized = SanitizeDigits(value, passwordMaxLength);
+            string sanitized = SanitizeDigits(value, PasswordLength);
             if (sanitized != value)
             {
                 passwordInput.SetTextWithoutNotify(sanitized);
@@ -185,8 +304,8 @@ namespace ProjectM.UI
             int caret = passwordInput.caretPosition;
             string current = passwordInput.text;
             passwordInput.contentType = isOn ? VisibleContent : MaskedContent;
-            passwordInput.characterLimit = passwordMaxLength;
-            passwordInput.text = SanitizeDigits(current, passwordMaxLength);
+            passwordInput.characterLimit = PasswordLength;
+            passwordInput.text = SanitizeDigits(current, PasswordLength);
             passwordInput.caretPosition = Mathf.Clamp(caret, 0, passwordInput.text.Length);
             passwordInput.ForceLabelUpdate();
         }
@@ -206,41 +325,61 @@ namespace ProjectM.UI
             return sb.ToString();
         }
 
-        // ── 버튼 ──────────────────────────────────────────────────
-        private void OnJoinClicked()
+        private async void OnJoinClicked()
         {
-            if (selectedRow == null || selectedRow.Entry == null)
+            if (isBusy || selectedRow == null || selectedRow.Entry == null) return;
+
+            if (lobbyRelayService == null)
             {
-                Debug.LogWarning("[JoinRoomPanel] 선택된 방이 없다.");
-                return;
-            }
-            if (roomManager == null)
-            {
-                Debug.LogError("[JoinRoomPanel] RoomManager 참조가 없다.");
-                return;
+                lobbyRelayService = LobbyRelayService.Instance;
+                if (lobbyRelayService == null)
+                {
+                    SetStatus("네트워크 서비스를 찾을 수 없습니다.");
+                    return;
+                }
             }
 
             var entry = selectedRow.Entry;
-            string nickname = nicknameInput != null ? nicknameInput.text?.Trim() : "";
             string password = entry.hasPassword && passwordInput != null
-                ? SanitizeDigits(passwordInput.text, passwordMaxLength)
+                ? SanitizeDigits(passwordInput.text, PasswordLength)
                 : string.Empty;
 
-            string ip = string.IsNullOrEmpty(entry.hostIp) ? "127.0.0.1" : entry.hostIp;
-
-            bool ok = roomManager.JoinRoom(ip, nickname, password);
-            if (!ok)
+            if (entry.hasPassword && password.Length != PasswordLength)
             {
-                Debug.LogError($"[JoinRoomPanel] 접속 실패: {entry.roomName} @ {ip}");
+                SetStatus("비밀번호 8자리를 입력해 주세요.");
                 return;
             }
 
-            Debug.Log($"[JoinRoomPanel] 참여: name='{entry.roomName}' ip={ip} hasPw={entry.hasPassword}");
+            SetBusy(true, "방 참여 중...");
 
-            gameObject.SetActive(false);
-            if (mainMenu != null) mainMenu.LoadGameplayScene();
+            try
+            {
+                await lobbyRelayService.JoinRoomAsync(entry.lobbyId, password);
+                gameObject.SetActive(false);
+                if (mainMenu != null) mainMenu.LoadCharacterSelectScene();
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogException(ex);
+                SetStatus(ex.Message.Contains("비밀번호")
+                    ? "비밀번호가 올바르지 않습니다."
+                    : $"참여 실패: {ex.Message}");
+                SetBusy(false);
+            }
         }
 
         private void OnCancelClicked() => gameObject.SetActive(false);
+
+        private void SetBusy(bool busy, string message = null)
+        {
+            isBusy = busy;
+            if (!string.IsNullOrEmpty(message)) SetStatus(message);
+            UpdateJoinButton();
+        }
+
+        private void SetStatus(string message)
+        {
+            if (statusText != null) statusText.text = message;
+        }
     }
 }

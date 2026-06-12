@@ -7,8 +7,7 @@ namespace ProjectM.Network
 {
     /// <summary>
     /// 로비/방 조율자. NetworkHost/NetworkClient 위에서 입장/Ready/시작 흐름을 처리한다.
-    /// MVP에서는 Room Code는 표시용이며, 실제 접속은 IP+포트로 직접 한다.
-    /// (추후 API Layer의 매치메이킹이 Code→IP를 해석하게 됨.)
+    /// MainMenu 방 생성/참여는 LobbyRelayService 사용. 아래 TCP API는 디버그/레거시용.
     /// </summary>
     public class RoomManager : MonoBehaviour
     {
@@ -68,7 +67,7 @@ namespace ProjectM.Network
 
         /// <summary>
         /// 방 생성. roomName/isPublic/password는 로비 메타데이터.
-        /// password는 비어 있으면 비밀번호 없는 방. (최대 4자리 숫자 권장)
+        /// password는 비어 있으면 비밀번호 없는 방.
         /// </summary>
         public bool CreateRoom(string nickname, string roomName, bool isPublic, string password)
         {

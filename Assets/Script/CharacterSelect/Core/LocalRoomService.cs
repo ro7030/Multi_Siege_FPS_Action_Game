@@ -1,4 +1,5 @@
 using System;
+using ProjectM.Auth;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -25,10 +26,12 @@ namespace ProjectM.CharacterSelect
             _slots = new RoomPlayerData[maxSlots];
             for (int i = 0; i < maxSlots; i++) _slots[i] = RoomPlayerData.Empty;
 
+            string nickname = AuthSessionManager.ResolveNickname(localNickname);
+
             _slots[LocalSlotIndex] = new RoomPlayerData
             {
                 IsOccupied = true,
-                Nickname = localNickname,
+                Nickname = nickname,
                 CharacterIndex = 0,
                 IsReady = false,
                 Score = 0
