@@ -1,5 +1,6 @@
 using ProjectM.Auth;
 using ProjectM.Network;
+using Unity.Netcode;
 using Unity.Services.Authentication;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -64,6 +65,17 @@ namespace ProjectM.UI
                 Debug.LogError("[MainMenu] characterSelectSceneName is empty.");
                 return;
             }
+
+            var lobby = LobbyRelayService.Instance;
+            var nm = NetworkManager.Singleton;
+
+            if (lobby != null && lobby.IsInSession && nm != null && nm.IsListening)
+            {
+                if (nm.IsHost)
+                    nm.SceneManager.LoadScene(characterSelectSceneName, LoadSceneMode.Single);
+                return;
+            }
+
             SceneManager.LoadScene(characterSelectSceneName);
         }
 

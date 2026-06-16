@@ -10,8 +10,11 @@ namespace ProjectM.CharacterSelect
 
         RoomPlayerData GetPlayer(int slotIndex);
 
+        bool CanStartGame { get; }
+
         void SelectCharacter(int characterIndex);
         void SetReady(bool ready);
+        void TryStartGame();
         void LeaveRoom();
 
         event Action<int> OnPlayerChanged;

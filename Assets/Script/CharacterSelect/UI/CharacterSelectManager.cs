@@ -8,6 +8,7 @@ namespace ProjectM.CharacterSelect
     public class CharacterSelectManager : MonoBehaviour
     {
         [Header("Services")]
+        [SerializeField] private RoomServiceBootstrapper roomServiceBootstrapper;
         [SerializeField] private MonoBehaviour roomServiceObject;
         [SerializeField] private CharacterDatabase database;
 
@@ -33,13 +34,9 @@ namespace ProjectM.CharacterSelect
 
         private void Awake()
         {
-            _room = roomServiceObject as IRoomService;
+            ResolveRoomService();
             if (_room == null)
-            {
-                Debug.LogError($"[{nameof(CharacterSelectManager)}] roomServiceObject must implement IRoomService.", this);
-                enabled = false;
-                return;
-            }
+                Debug.LogWarning($"[{nameof(CharacterSelectManager)}] IRoomService not ready in Awake; will retry in Start.", this);
 
             if (leftArrowButton != null)  leftArrowButton.onClick.AddListener(OnLeftArrow);
             if (rightArrowButton != null) rightArrowButton.onClick.AddListener(OnRightArrow);
@@ -47,8 +44,20 @@ namespace ProjectM.CharacterSelect
             if (exitRoomButton != null)   exitRoomButton.onClick.AddListener(OnExitClicked);
         }
 
+        private void ResolveRoomService()
+        {
+            if (roomServiceBootstrapper == null)
+                roomServiceBootstrapper = FindAnyObjectByType<RoomServiceBootstrapper>();
+
+            if (roomServiceBootstrapper != null && roomServiceBootstrapper.ActiveRoomService != null)
+                roomServiceObject = roomServiceBootstrapper.ActiveRoomService;
+
+            _room = roomServiceObject as IRoomService;
+        }
+
         private void OnEnable()
         {
+            if (_room == null) ResolveRoomService();
             if (_room == null) return;
             _room.OnPlayerChanged += HandlePlayerChanged;
             _room.OnAllPlayersReady += HandleAllReady;
@@ -63,9 +72,20 @@ namespace ProjectM.CharacterSelect
 
         private void Start()
         {
+            if (_room == null)
+            {
+                ResolveRoomService();
+                if (_room != null)
+                {
+                    _room.OnPlayerChanged += HandlePlayerChanged;
+                    _room.OnAllPlayersReady += HandleAllReady;
+                }
+            }
+
             if (_room == null) return;
             for (int i = 0; i < _room.MaxSlots; i++) HandlePlayerChanged(i);
             UpdateReadyButtonLabel();
+            UpdateArrowButtons();
         }
 
         private void OnLeftArrow()
@@ -84,6 +104,12 @@ namespace ProjectM.CharacterSelect
 
         private void OnReadyClicked()
         {
+            if (_room.IsLocalHost)
+            {
+                _room.TryStartGame();
+                return;
+            }
+
             var data = _room.GetPlayer(_room.LocalSlotIndex);
             _room.SetReady(!data.IsReady);
         }
@@ -104,19 +130,44 @@ namespace ProjectM.CharacterSelect
                 slotUIs[i].Bind(data, slotIndex == _room.LocalSlotIndex);
             }
 
-            if (slotIndex == _room.LocalSlotIndex) UpdateReadyButtonLabel();
+            if (slotIndex == _room.LocalSlotIndex)
+            {
+                UpdateReadyButtonLabel();
+                UpdateArrowButtons();
+            }
+            else if (_room.IsLocalHost)
+            {
+                UpdateReadyButtonLabel();
+            }
         }
 
         private void UpdateReadyButtonLabel()
         {
             if (readyButtonLabel == null) return;
+
+            if (_room.IsLocalHost)
+            {
+                readyButtonLabel.text = startLabel;
+                if (readyButton != null) readyButton.interactable = _room.CanStartGame;
+                return;
+            }
+
             var data = _room.GetPlayer(_room.LocalSlotIndex);
-            if (data.IsReady) { readyButtonLabel.text = cancelLabel; return; }
-            readyButtonLabel.text = _room.IsLocalHost ? startLabel : readyLabel;
+            readyButtonLabel.text = data.IsReady ? cancelLabel : readyLabel;
+            if (readyButton != null) readyButton.interactable = data.IsOccupied;
+        }
+
+        private void UpdateArrowButtons()
+        {
+            var data = _room.GetPlayer(_room.LocalSlotIndex);
+            bool canChange = data.IsOccupied && !data.IsReady;
+            if (leftArrowButton != null) leftArrowButton.interactable = canChange;
+            if (rightArrowButton != null) rightArrowButton.interactable = canChange;
         }
 
         private void HandleAllReady()
         {
+            if (_room is NetworkRoomService) return;
             if (string.IsNullOrEmpty(gameplaySceneName)) return;
             SceneManager.LoadScene(gameplaySceneName);
         }

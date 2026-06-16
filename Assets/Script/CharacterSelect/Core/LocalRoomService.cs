@@ -17,6 +17,7 @@ namespace ProjectM.CharacterSelect
         public int LocalSlotIndex => 0;
         public int MaxSlots => maxSlots;
         public bool IsLocalHost => true;
+        public bool CanStartGame => AllGuestsReadyOrNone();
 
         public event Action<int> OnPlayerChanged;
         public event Action OnAllPlayersReady;
@@ -71,8 +72,12 @@ namespace ProjectM.CharacterSelect
             data.IsReady = ready;
             _slots[LocalSlotIndex] = data;
             OnPlayerChanged?.Invoke(LocalSlotIndex);
+        }
 
-            if (ready && AllOccupiedReady()) OnAllPlayersReady?.Invoke();
+        public void TryStartGame()
+        {
+            if (!CanStartGame) return;
+            OnAllPlayersReady?.Invoke();
         }
 
         public void LeaveRoom()
@@ -83,11 +88,13 @@ namespace ProjectM.CharacterSelect
             }
         }
 
-        private bool AllOccupiedReady()
+        private bool AllGuestsReadyOrNone()
         {
             for (int i = 0; i < maxSlots; i++)
             {
-                if (_slots[i].IsOccupied && !_slots[i].IsReady) return false;
+                if (!_slots[i].IsOccupied) continue;
+                if (i == LocalSlotIndex) continue;
+                if (!_slots[i].IsReady) return false;
             }
             return true;
         }

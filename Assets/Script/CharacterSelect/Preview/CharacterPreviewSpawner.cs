@@ -6,6 +6,7 @@ namespace ProjectM.CharacterSelect
     {
         [SerializeField] private CharacterDatabase database;
         [SerializeField] private Transform[] slotAnchors;
+        [SerializeField] private RoomServiceBootstrapper roomServiceBootstrapper;
         [SerializeField] private MonoBehaviour roomServiceObject;
 
         private IRoomService _room;
@@ -14,18 +15,48 @@ namespace ProjectM.CharacterSelect
 
         private void Awake()
         {
-            _room = roomServiceObject as IRoomService;
+            ResolveRoomService();
             if (_room == null)
             {
-                Debug.LogError($"[{nameof(CharacterPreviewSpawner)}] roomServiceObject must implement IRoomService.", this);
-                enabled = false;
+                Debug.LogWarning($"[{nameof(CharacterPreviewSpawner)}] IRoomService not ready in Awake; will retry.", this);
                 return;
             }
 
+            InitSpawnArrays();
+        }
+
+        private void InitSpawnArrays()
+        {
+            if (_spawned != null) return;
             int slots = Mathf.Min(_room.MaxSlots, slotAnchors != null ? slotAnchors.Length : 0);
             _spawned = new GameObject[slots];
             _spawnedCharIndex = new int[slots];
             for (int i = 0; i < slots; i++) _spawnedCharIndex[i] = -1;
+        }
+
+        private void ResolveRoomService()
+        {
+            if (roomServiceBootstrapper == null)
+                roomServiceBootstrapper = FindAnyObjectByType<RoomServiceBootstrapper>();
+
+            if (roomServiceBootstrapper != null && roomServiceBootstrapper.ActiveRoomService != null)
+                roomServiceObject = roomServiceBootstrapper.ActiveRoomService;
+
+            _room = roomServiceObject as IRoomService;
+        }
+
+        private void Update()
+        {
+            if (_room == null)
+            {
+                ResolveRoomService();
+                if (_room != null && isActiveAndEnabled)
+                {
+                    InitSpawnArrays();
+                    _room.OnPlayerChanged += HandlePlayerChanged;
+                    for (int i = 0; i < _spawned.Length; i++) HandlePlayerChanged(i);
+                }
+            }
         }
 
         private void OnEnable()
@@ -40,13 +71,14 @@ namespace ProjectM.CharacterSelect
 
         private void Start()
         {
-            if (_room == null) return;
+            if (_room == null) ResolveRoomService();
+            if (_room == null || _spawned == null) return;
             for (int i = 0; i < _spawned.Length; i++) HandlePlayerChanged(i);
         }
 
         private void HandlePlayerChanged(int slotIndex)
         {
-            if (slotIndex < 0 || slotIndex >= _spawned.Length) return;
+            if (_spawned == null || slotIndex < 0 || slotIndex >= _spawned.Length) return;
             var data = _room.GetPlayer(slotIndex);
 
             if (!data.IsOccupied)
