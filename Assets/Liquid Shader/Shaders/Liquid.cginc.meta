@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: ada95764ff4bbd84d8612400b622d452
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 173635
+  packageName: Liquid Shader
+  packageVersion: 1.1.0
+  assetPath: Assets/Liquid Shader/Shaders/Liquid.cginc
+  uploadId: 436568

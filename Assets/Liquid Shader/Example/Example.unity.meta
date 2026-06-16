@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 9e95f1f4fbd48754abca601b41c5bb1f
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 173635
+  packageName: Liquid Shader
+  packageVersion: 1.1.0
+  assetPath: Assets/Liquid Shader/Example/Example.unity
+  uploadId: 436568

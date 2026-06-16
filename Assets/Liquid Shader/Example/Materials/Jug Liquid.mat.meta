@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6951f19cd766a6d46868ddba1a4764af
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 173635
+  packageName: Liquid Shader
+  packageVersion: 1.1.0
+  assetPath: Assets/Liquid Shader/Example/Materials/Jug Liquid.mat
+  uploadId: 436568

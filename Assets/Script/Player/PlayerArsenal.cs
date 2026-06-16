@@ -84,6 +84,9 @@ namespace ProjectM.Player
             if (rangedWeapon != null) rangedWeapon.IsActive = (slot == WeaponSlot.Primary);
             if (meleeWeapon != null)  meleeWeapon.IsActive  = (slot == WeaponSlot.Secondary);
 
+            if (rangedWeapon != null) rangedWeapon.SetViewModelVisible(slot == WeaponSlot.Primary);
+            if (meleeWeapon != null)  meleeWeapon.SetViewModelVisible(slot == WeaponSlot.Secondary);
+
             OnSlotChanged?.Invoke(slot);
             Debug.Log($"[Arsenal] 슬롯 전환: {slot}");
         }

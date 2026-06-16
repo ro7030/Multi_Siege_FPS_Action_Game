@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: b7dc8532d775f26449cd9e9db63894b0
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 173635
+  packageName: Liquid Shader
+  packageVersion: 1.1.0
+  assetPath: Assets/Liquid Shader/Editor/GlassEditor.cs
+  uploadId: 436568

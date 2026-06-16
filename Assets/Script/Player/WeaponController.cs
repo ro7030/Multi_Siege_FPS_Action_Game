@@ -15,6 +15,11 @@ namespace ProjectM.Player
         [SerializeField] private Camera viewCamera;
         [SerializeField] private Transform muzzle;
 
+        [Header("비주얼 (1인칭 뷰모델)")]
+        [Tooltip("카메라 자식의 빈 GameObject. 무기 모델이 이 곳의 자식으로 인스턴스화된다.")]
+        [SerializeField] private Transform viewModelSocket;
+        private GameObject viewModelInstance;
+
         [Header("탄도")]
         [SerializeField] private float damage = 25f;
         [SerializeField] private float range = 200f;
@@ -156,6 +161,26 @@ namespace ProjectM.Player
             magazineSize = def.magazineSize;
             reloadDuration = def.reloadDuration;
             if (CurrentMagazine > magazineSize) CurrentMagazine = magazineSize;
+
+            SwapViewModel(def.viewModelPrefab);
+        }
+
+        private void SwapViewModel(GameObject prefab)
+        {
+            if (viewModelInstance != null) Destroy(viewModelInstance);
+            viewModelInstance = null;
+
+            if (prefab == null || viewModelSocket == null) return;
+
+            viewModelInstance = Instantiate(prefab, viewModelSocket);
+            viewModelInstance.transform.localPosition = Vector3.zero;
+            viewModelInstance.transform.localRotation = Quaternion.identity;
+            viewModelInstance.SetActive(IsActive);
+        }
+
+        public void SetViewModelVisible(bool visible)
+        {
+            if (viewModelInstance != null) viewModelInstance.SetActive(visible);
         }
     }
 }

@@ -16,6 +16,11 @@ namespace ProjectM.Player
         [Header("기준 카메라")]
         [SerializeField] private Camera viewCamera;
 
+        [Header("비주얼 (1인칭 뷰모델)")]
+        [Tooltip("카메라 자식의 빈 GameObject. 무기 모델이 이 곳의 자식으로 인스턴스화된다.")]
+        [SerializeField] private Transform viewModelSocket;
+        private GameObject viewModelInstance;
+
         [Header("스탯 (WeaponDefinition 으로 덮어씀)")]
         [SerializeField] private float damage = 15f;
         [SerializeField] private float attackInterval = 2.5f;
@@ -51,6 +56,26 @@ namespace ProjectM.Player
             attackInterval = def.attackInterval;
             meleeRange = def.meleeRange;
             meleeAngle = def.meleeAngle;
+
+            SwapViewModel(def.viewModelPrefab);
+        }
+
+        private void SwapViewModel(GameObject prefab)
+        {
+            if (viewModelInstance != null) Destroy(viewModelInstance);
+            viewModelInstance = null;
+
+            if (prefab == null || viewModelSocket == null) return;
+
+            viewModelInstance = Instantiate(prefab, viewModelSocket);
+            viewModelInstance.transform.localPosition = Vector3.zero;
+            viewModelInstance.transform.localRotation = Quaternion.identity;
+            viewModelInstance.SetActive(IsActive);
+        }
+
+        public void SetViewModelVisible(bool visible)
+        {
+            if (viewModelInstance != null) viewModelInstance.SetActive(visible);
         }
 
         private void Update()

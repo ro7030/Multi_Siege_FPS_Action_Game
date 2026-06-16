@@ -2919,7 +2919,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: start
+  m_text: "\uC2DC\uC791"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d9c3847de03d37948bf1e3d46f58ebbc, type: 2}
   m_sharedMaterial: {fileID: 5028249470243527467, guid: d9c3847de03d37948bf1e3d46f58ebbc, type: 2}
@@ -3296,7 +3296,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &2079512918
 MonoBehaviour:
   m_ObjectHideFlags: 0

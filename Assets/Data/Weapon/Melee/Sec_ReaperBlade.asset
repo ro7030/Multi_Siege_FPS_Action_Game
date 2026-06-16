@@ -18,6 +18,7 @@ MonoBehaviour:
   price: 60
   damage: 20
   icon: {fileID: 21300000, guid: a18f484af704f3d479ccd8df56e8117b, type: 3}
+  viewModelPrefab: {fileID: 4334720229974137441, guid: 8dd1278bd62135046a6827f7b8d6b129, type: 3}
   fireRate: 5
   magazineSize: 30
   reloadDuration: 2.5

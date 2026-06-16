@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: d453be5b9f0ca0d48b737ff0bae7063c
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 173635
+  packageName: Liquid Shader
+  packageVersion: 1.1.0
+  assetPath: Assets/Liquid Shader/Editor/LiquidScriptEditor.cs
+  uploadId: 436568
