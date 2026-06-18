@@ -21,6 +21,9 @@ namespace ProjectM.Player
 
         [Header("입력")]
         [SerializeField] private bool isLocalPlayer = true;
+
+        public bool IsLocalPlayer { get => isLocalPlayer; set => isLocalPlayer = value; }
+
         [SerializeField] private Key interactKey = Key.F;
 
         /// <summary>현재 조준 중인 상호작용 대상 (없으면 null).</summary>

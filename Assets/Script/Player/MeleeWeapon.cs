@@ -33,6 +33,7 @@ namespace ProjectM.Player
         [SerializeField] private KitEquipper kitEquipper;
         [SerializeField] private ThrowableEquipper throwableEquipper;
 
+        public bool IsLocalPlayer { get => isLocalPlayer; set => isLocalPlayer = value; }
         public bool IsActive { get; set; } = false;
         public WeaponDefinition CurrentDefinition { get; private set; }
 

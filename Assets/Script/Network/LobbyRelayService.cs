@@ -119,8 +119,11 @@ namespace ProjectM.Network
             var lobby = await LobbyService.Instance.CreateLobbyAsync(displayName, maxPlayers, lobbyOptions);
 
             ApplyRelayServerData(allocation);
+            NetworkPlayerSessionGuard.ApplyManagerSettings(networkManager);
             if (!networkManager.StartHost())
                 throw new InvalidOperationException("Failed to start NGO Host.");
+
+            NetworkPlayerSessionGuard.EnforceGameplayOnlySpawn(networkManager);
 
             IsInSession = true;
             IsHost = true;
@@ -220,11 +223,14 @@ namespace ProjectM.Network
             JoinAllocation allocation = await RelayService.Instance.JoinAllocationAsync(relayJoinCode);
 
             ApplyRelayServerData(allocation);
+            NetworkPlayerSessionGuard.ApplyManagerSettings(networkManager);
             if (!networkManager.StartClient())
             {
                 await LobbyService.Instance.RemovePlayerAsync(lobby.Id, AuthenticationService.Instance.PlayerId);
                 throw new InvalidOperationException("Failed to start NGO Client.");
             }
+
+            NetworkPlayerSessionGuard.EnforceGameplayOnlySpawn(networkManager);
 
             IsInSession = true;
             IsHost = false;

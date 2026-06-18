@@ -1,5 +1,6 @@
 using UnityEngine;
 using ProjectM.Core;
+using ProjectM.Network;
 using ProjectM.Player;
 
 namespace ProjectM.Economy
@@ -43,6 +44,7 @@ namespace ProjectM.Economy
 
         private void HandleWaveEnded(int waveNumber)
         {
+            if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer) return;
             int reward = baseReward + waveBonus * waveNumber;
             // 보스 웨이브 보정: WaveConfig.isBossWave는 Wave 모듈에 있으므로 단순화하여 마지막 웨이브를 보스로 간주
             if (session != null && waveNumber >= session.State.MaxWave) reward += bossWaveBonus;
@@ -51,6 +53,7 @@ namespace ProjectM.Economy
 
         private void HandleMatchEnded(bool cleared)
         {
+            if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer) return;
             if (cleared) ApplyReward(finalClearBonus, "전체 클리어 보너스");
         }
 

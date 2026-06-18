@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using ProjectM.Core;
 using ProjectM.Defense;
+using ProjectM.Network;
 
 namespace ProjectM.Economy
 {
@@ -138,6 +139,7 @@ namespace ProjectM.Economy
 
         private void HandleWaveEnded(int waveNumber)
         {
+            if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer) return;
             // null 정리
             activeFarms.RemoveAll(f => f == null);
 

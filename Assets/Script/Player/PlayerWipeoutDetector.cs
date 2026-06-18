@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using ProjectM.Core;
+using ProjectM.Network;
 
 namespace ProjectM.Player
 {
@@ -108,6 +109,7 @@ namespace ProjectM.Player
         private void CheckWipeout()
         {
             if (ended) return;
+            if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer) return;
             if (session == null) return;
             if (tracked.Count == 0) return; // 플레이어를 한 번도 못 찾았으면 무시
 

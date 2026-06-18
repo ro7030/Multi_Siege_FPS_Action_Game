@@ -33,6 +33,9 @@ namespace ProjectM.Player
 
         [Header("입력")]
         [SerializeField] private bool isLocalPlayer = true;
+
+        public bool IsLocalPlayer { get => isLocalPlayer; set => isLocalPlayer = value; }
+
         [SerializeField] private Key cycleKey = Key.Digit4;
         [SerializeField] private Key quickThrowKey = Key.G;
 

@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine;
 using ProjectM.Core;
 using ProjectM.Enemy;
+using ProjectM.Network;
 
 namespace ProjectM.Wave
 {
@@ -53,6 +54,7 @@ namespace ProjectM.Wave
 
         public void StartWave(int waveNumber)
         {
+            if (!NetworkSessionHelper.IsGameplayAuthority) return;
             if (IsSpawning) { Debug.LogWarning("[Wave] 이미 스폰 중"); return; }
             int idx = Mathf.Clamp(waveNumber - 1, 0, (waves?.Length ?? 1) - 1);
             if (waves == null || waves.Length == 0)
@@ -109,9 +111,19 @@ namespace ProjectM.Wave
 
         public void AbortWave()
         {
+            if (!NetworkSessionHelper.IsGameplayAuthority) return;
             if (spawnRoutine != null) StopCoroutine(spawnRoutine);
             IsSpawning = false;
             spawner?.KillAll();
+        }
+
+        public void ApplyRemoteUiState(int totalToSpawn, int spawnedCount, bool isSpawning)
+        {
+            if (NetworkSessionHelper.IsGameplayAuthority) return;
+
+            TotalToSpawn = totalToSpawn;
+            SpawnedCount = spawnedCount;
+            IsSpawning = isSpawning;
         }
     }
 }
