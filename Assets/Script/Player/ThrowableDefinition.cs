@@ -26,6 +26,8 @@ namespace ProjectM.Player
         [Header("프리팹/표시")]
         [Tooltip("던질 프리팹 (ThrowableProjectile + Rigidbody + Collider). 비우면 기본 구체 생성.")]
         public GameObject projectilePrefab;
+        [Tooltip("들고 있을 때 1인칭 카메라 자식 소켓에 인스턴스화되는 모델 프리팹.")]
+        public GameObject heldViewModelPrefab;
         public Sprite icon;
         public int price = 35;
     }
