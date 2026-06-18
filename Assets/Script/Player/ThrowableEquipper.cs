@@ -31,6 +31,12 @@ namespace ProjectM.Player
         [SerializeField] private float throwUpward = 3f;
         [SerializeField] private float spawnForward = 0.8f;
 
+        [Header("비주얼 (1인칭 뷰모델)")]
+        [Tooltip("카메라 자식의 빈 GameObject. 장착한 투척무기 모델이 이 곳의 자식으로 인스턴스화된다.")]
+        [SerializeField] private Transform viewModelSocket;
+        private GameObject viewModelInstance;
+        private ThrowableType viewModelType = ThrowableType.None;
+
         [Header("입력")]
         [SerializeField] private bool isLocalPlayer = true;
 
@@ -146,7 +152,27 @@ namespace ProjectM.Player
             if (EquippedThrowable == type) return;
             EquippedThrowable = type;
             if (type != ThrowableType.None) kitEquipper?.Holster(); // 키트와 배타
+            SwapHeldViewModel(type);
             OnEquippedChanged?.Invoke(type);
+        }
+
+        private void SwapHeldViewModel(ThrowableType type)
+        {
+            if (viewModelType == type && viewModelInstance != null) return;
+
+            if (viewModelInstance != null) Destroy(viewModelInstance);
+            viewModelInstance = null;
+            viewModelType = ThrowableType.None;
+
+            if (type == ThrowableType.None || viewModelSocket == null) return;
+
+            var def = GetDef(type);
+            if (def == null || def.heldViewModelPrefab == null) return;
+
+            viewModelInstance = Instantiate(def.heldViewModelPrefab, viewModelSocket);
+            viewModelInstance.transform.localPosition = Vector3.zero;
+            viewModelInstance.transform.localRotation = Quaternion.identity;
+            viewModelType = type;
         }
 
         public void Holster() => SetEquipped(ThrowableType.None);
