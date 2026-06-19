@@ -1,5 +1,6 @@
 using UnityEngine;
 using ProjectM.Core;
+using ProjectM.Network;
 
 namespace ProjectM.Defense
 {
@@ -27,6 +28,9 @@ namespace ProjectM.Defense
         private void HandleDestroyed(DefenseObject _)
         {
             Debug.Log("[BaseCamp] 베이스 캠프 파괴 — 매치 패배");
+            if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer)
+                return;
+
             if (!endMatchOnDestroy || session == null) return;
             if (session.State.CurrentPhase == GamePhase.Wave ||
                 session.State.CurrentPhase == GamePhase.Preparation ||

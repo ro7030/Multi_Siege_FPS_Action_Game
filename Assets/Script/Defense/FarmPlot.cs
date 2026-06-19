@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using ProjectM.Network;
 using ProjectM.Player;
 
 namespace ProjectM.Defense
@@ -79,6 +80,9 @@ namespace ProjectM.Defense
             AccumulatedYield = 0;  // 파괴 시 누적분 손실
             ApplyVisual();
             OnDestroyedByEnemy?.Invoke(this);
+
+            if (TryGetComponent<NetworkFarmBridge>(out var bridge) && NetworkSessionHelper.IsServer)
+                bridge.ServerSyncFromPlot();
         }
 
         // ─────────────────────────────────────────────────────────────
@@ -101,7 +105,10 @@ namespace ProjectM.Defense
 
             // 완료 — FarmManager 에 위임 (실제 지급은 매니저가 팀 분배)
             holdProgress = 0f;
-            Economy.FarmManager.Instance?.HarvestFarm(this);
+            if (TryGetComponent<NetworkFarmBridge>(out var bridge))
+                bridge.RequestHarvest();
+            else
+                Economy.FarmManager.Instance?.HarvestFarm(this);
         }
 
         public void InteractHoldCancel() { holdProgress = 0f; }
@@ -117,6 +124,9 @@ namespace ProjectM.Defense
             AccumulatedYield += yieldPerWave;
             OnYieldAdded?.Invoke(this, yieldPerWave);
             ApplyVisual();
+
+            if (TryGetComponent<NetworkFarmBridge>(out var bridge) && NetworkSessionHelper.IsServer)
+                bridge.ServerSyncFromPlot();
         }
 
         /// <summary>수확 실행. 누적분 반환 후 0 으로 초기화. 실제 지갑 지급은 FarmManager 가 수행.</summary>
@@ -126,7 +136,22 @@ namespace ProjectM.Defense
             AccumulatedYield = 0;
             OnHarvested?.Invoke(this, amount);
             ApplyVisual();
+
+            if (TryGetComponent<NetworkFarmBridge>(out var bridge) && NetworkSessionHelper.IsServer)
+                bridge.ServerSyncFromPlot();
+
             return amount;
+        }
+
+        /// <summary>클라이언트 NGO 미러용. 서버 로직은 변경하지 않는다.</summary>
+        internal void ApplyNetworkMirror(int accumulatedYield, FarmState state)
+        {
+            if (NetworkSessionHelper.IsGameplayAuthority)
+                return;
+
+            AccumulatedYield = accumulatedYield;
+            State = state;
+            ApplyVisual();
         }
 
         // ─────────────────────────────────────────────────────────────

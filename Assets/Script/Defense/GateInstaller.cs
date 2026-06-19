@@ -1,4 +1,5 @@
 using UnityEngine;
+using ProjectM.Network;
 using ProjectM.Player;
 
 namespace ProjectM.Defense
@@ -36,6 +37,8 @@ namespace ProjectM.Defense
         private DefenseObject gateDefense;
         private float holdProgress;
 
+        public bool IsInstalled => installed;
+
         private void Awake()
         {
             if (gateObject != null)
@@ -58,9 +61,11 @@ namespace ProjectM.Defense
 
         private void HandleGateDestroyed(DefenseObject _)
         {
-            // 게이트 파괴 → 다시 설치 가능
             installed = false;
             if (gateObject != null) gateObject.SetActive(false);
+
+            if (TryGetComponent<NetworkGateInstaller>(out var bridge) && NetworkSessionHelper.IsServer)
+                bridge.ServerSetInstalled(false);
         }
 
         // ── IInteractable ──
@@ -93,14 +98,44 @@ namespace ProjectM.Defense
             holdProgress += deltaTime;
             if (holdProgress < holdDuration) return;
 
-            // 완료 — 인벤토리에서 키트 소모 + 설치
             holdProgress = 0f;
-            var inv = interactor.GetComponent<KitInventory>();
-            if (inv == null || !inv.TryConsume(requiredKit)) return;
+            if (TryGetComponent<NetworkGateInstaller>(out var bridge))
+                bridge.RequestInstall(interactor);
+            else
+                TryInstallFromInteractor(interactor);
+        }
 
-            gateObject.SetActive(true);   // 게이트 설치(활성화)
-            installed = true;
+        public bool TryInstallFromInteractor(GameObject interactor)
+        {
+            if (installed || gateObject == null || interactor == null)
+                return false;
+
+            var equipper = interactor.GetComponent<KitEquipper>();
+            if (equipper == null || equipper.EquippedKit != requiredKit)
+                return false;
+
+            var inv = interactor.GetComponent<KitInventory>();
+            if (inv == null || !inv.TryConsume(requiredKit))
+                return false;
+
+            ApplyInstalledLocal(true);
             Debug.Log($"[GateInstaller] 문 설치됨 ({gateObject.name})");
+            return true;
+        }
+
+        public void ApplyNetworkInstalled(bool value)
+        {
+            installed = value;
+            if (gateObject != null)
+                gateObject.SetActive(value);
+        }
+
+        private void ApplyInstalledLocal(bool value)
+        {
+            ApplyNetworkInstalled(value);
+
+            if (TryGetComponent<NetworkGateInstaller>(out var bridge) && NetworkSessionHelper.IsServer)
+                bridge.ServerSetInstalled(value);
         }
 
         public void InteractHoldCancel() { holdProgress = 0f; }

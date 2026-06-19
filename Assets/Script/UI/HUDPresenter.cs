@@ -10,7 +10,7 @@ using ProjectM.Enemy;
 namespace ProjectM.UI
 {
     /// <summary>
-    /// 인게임 HUD. 로컬 플레이어 체력 1칸 + 팀원/더미 등 추가 체력 슬롯을 인스펙터에서 연결한다.
+    /// 인게임 HUD. 로컬 플레이어 체력 1칸 + (선택) 팀원 체력 슬롯을 인스펙터에서 연결한다.
     /// </summary>
     public class HUDPresenter : MonoBehaviour
     {
@@ -25,7 +25,7 @@ namespace ProjectM.UI
         [Header("로컬 플레이어 체력 (화면 UI 1칸)")]
         [SerializeField] private HealthBarSlot playerHealthBar = new();
 
-        [Header("팀원·더미 등 추가 체력 슬롯 (칸마다 Health + Fill 연결)")]
+        [Header("팀원 추가 체력 슬롯 (칸마다 Health + Fill 연결, TeammateHealthView 사용 시 비워둠)")]
         [SerializeField] private HealthBarSlot[] teamHealthBars;
 
         [Header("UI 요소 — 비워두면 자동 생성")]
@@ -38,15 +38,15 @@ namespace ProjectM.UI
         [Header("자동 생성 옵션")]
         [SerializeField] private bool autoBuildMissing = true;
 
+        [Header("로컬 플레이어 재탐색 (NetworkPlayer 스폰 후 바인딩)")]
+        [SerializeField] private float localPlayerRescanInterval = 0.5f;
+
+        private float localPlayerRescanTimer;
+        private bool eventsBound;
+
         private void Awake()
         {
-            if (playerHealthBar.health == null)
-                playerHealthBar.health = LocalPlayerUtility.FindLocalHealthSystem();
-
-            if (playerWeapon == null) playerWeapon = LocalPlayerUtility.FindLocalWeaponController();
             if (session == null) session = FindAnyObjectByType<GameSessionManager>();
-            if (kitInventory == null) kitInventory = FindAnyObjectByType<KitInventory>();
-            if (kitEquipper == null) kitEquipper = FindAnyObjectByType<KitEquipper>();
             if (waveManager == null) waveManager = FindAnyObjectByType<WaveManager>();
             if (enemySpawner == null) enemySpawner = FindAnyObjectByType<EnemySpawner>();
 
@@ -56,11 +56,12 @@ namespace ProjectM.UI
         private void Start()
         {
             if (autoBuildMissing) BuildMissingElements();
+            TryResolveLocalPlayer(forceRebind: true);
             BindEvents();
             RefreshAll();
         }
 
-        /// <summary>팀 슬롯에 UI만 비어 있으면 HUD 자식 DummyHpBg 등을 0번 슬롯에 연결.</summary>
+        /// <summary>팀 슬롯에 UI만 비어 있으면 HUD 자식 TeammateHpBg 등을 0번 슬롯에 연결.</summary>
         private void ResolveTeamBarUiFromChildren()
         {
             if (teamHealthBars == null || teamHealthBars.Length == 0) return;
@@ -68,7 +69,7 @@ namespace ProjectM.UI
             var slot = teamHealthBars[0];
             if (slot == null || slot.fillImage != null) return;
 
-            var barRoot = transform.Find("DummyHpBg") ?? transform.Find("HpBg");
+            var barRoot = transform.Find("TeammateHpBg") ?? transform.Find("HpBg");
             if (barRoot == null) return;
 
             var fillT = barRoot.Find("HpFill");
@@ -169,6 +170,8 @@ namespace ProjectM.UI
 
         private void BindEvents()
         {
+            if (eventsBound) return;
+
             playerHealthBar.Bind(RefreshPlayerHp);
             BindTeamBars();
 
@@ -181,9 +184,52 @@ namespace ProjectM.UI
             if (session != null) session.OnWaveStarted += HandleWaveStarted;
             if (kitInventory != null) kitInventory.OnCountChanged += HandleKitChanged;
             if (kitEquipper != null) kitEquipper.OnEquippedChanged += HandleKitEquippedChanged;
+
+            eventsBound = true;
         }
 
-        private void OnDisable()
+        private void TryResolveLocalPlayer(bool forceRebind)
+        {
+            var health = LocalPlayerUtility.FindLocalHealthSystem();
+            var weapon = LocalPlayerUtility.FindLocalWeaponController();
+            var inventory = LocalPlayerUtility.FindLocalComponent<KitInventory>();
+            var equipper = LocalPlayerUtility.FindLocalComponent<KitEquipper>();
+
+            bool healthChanged = health != playerHealthBar.health;
+            bool weaponChanged = weapon != playerWeapon;
+            bool kitChanged = inventory != kitInventory || equipper != kitEquipper;
+
+            if (!forceRebind && !healthChanged && !weaponChanged && !kitChanged)
+                return;
+
+            if (eventsBound)
+                UnbindEvents();
+
+            if (healthChanged)
+            {
+                playerHealthBar.Unbind();
+                playerHealthBar.health = health;
+                if (playerHealthBar.root == null && playerHealthBar.fillImage != null)
+                    playerHealthBar.root = playerHealthBar.fillImage.transform.parent?.gameObject;
+            }
+
+            playerWeapon = weapon;
+            kitInventory = inventory;
+            kitEquipper = equipper;
+
+            eventsBound = false;
+            BindEvents();
+
+            if (healthChanged) RefreshPlayerHp();
+            if (weaponChanged)
+            {
+                RefreshAmmo();
+                RefreshReload();
+            }
+            if (kitChanged) RefreshKit();
+        }
+
+        private void UnbindEvents()
         {
             playerHealthBar.Unbind();
             UnbindTeamBars();
@@ -197,6 +243,13 @@ namespace ProjectM.UI
             if (session != null) session.OnWaveStarted -= HandleWaveStarted;
             if (kitInventory != null) kitInventory.OnCountChanged -= HandleKitChanged;
             if (kitEquipper != null) kitEquipper.OnEquippedChanged -= HandleKitEquippedChanged;
+
+            eventsBound = false;
+        }
+
+        private void OnDisable()
+        {
+            UnbindEvents();
         }
 
         private void BindTeamBars()
@@ -222,6 +275,13 @@ namespace ProjectM.UI
 
         private void Update()
         {
+            localPlayerRescanTimer += Time.deltaTime;
+            if (localPlayerRescanTimer >= localPlayerRescanInterval)
+            {
+                localPlayerRescanTimer = 0f;
+                TryResolveLocalPlayer(forceRebind: false);
+            }
+
             if (playerWeapon != null && reloadText != null)
             {
                 if (playerWeapon.IsReloading) reloadText.text = "RELOADING...";

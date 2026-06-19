@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using ProjectM.Defense;
 using ProjectM.Economy;
+using ProjectM.Network;
 
 namespace ProjectM.Player
 {
@@ -316,16 +317,30 @@ namespace ProjectM.Player
             if (!TryRaycastFromView(out RaycastHit hit)) return false;
 
             Vector3 placePos = hit.point;
-            Quaternion placeRot = Quaternion.LookRotation(Vector3.ProjectOnPlane(transform.forward, Vector3.up));
+            float rotY = Quaternion.LookRotation(Vector3.ProjectOnPlane(transform.forward, Vector3.up)).eulerAngles.y;
+
+            if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer)
+            {
+                var bridge = UnityEngine.Object.FindAnyObjectByType<NetworkFarmManagerBridge>();
+                if (bridge == null)
+                {
+                    Debug.LogWarning("[Kit] FarmKit: NetworkFarmManagerBridge 없음");
+                    return false;
+                }
+
+                bridge.RequestPlaceFarmServerRpc(placePos, rotY);
+                Debug.Log($"[Kit] FarmKit 설치 요청 @ {placePos}");
+                return true;
+            }
 
             if (!inventory.TryConsume(KitType.FarmKit)) return false;
 
-            if (FarmManager.Instance.TryPlaceFarm(placePos, placeRot, out _))
+            if (FarmManager.Instance.TryPlaceFarm(placePos, Quaternion.Euler(0f, rotY, 0f), out _))
             {
                 Debug.Log($"[Kit] FarmKit 사용 — 밭 설치 @ {placePos}");
                 return true;
             }
-            inventory.Add(KitType.FarmKit, 1); // 거부 시 환불
+            inventory.Add(KitType.FarmKit, 1);
             return false;
         }
 

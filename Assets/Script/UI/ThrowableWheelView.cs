@@ -28,10 +28,21 @@ namespace ProjectM.UI
         private static readonly Color Highlight = new(1f, 0.6f, 0.3f, 0.95f);
         private static readonly Color Disabled = new(0.12f, 0.12f, 0.12f, 0.7f);
 
+        [SerializeField] private float localPlayerRescanInterval = 0.5f;
+        private float localPlayerRescanTimer;
+
         private void Awake()
         {
-            if (equipper == null) equipper = FindAnyObjectByType<ThrowableEquipper>();
-            if (inventory == null) inventory = FindAnyObjectByType<ThrowableInventory>();
+            TryResolveLocalPlayer(force: true);
+        }
+
+        private void TryResolveLocalPlayer(bool force)
+        {
+            var nextEquipper = LocalPlayerUtility.FindLocalComponent<ThrowableEquipper>();
+            var nextInventory = LocalPlayerUtility.FindLocalComponent<ThrowableInventory>();
+            if (!force && nextEquipper == equipper && nextInventory == inventory) return;
+            equipper = nextEquipper;
+            inventory = nextInventory;
         }
 
         private void Start()
@@ -43,6 +54,13 @@ namespace ProjectM.UI
 
         private void Update()
         {
+            localPlayerRescanTimer += Time.deltaTime;
+            if (localPlayerRescanTimer >= localPlayerRescanInterval)
+            {
+                localPlayerRescanTimer = 0f;
+                TryResolveLocalPlayer(force: false);
+            }
+
             if (equipper == null) return;
             bool selecting = equipper.IsSelecting;
             if (panelGo.activeSelf != selecting) panelGo.SetActive(selecting);

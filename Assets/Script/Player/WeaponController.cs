@@ -56,18 +56,21 @@ namespace ProjectM.Player
 
         private float nextFireTime;
         private float reloadEndTime;
+        private ReviveSystem revive;
 
         private void Awake()
         {
             if (viewCamera == null) viewCamera = GetComponentInChildren<Camera>();
             if (kitEquipper == null) kitEquipper = GetComponent<KitEquipper>();
             if (throwableEquipper == null) throwableEquipper = GetComponent<ThrowableEquipper>();
+            revive = GetComponent<ReviveSystem>();
             CurrentMagazine = magazineSize;
         }
 
         private void Update()
         {
             if (!isLocalPlayer) return;
+            if (revive != null && (revive.IsDown || revive.IsDead)) return;
 
             // 재장전 완료는 슬롯이 비활성(보조무기 사용 중)이어도 진행
             if (IsReloading && Time.time >= reloadEndTime) FinishReload();

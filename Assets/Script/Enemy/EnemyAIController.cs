@@ -48,11 +48,21 @@ namespace ProjectM.Enemy
         public void SetSimulationEnabled(bool enabled)
         {
             hostAuthoritative = enabled;
-            if (agent != null && !enabled)
+            if (agent == null) return;
+
+            if (!enabled)
             {
-                agent.isStopped = true;
-                agent.ResetPath();
+                if (agent.enabled && agent.isOnNavMesh)
+                {
+                    agent.isStopped = true;
+                    agent.ResetPath();
+                }
+
+                agent.enabled = false;
+                return;
             }
+
+            agent.enabled = true;
         }
 
         private NavMeshAgent agent;
@@ -183,7 +193,11 @@ namespace ProjectM.Enemy
 
         private void OnDeadEnter()
         {
-            if (agent.isOnNavMesh) { agent.isStopped = true; agent.ResetPath(); }
+            if (agent != null && agent.enabled && agent.isOnNavMesh)
+            {
+                agent.isStopped = true;
+                agent.ResetPath();
+            }
             OnDeath?.Invoke(this);
 
             if (TryGetComponent<NetworkObject>(out var netObj) && netObj.IsSpawned)
@@ -414,6 +428,20 @@ namespace ProjectM.Enemy
                 float d = Vector3.Distance(transform.position, h.transform.position);
                 if (d < bestDist) { bestDist = d; best = h.transform; }
             }
+
+            // CharacterController / 트리거만 있는 NetworkPlayer 는 OverlapSphere 에 안 잡힘 → 거리 스캔
+            foreach (var pc in UnityEngine.Object.FindObjectsByType<PlayerController>(FindObjectsSortMode.None))
+            {
+                var hs = pc.GetComponent<HealthSystem>();
+                if (hs == null || !hs.IsAlive) continue;
+
+                float d = Vector3.Distance(transform.position, pc.transform.position);
+                if (d > stats.detectRange || d >= bestDist) continue;
+
+                bestDist = d;
+                best = pc.transform;
+            }
+
             return best;
         }
 

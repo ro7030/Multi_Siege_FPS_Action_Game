@@ -59,6 +59,24 @@ namespace ProjectM.Economy
 
         private void ApplyReward(int amount, string reason)
         {
+            if (amount <= 0) return;
+
+            if (NetworkSessionHelper.IsMultiplayerSession)
+            {
+                foreach (var player in NetworkPlayerRegistry.All)
+                {
+                    if (player == null) continue;
+                    if (player.TryGetComponent<NetworkCurrencyWallet>(out var netWallet))
+                        netWallet.ServerAdd(amount);
+                    else if (player.TryGetComponent<CurrencyWallet>(out var w))
+                        w.Add(amount);
+                }
+
+                LastReward = amount;
+                Debug.Log($"[Reward] {reason}: +{amount} × {NetworkPlayerRegistry.All.Count}명");
+                return;
+            }
+
             if (wallet == null) return;
             wallet.Add(amount);
             LastReward = amount;

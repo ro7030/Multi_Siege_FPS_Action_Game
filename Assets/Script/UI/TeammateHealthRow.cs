@@ -22,8 +22,35 @@ namespace ProjectM.UI
         [SerializeField] private GameObject downIcon; // 다운 시 표시할 이미지
         [SerializeField] private GameObject deadIcon; // 사망 시 표시할 이미지
 
+        private void Awake()
+        {
+            ResolveFillImage();
+        }
+
+        private void ResolveFillImage()
+        {
+            if (fillImage != null && fillImage.type == Image.Type.Filled) return;
+
+            var fillTransform = transform.Find("BarBg/Fill") ?? transform.Find("Fill");
+            if (fillTransform != null && fillTransform.TryGetComponent(out Image resolved))
+                fillImage = resolved;
+        }
+
         public void SetName(string n) { if (nameText != null) nameText.text = n; }
-        public void SetFill(float ratio01) { if (fillImage != null) fillImage.fillAmount = Mathf.Clamp01(ratio01); }
+
+        public void SetFill(float ratio01)
+        {
+            ResolveFillImage();
+            if (fillImage == null) return;
+            if (fillImage.type != Image.Type.Filled)
+            {
+                fillImage.type = Image.Type.Filled;
+                fillImage.fillMethod = Image.FillMethod.Horizontal;
+                fillImage.fillOrigin = (int)Image.OriginHorizontal.Left;
+            }
+            fillImage.fillAmount = Mathf.Clamp01(ratio01);
+        }
+
         public void SetFillColor(Color c) { if (fillImage != null) fillImage.color = c; }
 
         /// <summary>상태에 맞는 아이콘만 켠다.</summary>

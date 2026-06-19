@@ -79,17 +79,57 @@ namespace ProjectM.UI
         [Tooltip("키트 슬롯이 미장착일 때도 마지막 선택(LastSelected) 종류의 아이콘을 보여줄지")]
         [SerializeField] private bool kitShowLastSelectedWhenIdle = true;
 
+        [Header("로컬 플레이어 재탐색")]
+        [SerializeField] private float localPlayerRescanInterval = 0.5f;
+
+        private float localPlayerRescanTimer;
+        private KitType lastAppliedKitIcon = (KitType)(-1);
+        private ThrowableType lastAppliedThrowableIcon = (ThrowableType)(-1);
+
         private void Awake()
         {
-            if (arsenal == null) arsenal = FindAnyObjectByType<PlayerArsenal>();
-            if (rangedWeapon == null) rangedWeapon = FindAnyObjectByType<WeaponController>();
-            if (kitInventory == null) kitInventory = FindAnyObjectByType<KitInventory>();
-            if (kitEquipper == null) kitEquipper = FindAnyObjectByType<KitEquipper>();
-            if (throwableInventory == null) throwableInventory = FindAnyObjectByType<ThrowableInventory>();
-            if (throwableEquipper == null) throwableEquipper = FindAnyObjectByType<ThrowableEquipper>();
+            TryResolveLocalPlayer(force: true);
         }
 
-        private void Update() => Refresh();
+        private void Update()
+        {
+            localPlayerRescanTimer += Time.deltaTime;
+            if (localPlayerRescanTimer >= localPlayerRescanInterval)
+            {
+                localPlayerRescanTimer = 0f;
+                TryResolveLocalPlayer(force: false);
+            }
+
+            Refresh();
+        }
+
+        private void TryResolveLocalPlayer(bool force)
+        {
+            var nextArsenal = LocalPlayerUtility.FindLocalComponent<PlayerArsenal>();
+            var nextWeapon = LocalPlayerUtility.FindLocalWeaponController();
+            var nextKitInventory = LocalPlayerUtility.FindLocalComponent<KitInventory>();
+            var nextKitEquipper = LocalPlayerUtility.FindLocalComponent<KitEquipper>();
+            var nextThrowableInventory = LocalPlayerUtility.FindLocalComponent<ThrowableInventory>();
+            var nextThrowableEquipper = LocalPlayerUtility.FindLocalComponent<ThrowableEquipper>();
+
+            if (!force
+                && nextArsenal == arsenal
+                && nextWeapon == rangedWeapon
+                && nextKitInventory == kitInventory
+                && nextKitEquipper == kitEquipper
+                && nextThrowableInventory == throwableInventory
+                && nextThrowableEquipper == throwableEquipper)
+                return;
+
+            arsenal = nextArsenal;
+            rangedWeapon = nextWeapon;
+            kitInventory = nextKitInventory;
+            kitEquipper = nextKitEquipper;
+            throwableInventory = nextThrowableInventory;
+            throwableEquipper = nextThrowableEquipper;
+            lastAppliedKitIcon = (KitType)(-1);
+            lastAppliedThrowableIcon = (ThrowableType)(-1);
+        }
 
         // ─────────────────────────────────────────────────────────────
         private void Refresh()
@@ -163,7 +203,8 @@ namespace ProjectM.UI
 
         private void ApplyKitSlotIcon(KitType type)
         {
-            if (kitSlot == null) return;
+            if (kitSlot == null || type == lastAppliedKitIcon) return;
+            lastAppliedKitIcon = type;
 
             if (type == KitType.None)
             {
@@ -186,7 +227,8 @@ namespace ProjectM.UI
 
         private void ApplyThrowableSlotIcon(ThrowableType type)
         {
-            if (throwableSlot == null) return;
+            if (throwableSlot == null || type == lastAppliedThrowableIcon) return;
+            lastAppliedThrowableIcon = type;
 
             if (type == ThrowableType.None)
             {

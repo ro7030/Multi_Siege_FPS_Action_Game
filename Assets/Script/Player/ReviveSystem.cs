@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using ProjectM.Network;
 
 namespace ProjectM.Player
 {
@@ -38,6 +39,7 @@ namespace ProjectM.Player
 
         private void HandleHealthDied(GameObject _)
         {
+            if (!ShouldSimulateLocally()) return;
             if (IsDead || IsDown) return;
             EnterDownState();
         }
@@ -54,6 +56,7 @@ namespace ProjectM.Player
 
         private void Update()
         {
+            if (!ShouldSimulateLocally()) return;
             if (!IsDown || IsDead) return;
 
             if (!reviveInProgress)
@@ -65,6 +68,7 @@ namespace ProjectM.Player
 
         public void ProgressRevive(float delta)
         {
+            if (!ShouldSimulateLocally()) return;
             if (!IsDown || IsDead) return;
             if (!reviveInProgress)
             {
@@ -98,10 +102,71 @@ namespace ProjectM.Player
 
         private void EnterFullDeath()
         {
+            if (!ShouldSimulateLocally()) return;
             IsDown = false;
             IsDead = true;
             OnFullDeath?.Invoke();
             Debug.Log($"[Revive] {name} 완전 사망");
+        }
+
+        public void ApplyNetworkLifeState(byte state)
+        {
+            if (ShouldSimulateLocally()) return;
+
+            const byte lifeAlive = 0;
+            const byte lifeDown = 1;
+            const byte lifeDead = 2;
+
+            switch (state)
+            {
+                case lifeAlive:
+                    if (IsDown || IsDead)
+                    {
+                        IsDown = false;
+                        IsDead = false;
+                        reviveInProgress = false;
+                        ReviveProgress = 0f;
+                        OnRevived?.Invoke();
+                    }
+                    break;
+                case lifeDown:
+                    if (!IsDown && !IsDead)
+                    {
+                        IsDown = true;
+                        IsDead = false;
+                        DownTimer = downDuration;
+                        ReviveProgress = 0f;
+                        reviveInProgress = false;
+                        OnDowned?.Invoke();
+                    }
+                    else if (IsDown)
+                    {
+                        IsDead = false;
+                    }
+                    break;
+                case lifeDead:
+                    if (!IsDead)
+                    {
+                        IsDown = false;
+                        IsDead = true;
+                        reviveInProgress = false;
+                        ReviveProgress = 0f;
+                        OnFullDeath?.Invoke();
+                    }
+                    break;
+            }
+        }
+
+        public void ApplyNetworkReviveProgress(float progress)
+        {
+            if (ShouldSimulateLocally()) return;
+            ReviveProgress = Mathf.Max(0f, progress);
+            reviveInProgress = ReviveProgress > 0f && IsDown && !IsDead;
+        }
+
+        private static bool ShouldSimulateLocally()
+        {
+            return !NetworkSessionHelper.IsMultiplayerSession || NetworkSessionHelper.IsServer;
         }
     }
 }
