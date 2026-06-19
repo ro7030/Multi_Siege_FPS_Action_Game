@@ -29,6 +29,7 @@ namespace ProjectM.Player
 
         private CharacterController cc;
         private HealthSystem health;
+        private ReviveSystem revive;
         private KitEquipper kitEquipper;
         private ThrowableEquipper throwableEquipper;
         private Vector3 velocity;
@@ -42,6 +43,7 @@ namespace ProjectM.Player
         {
             cc = GetComponent<CharacterController>();
             health = GetComponent<HealthSystem>();
+            revive = GetComponent<ReviveSystem>();
             kitEquipper = GetComponent<KitEquipper>();
             throwableEquipper = GetComponent<ThrowableEquipper>();
             if (cameraPivot == null)
@@ -54,12 +56,25 @@ namespace ProjectM.Player
         private void OnEnable()
         {
             if (health != null) health.OnDied += HandleDied;
+            if (revive != null)
+            {
+                revive.OnDowned += HandleDowned;
+                revive.OnRevived += HandleRevived;
+                revive.OnFullDeath += HandleFullDeath;
+                SyncControlFromRevive();
+            }
             if (isLocalPlayer && lockCursor) SetCursorLocked(true);
         }
 
         private void OnDisable()
         {
             if (health != null) health.OnDied -= HandleDied;
+            if (revive != null)
+            {
+                revive.OnDowned -= HandleDowned;
+                revive.OnRevived -= HandleRevived;
+                revive.OnFullDeath -= HandleFullDeath;
+            }
             if (isLocalPlayer) SetCursorLocked(false);
         }
 
@@ -69,7 +84,20 @@ namespace ProjectM.Player
             RefreshInputDevices();
         }
 
-        private void HandleDied(GameObject _) => canControl = false;
+        private void HandleDied(GameObject _)
+        {
+            if (revive == null) canControl = false;
+        }
+
+        private void HandleDowned() => canControl = false;
+        private void HandleFullDeath() => canControl = false;
+        private void HandleRevived() => canControl = true;
+
+        private void SyncControlFromRevive()
+        {
+            if (revive == null) return;
+            canControl = !revive.IsDown && !revive.IsDead;
+        }
 
         private void Update()
         {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using ProjectM.Core;
 using ProjectM.Defense;
@@ -74,6 +75,17 @@ namespace ProjectM.Economy
         {
             placed = null;
 
+            if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer)
+                return false;
+
+            return PlaceFarmInternal(position, rotation, out placed);
+        }
+
+        /// <summary>서버 전용 설치. NetworkFarmManagerBridge·Host 가 호출.</summary>
+        public bool PlaceFarmInternal(Vector3 position, Quaternion rotation, out FarmPlot placed)
+        {
+            placed = null;
+
             if (!IsPlacementAllowed())
             {
                 Debug.LogWarning("[FarmManager] 설치 불가: 정비 시간이 아니거나 최대 개수 도달");
@@ -87,6 +99,12 @@ namespace ProjectM.Economy
             }
 
             var go = Instantiate(farmPrefab, position, rotation);
+            if (NetworkSessionHelper.IsMultiplayerSession
+                && go.TryGetComponent<NetworkObject>(out var netObj))
+            {
+                netObj.Spawn();
+            }
+
             var plot = go.GetComponent<FarmPlot>();
             if (plot == null)
             {
@@ -178,11 +196,28 @@ namespace ProjectM.Economy
         {
             if (wallets == null || wallets.Count == 0) return;
             foreach (var w in wallets)
-                if (w != null) w.Add(amountPerPlayer);
+            {
+                if (w == null) continue;
+                if (w.TryGetComponent<NetworkCurrencyWallet>(out var netWallet))
+                    netWallet.ServerAdd(amountPerPlayer);
+                else
+                    w.Add(amountPerPlayer);
+            }
         }
 
         private List<CurrencyWallet> FindAllWallets()
         {
+            if (NetworkSessionHelper.IsMultiplayerSession)
+            {
+                var wallets = new List<CurrencyWallet>();
+                foreach (var player in NetworkPlayerRegistry.All)
+                {
+                    if (player != null && player.TryGetComponent<CurrencyWallet>(out var wallet))
+                        wallets.Add(wallet);
+                }
+                return wallets;
+            }
+
             var found = FindObjectsByType<CurrencyWallet>(FindObjectsSortMode.None);
             return new List<CurrencyWallet>(found);
         }

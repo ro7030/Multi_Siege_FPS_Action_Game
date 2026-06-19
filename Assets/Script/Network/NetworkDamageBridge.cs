@@ -5,14 +5,78 @@ using ProjectM.Player;
 namespace ProjectM.Network
 {
     /// <summary>
-    /// NGO 적 데미지를 서버에서만 적용한다. 클라이언트 TakeDamage 요청은 ServerRpc로 전달.
+    /// NGO 체력 권한: 클라이언트 데미지/회복 요청은 ServerRpc, HP·다운 상태는 NetworkVariable로 복제.
     /// </summary>
     [RequireComponent(typeof(HealthSystem))]
     public class NetworkDamageBridge : NetworkBehaviour
     {
-        /// <summary>
-        /// 클라이언트면 ServerRpc로 위임하고 true. 서버/오프라인이면 false (로컬 적용).
-        /// </summary>
+        private const byte LifeAlive = 0;
+        private const byte LifeDown = 1;
+        private const byte LifeDead = 2;
+
+        private readonly NetworkVariable<float> netCurrentHp = new(
+            0f,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server);
+
+        private readonly NetworkVariable<float> netMaxHp = new(
+            0f,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server);
+
+        private readonly NetworkVariable<byte> netLifeState = new(
+            LifeAlive,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server);
+
+        private readonly NetworkVariable<float> netReviveProgress = new(
+            0f,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server);
+
+        private HealthSystem health;
+        private ReviveSystem revive;
+
+        private void Awake()
+        {
+            health = GetComponent<HealthSystem>();
+            revive = GetComponent<ReviveSystem>();
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            if (IsServer)
+            {
+                PushHealthSnapshot();
+                health.OnHpChanged += HandleServerHpChanged;
+                BindReviveEvents();
+            }
+            else
+            {
+                netCurrentHp.OnValueChanged += HandleClientHpChanged;
+                netMaxHp.OnValueChanged += HandleClientHpChanged;
+                netLifeState.OnValueChanged += HandleClientLifeStateChanged;
+                netReviveProgress.OnValueChanged += HandleClientReviveProgressChanged;
+                ApplyClientHealthSnapshot();
+            }
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            if (IsServer)
+            {
+                health.OnHpChanged -= HandleServerHpChanged;
+                UnbindReviveEvents();
+            }
+            else
+            {
+                netCurrentHp.OnValueChanged -= HandleClientHpChanged;
+                netMaxHp.OnValueChanged -= HandleClientHpChanged;
+                netLifeState.OnValueChanged -= HandleClientLifeStateChanged;
+                netReviveProgress.OnValueChanged -= HandleClientReviveProgressChanged;
+            }
+        }
+
         public bool TryRequestServerDamage(float amount, GameObject attacker)
         {
             if (!NetworkSessionHelper.IsMultiplayerSession || !IsSpawned)
@@ -25,15 +89,158 @@ namespace ProjectM.Network
             return true;
         }
 
+        public bool TryRequestServerHeal(float amount)
+        {
+            if (!NetworkSessionHelper.IsMultiplayerSession || !IsSpawned)
+                return false;
+
+            if (IsServer)
+                return false;
+
+            if (!IsOwner)
+                return false;
+
+            RequestHealServerRpc(amount);
+            return true;
+        }
+
+        public void RequestReviveHold(float deltaTime)
+        {
+            if (!NetworkSessionHelper.IsMultiplayerSession || !IsSpawned)
+            {
+                revive?.ProgressRevive(deltaTime);
+                return;
+            }
+
+            if (IsServer)
+            {
+                revive?.ProgressRevive(deltaTime);
+                PushHealthSnapshot();
+                return;
+            }
+
+            RequestReviveHoldServerRpc(deltaTime);
+        }
+
+        public void RequestReviveHoldCancel()
+        {
+            if (!NetworkSessionHelper.IsMultiplayerSession || !IsSpawned)
+            {
+                revive?.CancelRevive();
+                return;
+            }
+
+            if (IsServer)
+            {
+                revive?.CancelRevive();
+                return;
+            }
+
+            CancelReviveHoldServerRpc();
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void RequestReviveHoldServerRpc(float deltaTime)
+        {
+            revive?.ProgressRevive(deltaTime);
+            PushHealthSnapshot();
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void CancelReviveHoldServerRpc()
+        {
+            revive?.CancelRevive();
+        }
+
         [ServerRpc(RequireOwnership = false)]
         private void RequestDamageServerRpc(float amount, ServerRpcParams rpcParams = default)
         {
-            var health = GetComponent<HealthSystem>();
             if (health == null || !health.IsAlive || amount <= 0f)
                 return;
 
             GameObject attacker = ResolveAttacker(rpcParams.Receive.SenderClientId);
             health.ApplyDamageLocal(amount, attacker);
+            PushHealthSnapshot();
+        }
+
+        [ServerRpc(RequireOwnership = true)]
+        private void RequestHealServerRpc(float amount)
+        {
+            if (health == null || amount <= 0f)
+                return;
+
+            health.ApplyHealLocal(amount);
+            PushHealthSnapshot();
+        }
+
+        private void HandleServerHpChanged(float current, float max) => PushHealthSnapshot();
+
+        private void PushHealthSnapshot()
+        {
+            if (!IsServer || health == null)
+                return;
+
+            netMaxHp.Value = health.MaxHp;
+            netCurrentHp.Value = health.CurrentHp;
+            netLifeState.Value = ResolveLifeState();
+            netReviveProgress.Value = revive != null ? revive.ReviveProgress : 0f;
+        }
+
+        private byte ResolveLifeState()
+        {
+            if (revive == null)
+                return health.IsAlive ? LifeAlive : LifeDead;
+
+            if (revive.IsDead) return LifeDead;
+            if (revive.IsDown) return LifeDown;
+            if (!health.IsAlive) return LifeDown;
+            return LifeAlive;
+        }
+
+        private void BindReviveEvents()
+        {
+            if (revive == null) return;
+
+            revive.OnDowned += HandleReviveStateChanged;
+            revive.OnRevived += HandleReviveStateChanged;
+            revive.OnFullDeath += HandleReviveStateChanged;
+        }
+
+        private void UnbindReviveEvents()
+        {
+            if (revive == null) return;
+
+            revive.OnDowned -= HandleReviveStateChanged;
+            revive.OnRevived -= HandleReviveStateChanged;
+            revive.OnFullDeath -= HandleReviveStateChanged;
+        }
+
+        private void HandleReviveStateChanged() => PushHealthSnapshot();
+
+        private void HandleClientHpChanged(float _, float __) => ApplyClientHealthSnapshot();
+
+        private void HandleClientLifeStateChanged(byte _, byte __)
+        {
+            if (revive == null) return;
+            revive.ApplyNetworkLifeState(netLifeState.Value);
+        }
+
+        private void HandleClientReviveProgressChanged(float _, float __)
+        {
+            if (revive == null) return;
+            revive.ApplyNetworkReviveProgress(netReviveProgress.Value);
+        }
+
+        private void ApplyClientHealthSnapshot()
+        {
+            if (IsServer || health == null) return;
+            health.SetNetworkSnapshot(netCurrentHp.Value, netMaxHp.Value);
+
+            if (revive != null)
+            {
+                revive.ApplyNetworkLifeState(netLifeState.Value);
+                revive.ApplyNetworkReviveProgress(netReviveProgress.Value);
+            }
         }
 
         private static GameObject ResolveAttacker(ulong clientId)

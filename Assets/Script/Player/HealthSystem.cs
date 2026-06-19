@@ -1,4 +1,5 @@
 using System;
+using Unity.Netcode;
 using UnityEngine;
 using ProjectM.Network;
 
@@ -36,7 +37,25 @@ namespace ProjectM.Player
             if (TryGetComponent<NetworkDamageBridge>(out var bridge) && bridge.TryRequestServerDamage(amount, attacker))
                 return;
 
+            if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer
+                && TryGetComponent<NetworkObject>(out _))
+                return;
+
             ApplyDamageLocal(amount, attacker);
+        }
+
+        public void Heal(float amount)
+        {
+            if (amount <= 0f) return;
+
+            if (TryGetComponent<NetworkDamageBridge>(out var bridge) && bridge.TryRequestServerHeal(amount))
+                return;
+
+            if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer
+                && TryGetComponent<NetworkObject>(out _))
+                return;
+
+            ApplyHealLocal(amount);
         }
 
         public void ApplyDamageLocal(float amount, GameObject attacker)
@@ -53,11 +72,21 @@ namespace ProjectM.Player
             }
         }
 
-        public void Heal(float amount)
+        public void ApplyHealLocal(float amount)
         {
             if (amount <= 0f || !IsAlive) return;
             currentHp = Mathf.Min(maxHp, currentHp + amount);
             OnHealed?.Invoke(amount);
+            OnHpChanged?.Invoke(currentHp, maxHp);
+        }
+
+        /// <summary>클라이언트 UI용 HP 미러. OnDied/Revive는 NetworkDamageBridge가 별도 동기화.</summary>
+        public void SetNetworkSnapshot(float current, float max)
+        {
+            if (NetworkSessionHelper.IsGameplayAuthority) return;
+
+            maxHp = Mathf.Max(1f, max);
+            currentHp = Mathf.Clamp(current, 0f, maxHp);
             OnHpChanged?.Invoke(currentHp, maxHp);
         }
 

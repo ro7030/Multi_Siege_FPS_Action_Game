@@ -182,6 +182,10 @@ GameObject:
   - component: {fileID: 36363586663884873}
   - component: {fileID: 4187230053207645675}
   - component: {fileID: 7188811562901383254}
+  - component: {fileID: 9200000000000000004}
+  - component: {fileID: 9200000000000000005}
+  - component: {fileID: 9200000000000000006}
+  - component: {fileID: 6057384098685604910}
   m_Layer: 0
   m_Name: NetworkPlayer
   m_TagString: Player
@@ -488,6 +492,7 @@ MonoBehaviour:
   throwForce: 14
   throwUpward: 3
   spawnForward: 0.8
+  viewModelSocket: {fileID: 0}
   isLocalPlayer: 1
   cycleKey: 44
   quickThrowKey: 21
@@ -575,4 +580,69 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be046f8a9c61c4d639259ad0da7ae652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Network.NetworkPlayer
+  ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &9200000000000000004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8514623158254487877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e5f6a7b8c9d0e1f2a3b4c5d6e7f8091, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Network.NetworkDamageBridge
+  ShowTopMostFoldoutHeaderGroup: 1
+--- !u!136 &9200000000000000005
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8514623158254487877}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 1.8
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!114 &9200000000000000006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8514623158254487877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76796782858bfe44ba7be45ce275c210, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.ReviveInteractable
+  target: {fileID: 0}
+  promptFormat: "{name} \uBD80\uD65C"
+  promptIcon: {fileID: 0}
+  promptAnchor: {fileID: 0}
+--- !u!114 &6057384098685604910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8514623158254487877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79693e0b24b4d479dacccef512c18201, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Network.NetworkCurrencyWallet
   ShowTopMostFoldoutHeaderGroup: 1

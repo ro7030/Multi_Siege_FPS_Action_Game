@@ -1,4 +1,5 @@
 using UnityEngine;
+using ProjectM.Network;
 
 namespace ProjectM.Player
 {
@@ -18,7 +19,13 @@ namespace ProjectM.Player
 
         private void Awake()
         {
+            if (target == null) target = GetComponent<ReviveSystem>();
             if (target == null) target = GetComponentInParent<ReviveSystem>();
+        }
+
+        private void Start()
+        {
+            if (target == null) target = GetComponent<ReviveSystem>();
         }
 
         // ── IInteractable ──
@@ -34,7 +41,9 @@ namespace ProjectM.Player
         {
             get
             {
-                string n = target != null ? target.gameObject.name : "Player";
+                string n = target != null
+                    ? PlayerDisplayNameUtility.GetDisplayName(target)
+                    : "Player";
                 return promptFormat.Replace("{name}", n);
             }
         }
@@ -50,11 +59,24 @@ namespace ProjectM.Player
         public void InteractHold(GameObject interactor, float deltaTime)
         {
             if (target == null) return;
+
+            if (target.TryGetComponent<NetworkDamageBridge>(out var bridge))
+            {
+                bridge.RequestReviveHold(deltaTime);
+                return;
+            }
+
             target.ProgressRevive(deltaTime);
         }
 
         public void InteractHoldCancel()
         {
+            if (target != null && target.TryGetComponent<NetworkDamageBridge>(out var bridge))
+            {
+                bridge.RequestReviveHoldCancel();
+                return;
+            }
+
             target?.CancelRevive();
         }
     }

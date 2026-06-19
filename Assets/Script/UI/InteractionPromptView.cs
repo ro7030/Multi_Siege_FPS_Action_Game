@@ -54,10 +54,20 @@ namespace ProjectM.UI
         /// <summary>promptRoot가 이 오브젝트와 같을 때 true. SetActive(self)는 스크립트를 꺼버리므로 자식만 토글한다.</summary>
         private bool promptRootIsSelf;
 
+        [SerializeField] private float localPlayerRescanInterval = 0.5f;
+        private float localPlayerRescanTimer;
+
         private void Awake()
         {
-            if (interactor == null) interactor = FindAnyObjectByType<PlayerInteractor>();
+            TryResolveLocalPlayer(force: true);
             if (worldCamera == null) worldCamera = Camera.main;
+        }
+
+        private void TryResolveLocalPlayer(bool force)
+        {
+            var nextInteractor = LocalPlayerUtility.FindLocalComponent<PlayerInteractor>();
+            if (!force && nextInteractor == interactor) return;
+            interactor = nextInteractor;
         }
 
         private void Start()
@@ -85,6 +95,13 @@ namespace ProjectM.UI
 
         private void LateUpdate()
         {
+            localPlayerRescanTimer += Time.deltaTime;
+            if (localPlayerRescanTimer >= localPlayerRescanInterval)
+            {
+                localPlayerRescanTimer = 0f;
+                TryResolveLocalPlayer(force: false);
+            }
+
             if (promptRoot == null) return;
 
             var target = interactor != null ? interactor.Current : null;

@@ -27,9 +27,6 @@ namespace ProjectM.Network
         {
             bool simulate = !NetworkSessionHelper.IsMultiplayerSession || IsServer;
 
-            if (agent != null)
-                agent.enabled = simulate;
-
             foreach (var ai in GetComponentsInChildren<EnemyAIController>(true))
                 ai.SetSimulationEnabled(simulate);
         }

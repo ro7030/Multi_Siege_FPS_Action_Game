@@ -7,7 +7,7 @@ using ProjectM.Player;
 namespace ProjectM.UI
 {
     /// <summary>
-    /// 화면 체력바 1칸. HUDPresenter 에서 로컬 플레이어·팀원·더미 등에 재사용한다.
+    /// 화면 체력바 1칸. HUDPresenter 에서 로컬 플레이어·팀원 등에 재사용한다.
     /// </summary>
     [Serializable]
     public class HealthBarSlot

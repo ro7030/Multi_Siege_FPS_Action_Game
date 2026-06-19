@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using ProjectM.Network;
 
 namespace ProjectM.Economy
 {
@@ -27,6 +28,16 @@ namespace ProjectM.Economy
         public void Add(int amount)
         {
             if (amount <= 0) return;
+
+            if (TryGetComponent<NetworkCurrencyWallet>(out var netWallet)
+                && NetworkSessionHelper.IsMultiplayerSession
+                && netWallet.IsSpawned)
+            {
+                if (NetworkSessionHelper.IsServer)
+                    netWallet.ServerAdd(amount);
+                return;
+            }
+
             balance += amount;
             OnAdded?.Invoke(amount);
             OnChanged?.Invoke(balance);
@@ -35,6 +46,18 @@ namespace ProjectM.Economy
         public bool TrySpend(int amount)
         {
             if (amount <= 0) return true;
+
+            if (TryGetComponent<NetworkCurrencyWallet>(out var netWallet)
+                && NetworkSessionHelper.IsMultiplayerSession
+                && netWallet.IsSpawned)
+            {
+                if (NetworkSessionHelper.IsServer)
+                    return netWallet.ServerTrySpend(amount);
+
+                OnSpendFailed?.Invoke(amount);
+                return false;
+            }
+
             if (balance < amount)
             {
                 OnSpendFailed?.Invoke(amount);

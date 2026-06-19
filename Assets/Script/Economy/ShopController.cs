@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ProjectM.Core;
+using ProjectM.Network;
 using ProjectM.Player;
 
 namespace ProjectM.Economy
@@ -54,6 +55,15 @@ namespace ProjectM.Economy
         public bool TryUpgradeWeapon(WeaponSlot slot)
         {
             if (playerArsenal == null) { Fail(null, "무기고 없음"); return false; }
+
+            if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer)
+            {
+                var local = NetworkPlayerRegistry.LocalPlayer;
+                if (local == null) { Fail(null, "플레이어 없음"); return false; }
+                local.RequestWeaponUpgradeServerRpc((int)slot);
+                return false;
+            }
+
             int next = playerArsenal.CurrentTierIndex(slot) + 1;
             return TryPurchaseWeaponTier(slot, next);
         }
@@ -62,22 +72,16 @@ namespace ProjectM.Economy
         public bool TryPurchaseWeaponTier(WeaponSlot slot, int tierIndex)
         {
             if (playerArsenal == null) { Fail(null, "무기고 없음"); return false; }
-            if (!playerArsenal.CanPurchaseTier(slot, tierIndex)) { Fail(null, "구매 불가"); return false; }
 
-            int price = playerArsenal.GetTierPrice(slot, tierIndex);
-            if (wallet == null) { Fail(null, "지갑 없음"); return false; }
-            if (price > 0 && !wallet.TrySpend(price)) { Fail(null, "잔액 부족"); return false; }
-
-            if (!playerArsenal.TrySetTier(slot, tierIndex))
+            if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer)
             {
-                if (price > 0) wallet.Add(price);
-                Fail(null, "적용 실패");
+                var local = NetworkPlayerRegistry.LocalPlayer;
+                if (local == null) { Fail(null, "플레이어 없음"); return false; }
+                local.RequestWeaponTierPurchaseServerRpc((int)slot, tierIndex);
                 return false;
             }
 
-            OnPurchased?.Invoke(null);
-            Debug.Log($"[Shop] {slot} 티어 {tierIndex} 구매 (-{price}, 잔액 {wallet.Balance})");
-            return true;
+            return TryPurchaseWeaponTierForPlayer(LocalPlayerUtility.FindLocalPlayerObject(), slot, tierIndex);
         }
 
         public IEnumerable<ItemData> GetUnlockedItems()
@@ -102,13 +106,61 @@ namespace ProjectM.Economy
         public bool TryPurchase(ItemData item)
         {
             if (item == null) { Fail(null, "아이템 없음"); return false; }
-            if (!IsUnlocked(item)) { Fail(item, "아직 잠금"); return false; }
-            if (wallet == null) { Fail(item, "지갑 없음"); return false; }
-            if (!wallet.TrySpend(item.price)) { Fail(item, "잔액 부족"); return false; }
 
-            ApplyEffect(item);
+            if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer)
+            {
+                var local = NetworkPlayerRegistry.LocalPlayer;
+                if (local == null) { Fail(item, "플레이어 없음"); return false; }
+                local.RequestShopPurchaseServerRpc(item.id);
+                return false;
+            }
+
+            return TryPurchaseForPlayer(LocalPlayerUtility.FindLocalPlayerObject(), item);
+        }
+
+        public bool TryPurchaseForPlayer(GameObject buyer, string itemId)
+        {
+            if (catalog == null) return false;
+            var item = catalog.GetById(itemId);
+            return TryPurchaseForPlayer(buyer, item);
+        }
+
+        public bool TryPurchaseForPlayer(GameObject buyer, ItemData item)
+        {
+            if (item == null) { Fail(null, "아이템 없음"); return false; }
+            if (!IsUnlocked(item)) { Fail(item, "아직 잠금"); return false; }
+
+            var buyerWallet = buyer != null ? buyer.GetComponent<CurrencyWallet>() : null;
+            if (buyerWallet == null) { Fail(item, "지갑 없음"); return false; }
+            if (!buyerWallet.TrySpend(item.price)) { Fail(item, "잔액 부족"); return false; }
+
+            ApplyEffectForBuyer(buyer, item);
             OnPurchased?.Invoke(item);
-            Debug.Log($"[Shop] 구매 성공: {item.displayName} (-{item.price}, 잔액 {wallet.Balance})");
+            Debug.Log($"[Shop] 구매 성공: {item.displayName} (-{item.price}, 잔액 {buyerWallet.Balance})");
+            return true;
+        }
+
+        public bool TryPurchaseWeaponTierForPlayer(GameObject buyer, WeaponSlot slot, int tierIndex)
+        {
+            var arsenal = buyer != null ? buyer.GetComponent<PlayerArsenal>() : null;
+            var buyerWallet = buyer != null ? buyer.GetComponent<CurrencyWallet>() : null;
+
+            if (arsenal == null) { Fail(null, "무기고 없음"); return false; }
+            if (!arsenal.CanPurchaseTier(slot, tierIndex)) { Fail(null, "구매 불가"); return false; }
+
+            int price = arsenal.GetTierPrice(slot, tierIndex);
+            if (buyerWallet == null) { Fail(null, "지갑 없음"); return false; }
+            if (price > 0 && !buyerWallet.TrySpend(price)) { Fail(null, "잔액 부족"); return false; }
+
+            if (!arsenal.TrySetTier(slot, tierIndex))
+            {
+                if (price > 0) buyerWallet.Add(price);
+                Fail(null, "적용 실패");
+                return false;
+            }
+
+            OnPurchased?.Invoke(null);
+            Debug.Log($"[Shop] {slot} 티어 {tierIndex} 구매 (-{price}, 잔액 {buyerWallet.Balance})");
             return true;
         }
 
@@ -120,14 +172,25 @@ namespace ProjectM.Economy
 
         private void ApplyEffect(ItemData item)
         {
+            ApplyEffectForBuyer(LocalPlayerUtility.FindLocalPlayerObject(), item);
+        }
+
+        private void ApplyEffectForBuyer(GameObject buyer, ItemData item)
+        {
+            if (buyer == null) return;
+
+            var buyerHealth = buyer.GetComponentInChildren<HealthSystem>();
+            var buyerWeapon = buyer.GetComponentInChildren<WeaponController>();
+            var buyerKitInventory = buyer.GetComponent<KitInventory>();
+            var buyerThrowableInventory = buyer.GetComponent<ThrowableInventory>();
+
             switch (item.type)
             {
                 case ItemType.Heal:
-                    // legacy: 즉시 회복
-                    if (playerHealth != null) playerHealth.Heal(item.value);
+                    if (buyerHealth != null) buyerHealth.Heal(item.value);
                     break;
                 case ItemType.AmmoRefill:
-                    if (playerWeapon != null) playerWeapon.AddReserveAmmo(Mathf.RoundToInt(item.value));
+                    if (buyerWeapon != null) buyerWeapon.AddReserveAmmo(Mathf.RoundToInt(item.value));
                     break;
                 case ItemType.WeaponUpgrade:
                     Debug.Log($"[Shop] WeaponUpgrade 효과 적용 보류: {item.displayName} (+{item.value})");
@@ -136,52 +199,50 @@ namespace ProjectM.Economy
                     Debug.Log($"[Shop] Consumable {item.displayName} 사용");
                     break;
 
-                // 키트류: 인벤토리에 추가 (실제 사용은 KitEquipper 가 좌클릭 시 처리)
                 case ItemType.HealKit:
-                    AddKit(KitType.HealKit, item);
+                    AddKit(buyerKitInventory, KitType.HealKit, item);
                     break;
                 case ItemType.RepairKit:
-                    AddKit(KitType.RepairKit, item);
+                    AddKit(buyerKitInventory, KitType.RepairKit, item);
                     break;
                 case ItemType.FarmKit:
-                    AddKit(KitType.FarmKit, item);
+                    AddKit(buyerKitInventory, KitType.FarmKit, item);
                     break;
 
-                // 투척무기: ThrowableInventory 에 추가
                 case ItemType.Grenade:
-                    AddThrowable(ThrowableType.Grenade, item);
+                    AddThrowable(buyerThrowableInventory, ThrowableType.Grenade, item);
                     break;
                 case ItemType.Molotov:
-                    AddThrowable(ThrowableType.Molotov, item);
+                    AddThrowable(buyerThrowableInventory, ThrowableType.Molotov, item);
                     break;
                 case ItemType.Flash:
-                    AddThrowable(ThrowableType.Flash, item);
+                    AddThrowable(buyerThrowableInventory, ThrowableType.Flash, item);
                     break;
             }
         }
 
-        private void AddThrowable(ThrowableType type, ItemData item)
+        private void AddThrowable(ThrowableInventory inventory, ThrowableType type, ItemData item)
         {
-            if (playerThrowableInventory == null)
+            if (inventory == null)
             {
                 Debug.LogWarning($"[Shop] {type} 구매했지만 ThrowableInventory 가 없음 — 효과 미적용");
                 return;
             }
             int count = Mathf.Max(1, Mathf.RoundToInt(item.value));
-            playerThrowableInventory.Add(type, count);
-            Debug.Log($"[Shop] {type} +{count} (총 {playerThrowableInventory.GetCount(type)})");
+            inventory.Add(type, count);
+            Debug.Log($"[Shop] {type} +{count} (총 {inventory.GetCount(type)})");
         }
 
-        private void AddKit(KitType type, ItemData item)
+        private void AddKit(KitInventory inventory, KitType type, ItemData item)
         {
-            if (playerKitInventory == null)
+            if (inventory == null)
             {
                 Debug.LogWarning($"[Shop] {type} 구매했지만 KitInventory 가 없음 — 효과 미적용");
                 return;
             }
-            int count = Mathf.Max(1, Mathf.RoundToInt(item.value)); // value 를 묶음 단위로 사용
-            playerKitInventory.Add(type, count);
-            Debug.Log($"[Shop] {type} +{count} 인벤토리 추가 (총 {playerKitInventory.GetCount(type)})");
+            int count = Mathf.Max(1, Mathf.RoundToInt(item.value));
+            inventory.Add(type, count);
+            Debug.Log($"[Shop] {type} +{count} 인벤토리 추가 (총 {inventory.GetCount(type)})");
         }
     }
 }

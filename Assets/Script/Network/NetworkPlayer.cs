@@ -3,6 +3,7 @@ using Unity.Netcode;
 using UnityEngine;
 using ProjectM.Auth;
 using ProjectM.CharacterSelect;
+using ProjectM.Economy;
 using ProjectM.Player;
 
 namespace ProjectM.Network
@@ -26,6 +27,9 @@ namespace ProjectM.Network
 
             if (IsServer)
                 networkNickname.Value = ResolveNickname(OwnerClientId);
+
+            if (IsOwner)
+                SubmitNicknameServerRpc(new FixedString64Bytes(AuthSessionManager.ResolveNickname("Player")));
 
             ConfigureOwnership();
         }
@@ -63,6 +67,9 @@ namespace ProjectM.Network
             foreach (var cam in GetComponentsInChildren<Camera>(true))
                 cam.enabled = local;
 
+            foreach (var listener in GetComponentsInChildren<AudioListener>(true))
+                listener.enabled = local;
+
             if (TryGetComponent<CharacterController>(out var cc))
                 cc.enabled = local;
 
@@ -70,22 +77,52 @@ namespace ProjectM.Network
                 gameObject.tag = "Player";
         }
 
+        [ServerRpc]
+        private void SubmitNicknameServerRpc(FixedString64Bytes nickname)
+        {
+            if (!nickname.IsEmpty)
+                networkNickname.Value = nickname;
+            else if (networkNickname.Value.IsEmpty)
+                networkNickname.Value = ResolveNickname(OwnerClientId);
+        }
+
         private static FixedString64Bytes ResolveNickname(ulong clientId)
         {
             if (CharacterLobbyNetwork.Instance != null)
             {
-                string name = CharacterLobbyNetwork.Instance.GetNicknameForClient(clientId);
-                if (!string.IsNullOrEmpty(name))
-                    return new FixedString64Bytes(name);
-            }
-
-            if (NetworkManager.Singleton != null
-                && clientId == NetworkManager.Singleton.LocalClientId)
-            {
-                return AuthSessionManager.ResolveNickname("Player");
+                string lobbyName = CharacterLobbyNetwork.Instance.GetNicknameForClient(clientId);
+                if (!string.IsNullOrWhiteSpace(lobbyName))
+                    return new FixedString64Bytes(lobbyName.Trim());
             }
 
             return new FixedString64Bytes($"Player{clientId}");
+        }
+
+        [ServerRpc]
+        public void RequestShopPurchaseServerRpc(FixedString64Bytes itemId)
+        {
+            var shop = Object.FindAnyObjectByType<ShopController>();
+            shop?.TryPurchaseForPlayer(gameObject, itemId.ToString());
+        }
+
+        [ServerRpc]
+        public void RequestWeaponUpgradeServerRpc(int slot)
+        {
+            var shop = Object.FindAnyObjectByType<ShopController>();
+            if (shop == null) return;
+
+            var arsenal = GetComponent<PlayerArsenal>();
+            if (arsenal == null) return;
+
+            int next = arsenal.CurrentTierIndex((WeaponSlot)slot) + 1;
+            shop.TryPurchaseWeaponTierForPlayer(gameObject, (WeaponSlot)slot, next);
+        }
+
+        [ServerRpc]
+        public void RequestWeaponTierPurchaseServerRpc(int slot, int tierIndex)
+        {
+            var shop = Object.FindAnyObjectByType<ShopController>();
+            shop?.TryPurchaseWeaponTierForPlayer(gameObject, (WeaponSlot)slot, tierIndex);
         }
     }
 }

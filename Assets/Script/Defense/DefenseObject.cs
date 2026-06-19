@@ -11,23 +11,15 @@ namespace ProjectM.Defense
     [RequireComponent(typeof(HealthSystem))]
     public class DefenseObject : MonoBehaviour
     {
-        [Header("수리 설정")]
-        [SerializeField] private float repairPerSecond = 10f;
-        [SerializeField] private int repairCost = 0; // 0이면 무료, Phase 6에서 화폐 차감 연결
-        [SerializeField] private bool canRepairWhileDestroyed = false;
-
         [Header("표시")]
         [SerializeField] private string displayName = "Defense Object";
         [SerializeField] private bool autoApplyTag = true;
 
         public string DisplayName => displayName;
-        public float RepairPerSecond => repairPerSecond;
-        public int RepairCost => repairCost;
         public bool IsDestroyed => health != null && !health.IsAlive;
         public HealthSystem Health => health;
 
-        public event Action<DefenseObject, float> OnDamaged; // 받은 데미지
-        public event Action<DefenseObject, float> OnRepaired; // 수리량
+        public event Action<DefenseObject, float> OnDamaged;
         public event Action<DefenseObject> OnDestroyed;
 
         private HealthSystem health;
@@ -61,22 +53,11 @@ namespace ProjectM.Defense
             Debug.Log($"[Defense] {displayName} 파괴됨");
         }
 
-        /// <summary>지속 수리 (delta는 초 단위). 외부 인터랙션이 매 프레임 호출.</summary>
-        public void Repair(float deltaSeconds)
-        {
-            if (!canRepairWhileDestroyed && IsDestroyed) return;
-            if (health.CurrentHp >= health.MaxHp) return;
-            float amount = repairPerSecond * deltaSeconds;
-            health.Heal(amount);
-            OnRepaired?.Invoke(this, amount);
-        }
-
-        /// <summary>일괄 수리 (수치 직접 지정).</summary>
+        /// <summary>디버그 UI 전용 일괄 회복.</summary>
         public void RepairInstant(float amount)
         {
-            if (!canRepairWhileDestroyed && IsDestroyed) return;
+            if (IsDestroyed || amount <= 0f) return;
             health.Heal(amount);
-            OnRepaired?.Invoke(this, amount);
         }
 
         private void TryApplyDefenseTag()
