@@ -24,7 +24,11 @@ namespace ProjectM.Network
         private NetworkManager ResolveNetworkManager()
         {
             var existing = FindAnyObjectByType<NetworkManager>();
-            if (existing != null) return existing;
+            if (existing != null)
+            {
+                NetworkPlayerSessionGuard.ApplyManagerSettings(existing);
+                return existing;
+            }
 
             if (networkManagerPrefab == null)
             {
@@ -33,11 +37,13 @@ namespace ProjectM.Network
                 var manager = go.AddComponent<NetworkManager>();
                 manager.NetworkConfig = new NetworkConfig();
                 go.AddComponent<UnityTransport>();
+                NetworkPlayerSessionGuard.ApplyManagerSettings(manager);
                 return manager;
             }
 
             var instance = Instantiate(networkManagerPrefab);
             DontDestroyOnLoad(instance.gameObject);
+            NetworkPlayerSessionGuard.ApplyManagerSettings(instance);
             return instance;
         }
 

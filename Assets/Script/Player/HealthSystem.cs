@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using ProjectM.Network;
 
 namespace ProjectM.Player
 {
@@ -29,6 +30,16 @@ namespace ProjectM.Player
         }
 
         public void TakeDamage(float amount, GameObject attacker)
+        {
+            if (!IsAlive || amount <= 0f) return;
+
+            if (TryGetComponent<NetworkDamageBridge>(out var bridge) && bridge.TryRequestServerDamage(amount, attacker))
+                return;
+
+            ApplyDamageLocal(amount, attacker);
+        }
+
+        public void ApplyDamageLocal(float amount, GameObject attacker)
         {
             if (!IsAlive || amount <= 0f) return;
             currentHp = Mathf.Max(0f, currentHp - amount);

@@ -1,7 +1,10 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using Unity.Netcode;
 using ProjectM.Player;
+using ProjectM.Network;
 
 namespace ProjectM.Enemy
 {
@@ -42,6 +45,16 @@ namespace ProjectM.Enemy
 
         public event Action<EnemyAIController> OnDeath;
 
+        public void SetSimulationEnabled(bool enabled)
+        {
+            hostAuthoritative = enabled;
+            if (agent != null && !enabled)
+            {
+                agent.isStopped = true;
+                agent.ResetPath();
+            }
+        }
+
         private NavMeshAgent agent;
         private HealthSystem health;
         private float nextTargetSearchTime;
@@ -76,7 +89,9 @@ namespace ProjectM.Enemy
 
         private void Update()
         {
-            if (!hostAuthoritative) return; // 추후 네트워크 단계에서 Host만 동작
+            if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer)
+                return;
+            if (!hostAuthoritative) return;
             FSM.Tick();
         }
 
@@ -170,8 +185,24 @@ namespace ProjectM.Enemy
         {
             if (agent.isOnNavMesh) { agent.isStopped = true; agent.ResetPath(); }
             OnDeath?.Invoke(this);
-            // 시체 정리는 Spawner 측에서 풀로 회수하거나 일정 시간 후 Destroy
+
+            if (TryGetComponent<NetworkObject>(out var netObj) && netObj.IsSpawned)
+            {
+                if (NetworkSessionHelper.IsServer)
+                    StartCoroutine(DespawnAfterDelay(2f));
+                return;
+            }
+
             Destroy(gameObject, 2f);
+        }
+
+        private IEnumerator DespawnAfterDelay(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            if (TryGetComponent<NetworkObject>(out var netObj) && netObj.IsSpawned)
+                netObj.Despawn(true);
+            else if (gameObject != null)
+                Destroy(gameObject);
         }
 
         // ── 타깃 선정 ──────────────────────────────────────────────

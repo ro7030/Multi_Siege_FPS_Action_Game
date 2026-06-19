@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using ProjectM.Network;
 
 namespace ProjectM.Core
 {
@@ -107,6 +108,54 @@ namespace ProjectM.Core
         {
             Phase.ChangePhase(GamePhase.Lobby);
             State.Reset();
+        }
+
+        public void MirrorMatchStarted()
+        {
+            if (NetworkSessionHelper.IsGameplayAuthority) return;
+
+            State.Reset();
+            State.MaxWave = maxWave;
+            State.MatchStartTime = Time.time;
+            State.CurrentPhase = GamePhase.Preparation;
+            OnMatchStarted?.Invoke();
+        }
+
+        public void MirrorWaveStarted(int wave)
+        {
+            if (NetworkSessionHelper.IsGameplayAuthority) return;
+
+            State.CurrentWave = wave;
+            State.CurrentWaveStartTime = Time.time;
+            State.CurrentPhase = GamePhase.Wave;
+            OnWaveStarted?.Invoke(wave);
+        }
+
+        public void MirrorWaveEnded(int wave, GamePhase phase)
+        {
+            if (NetworkSessionHelper.IsGameplayAuthority) return;
+
+            State.CurrentWave = wave;
+            State.CurrentPhase = phase;
+            OnWaveEnded?.Invoke(wave);
+        }
+
+        public void MirrorMatchEnded(bool cleared, GamePhase phase)
+        {
+            if (NetworkSessionHelper.IsGameplayAuthority) return;
+
+            State.IsCleared = cleared;
+            State.IsFailed = !cleared;
+            State.CurrentPhase = phase;
+            OnMatchEnded?.Invoke(cleared);
+        }
+
+        public void MirrorPhase(GamePhase phase, int wave)
+        {
+            if (NetworkSessionHelper.IsGameplayAuthority) return;
+
+            State.CurrentWave = wave;
+            State.CurrentPhase = phase;
         }
     }
 }

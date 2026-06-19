@@ -58,6 +58,8 @@ namespace ProjectM.Player
         [Header("로컬 권한")]
         [SerializeField] private bool isLocalPlayer = true;
 
+        public bool IsLocalPlayer { get => isLocalPlayer; set => isLocalPlayer = value; }
+
         [Header("연동")]
         [SerializeField] private ThrowableEquipper throwableEquipper; // 키트 장착 시 투척 내려놓기
 

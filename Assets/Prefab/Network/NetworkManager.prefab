@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1319483872402060148}
   - component: {fileID: 4575265924059931448}
   - component: {fileID: 1429338974042514212}
+  - component: {fileID: 8234567890123456789}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -70,11 +71,24 @@ MonoBehaviour:
     EnableNetworkLogs: 1
     NetworkTopology: 0
     UseCMBService: 0
-    AutoSpawnPlayerPrefabClientSide: 1
+    AutoSpawnPlayerPrefabClientSide: 0
     NetworkProfilingMetrics: 1
     OldPrefabList: []
   RunInBackground: 1
   LogLevel: 1
+--- !u!114 &8234567890123456789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6860595276878264149}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62b77de4133bd49878fe80fccd2c071e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Network.NetworkPlayerSessionGuard
+  gameplaySceneName: GamePlay
 --- !u!114 &1429338974042514212
 MonoBehaviour:
   m_ObjectHideFlags: 0

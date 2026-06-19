@@ -1,5 +1,6 @@
 using UnityEngine;
 using ProjectM.Economy;
+using ProjectM.Network;
 
 namespace ProjectM.Player
 {
@@ -15,6 +16,10 @@ namespace ProjectM.Player
         /// </summary>
         public static CurrencyWallet FindLocalCurrencyWallet()
         {
+            var netLocal = NetworkPlayerRegistry.LocalPlayer;
+            if (netLocal != null && netLocal.TryGetComponent(out CurrencyWallet netWallet))
+                return netWallet;
+
             foreach (var pc in Object.FindObjectsByType<PlayerController>(FindObjectsSortMode.None))
             {
                 if (!pc.IsLocalPlayer) continue;
@@ -39,6 +44,10 @@ namespace ProjectM.Player
 
         public static HealthSystem FindLocalHealthSystem()
         {
+            var netLocal = NetworkPlayerRegistry.LocalPlayer;
+            if (netLocal != null && netLocal.TryGetComponent(out HealthSystem netHealth))
+                return netHealth;
+
             foreach (var pc in Object.FindObjectsByType<PlayerController>(FindObjectsSortMode.None))
             {
                 if (!pc.IsLocalPlayer) continue;
@@ -63,6 +72,10 @@ namespace ProjectM.Player
 
         public static WeaponController FindLocalWeaponController()
         {
+            var netLocal = NetworkPlayerRegistry.LocalPlayer;
+            if (netLocal != null && netLocal.TryGetComponent(out WeaponController netWeapon))
+                return netWeapon;
+
             foreach (var w in Object.FindObjectsByType<WeaponController>(FindObjectsSortMode.None))
             {
                 if (!w.IsLocalPlayer) continue;

@@ -30,6 +30,8 @@ namespace ProjectM.Player
         [SerializeField] private ThrowableEquipper throwableEquipper;
         [SerializeField] private bool isLocalPlayer = true;
 
+        public bool IsLocalPlayer { get => isLocalPlayer; set => isLocalPlayer = value; }
+
         [Header("전환 키 (Inspector 조절)")]
         [Tooltip("주 무기(라이플)로 전환할 키")]
         [SerializeField] private Key primaryKey = Key.Digit2;   // 2번 = 라이플

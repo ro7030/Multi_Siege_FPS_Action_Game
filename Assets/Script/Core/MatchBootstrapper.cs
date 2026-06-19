@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using ProjectM.Network;
 using ProjectM.UI;
 
 namespace ProjectM.Core
@@ -46,6 +47,8 @@ namespace ProjectM.Core
         private IEnumerator Start()
         {
             if (!autoStartMatch || session == null) yield break;
+            if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer)
+                yield break;
 
             // CountdownPresenter 가 있으면 카운트다운이 끝날 때까지 대기
             if (countdown != null)

@@ -136,6 +136,13 @@ namespace ProjectM.CharacterSelect
             };
         }
 
+        public string GetNicknameForClient(ulong clientId)
+        {
+            int slot = FindSlotByClientId(clientId);
+            if (slot < 0) return string.Empty;
+            return slots[slot].Nickname.ToString();
+        }
+
         public bool CanStartGame()
         {
             if (NetworkManager == null || slots == null) return false;

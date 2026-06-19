@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -62,31 +63,47 @@ namespace ProjectM.Player
             if (isLocalPlayer) SetCursorLocked(false);
         }
 
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            if (!isLocalPlayer || !hasFocus) return;
+            RefreshInputDevices();
+        }
+
         private void HandleDied(GameObject _) => canControl = false;
 
         private void Update()
         {
             if (!isLocalPlayer || !canControl) return;
 
+            HandleCursorInput();
             HandleLook();
             HandleMove();
+        }
+
+        private void HandleCursorInput()
+        {
+            if (!lockCursor) return;
+
+            var kb = Keyboard.current;
+            if (kb != null && kb.f1Key.wasPressedThisFrame)
+                SetCursorLocked(Cursor.lockState != CursorLockMode.Locked);
+
+            if (kb != null && kb.escapeKey.wasPressedThisFrame)
+                SetCursorLocked(Cursor.lockState != CursorLockMode.Locked);
+
+            if (Cursor.lockState == CursorLockMode.Locked) return;
+
+            var mouse = Mouse.current;
+            if (mouse != null && mouse.leftButton.wasPressedThisFrame)
+                SetCursorLocked(true);
         }
 
         private void HandleLook()
         {
             var mouse = Mouse.current;
-            var kb = Keyboard.current;
             if (mouse == null || cameraPivot == null) return;
 
-            // F1으로 커서 잠금 토글 (디버그 UI 클릭용. Tab은 스코어보드에 양보)
-            if (kb != null && kb.f1Key.wasPressedThisFrame)
-                SetCursorLocked(Cursor.lockState != CursorLockMode.Locked);
-            if (kb != null && kb.escapeKey.wasPressedThisFrame)
-                SetCursorLocked(false);
-
-            // 커서가 잠겨 있을 때만 시점 회전
             if (Cursor.lockState != CursorLockMode.Locked) return;
-            // 키트/투척 휠이 열려있으면 마우스는 휠 선택용 — 시점 회전 억제
             if (kitEquipper != null && kitEquipper.IsSelecting) return;
             if (throwableEquipper != null && throwableEquipper.IsSelecting) return;
 
@@ -129,6 +146,17 @@ namespace ProjectM.Player
         {
             Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
             Cursor.visible = !locked;
+
+            if (locked)
+                RefreshInputDevices();
+        }
+
+        private static void RefreshInputDevices()
+        {
+            if (Keyboard.current != null)
+                InputSystem.EnableDevice(Keyboard.current);
+            if (Mouse.current != null)
+                InputSystem.EnableDevice(Mouse.current);
         }
     }
 }
