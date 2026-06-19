@@ -19,6 +19,7 @@ MonoBehaviour:
   radius: 5
   fuseTime: 1.5
   effectDuration: 0
-  projectilePrefab: {fileID: 0}
+  projectilePrefab: {fileID: 4867813091239152202, guid: 0d1c4d402651e654cb2d8f202b60c007, type: 3}
+  heldViewModelPrefab: {fileID: 4867813091239152202, guid: 0d1c4d402651e654cb2d8f202b60c007, type: 3}
   icon: {fileID: 21300000, guid: 0576aab5a8902ab4e8144998b9097a97, type: 3}
   price: 30

@@ -773,6 +773,8 @@ Transform:
   m_Children:
   - {fileID: 1973801756}
   - {fileID: 2065137662}
+  - {fileID: 250448296}
+  - {fileID: 1553955721}
   m_Father: {fileID: 1877396697}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &152451123
@@ -1617,6 +1619,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &250448295
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 250448296}
+  m_Layer: 0
+  m_Name: ThrowableSocket
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &250448296
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 250448295}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.15585238, y: -0.78498596, z: -0.3042918, w: 0.5166367}
+  m_LocalPosition: {x: 0.36, y: -0.45, z: 0.78}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 148666930}
+  m_LocalEulerAnglesHint: {x: -39.7, y: -111.42, z: -5.2}
 --- !u!1 &262564558
 GameObject:
   m_ObjectHideFlags: 0
@@ -10470,6 +10503,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1248360287}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1553955720
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1553955721}
+  m_Layer: 0
+  m_Name: KitSocket
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1553955721
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1553955720}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.15585238, y: -0.78498596, z: -0.3042918, w: 0.5166367}
+  m_LocalPosition: {x: 0.36, y: -0.45, z: 0.78}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 148666930}
+  m_LocalEulerAnglesHint: {x: -39.7, y: -111.42, z: -5.2}
 --- !u!1 &1574365146
 GameObject:
   m_ObjectHideFlags: 0
@@ -12303,10 +12367,18 @@ MonoBehaviour:
     m_Bits: 4294967295
   healAmount: 50
   repairAmount: 50
+  healProgression: {fileID: 11400000, guid: 1b0bb644fb46c7f459c5477fec6ccc4b, type: 2}
+  currentHealTier: 0
   cycleOrder: 010000000200000003000000
   cycleKey: 43
   isLocalPlayer: 1
   throwableEquipper: {fileID: 0}
+  viewModelSocket: {fileID: 1553955721}
+  heldViewModels:
+  - type: 2
+    prefab: {fileID: 0}
+  - type: 3
+    prefab: {fileID: 0}
 --- !u!114 &1877396700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12328,6 +12400,7 @@ MonoBehaviour:
   throwForce: 14
   throwUpward: 3
   spawnForward: 0.8
+  viewModelSocket: {fileID: 250448296}
   isLocalPlayer: 1
   cycleKey: 44
   quickThrowKey: 21

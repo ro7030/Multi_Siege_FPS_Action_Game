@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ed85d94bc0595c046909cd7cfc5c0e4a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 318845
+  packageName: 3D_Game_Assets_City
+  packageVersion: 1.0.0
+  assetPath: Assets/3D_Game_Assets_City/Models/Home/Windows/Material/Glass for Window_Material.mat
+  uploadId: 752907

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 631a086a5008de04cb50d445773196fb
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 318845
+  packageName: 3D_Game_Assets_City
+  packageVersion: 1.0.0
+  assetPath: Assets/3D_Game_Assets_City/Models/Home/Porch/Material/Porch_Wood_Material.mat
+  uploadId: 752907

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e801f6563df4ea742b499862ecd9d82a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 318845
+  packageName: 3D_Game_Assets_City
+  packageVersion: 1.0.0
+  assetPath: Assets/3D_Game_Assets_City/Models/Home/Home_Base/Material/House_Brick_M_Material.mat
+  uploadId: 752907

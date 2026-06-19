@@ -55,6 +55,21 @@ namespace ProjectM.Player
             if (throwableEquipper == null) throwableEquipper = GetComponent<ThrowableEquipper>();
         }
 
+        private void OnEnable()
+        {
+            if (kitEquipper != null)       kitEquipper.OnEquippedChanged       += HandleKitChanged;
+            if (throwableEquipper != null) throwableEquipper.OnEquippedChanged += HandleThrowableChanged;
+        }
+
+        private void OnDisable()
+        {
+            if (kitEquipper != null)       kitEquipper.OnEquippedChanged       -= HandleKitChanged;
+            if (throwableEquipper != null) throwableEquipper.OnEquippedChanged -= HandleThrowableChanged;
+        }
+
+        private void HandleKitChanged(KitType _)             => RefreshWeaponVisibility();
+        private void HandleThrowableChanged(ThrowableType _) => RefreshWeaponVisibility();
+
         private void Start()
         {
             ApplySlot(WeaponSlot.Primary);
@@ -84,8 +99,7 @@ namespace ProjectM.Player
             if (rangedWeapon != null) rangedWeapon.IsActive = (slot == WeaponSlot.Primary);
             if (meleeWeapon != null)  meleeWeapon.IsActive  = (slot == WeaponSlot.Secondary);
 
-            if (rangedWeapon != null) rangedWeapon.SetViewModelVisible(slot == WeaponSlot.Primary);
-            if (meleeWeapon != null)  meleeWeapon.SetViewModelVisible(slot == WeaponSlot.Secondary);
+            RefreshWeaponVisibility();
 
             OnSlotChanged?.Invoke(slot);
             Debug.Log($"[Arsenal] 슬롯 전환: {slot}");
@@ -155,6 +169,19 @@ namespace ProjectM.Player
                 rangedWeapon.ApplyDefinition(def);
             else if (slot == WeaponSlot.Secondary && meleeWeapon != null)
                 meleeWeapon.ApplyDefinition(def);
+        }
+
+        /// <summary>키트/투척 장착 상태와 ActiveSlot 을 종합해 무기 뷰모델 표시 여부를 갱신.</summary>
+        private void RefreshWeaponVisibility()
+        {
+            bool kitOn       = kitEquipper       != null && kitEquipper.IsKitEquipped;
+            bool throwableOn = throwableEquipper != null && throwableEquipper.IsThrowableEquipped;
+            bool weaponsVisible = !kitOn && !throwableOn;
+
+            if (rangedWeapon != null)
+                rangedWeapon.SetViewModelVisible(weaponsVisible && ActiveSlot == WeaponSlot.Primary);
+            if (meleeWeapon != null)
+                meleeWeapon.SetViewModelVisible(weaponsVisible && ActiveSlot == WeaponSlot.Secondary);
         }
     }
 }

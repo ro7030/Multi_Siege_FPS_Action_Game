@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 515de8eb59627b1448ca31383aa8b4f0
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 318845
+  packageName: 3D_Game_Assets_City
+  packageVersion: 1.0.0
+  assetPath: Assets/3D_Game_Assets_City/Models/Fortress/Material/Wall_Var_2_Material.mat
+  uploadId: 752907

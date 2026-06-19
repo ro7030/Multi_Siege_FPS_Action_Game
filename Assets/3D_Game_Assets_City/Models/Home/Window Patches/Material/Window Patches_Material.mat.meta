@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 05dae8d97c6a30643a4798b9fdaddc27
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 318845
+  packageName: 3D_Game_Assets_City
+  packageVersion: 1.0.0
+  assetPath: Assets/3D_Game_Assets_City/Models/Home/Window Patches/Material/Window
+    Patches_Material.mat
+  uploadId: 752907

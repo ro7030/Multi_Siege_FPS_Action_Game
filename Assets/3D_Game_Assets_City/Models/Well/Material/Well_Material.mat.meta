@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 8b5c47b64e58a2e4eb1dcdcfd240b3fc
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 318845
+  packageName: 3D_Game_Assets_City
+  packageVersion: 1.0.0
+  assetPath: Assets/3D_Game_Assets_City/Models/Well/Material/Well_Material.mat
+  uploadId: 752907

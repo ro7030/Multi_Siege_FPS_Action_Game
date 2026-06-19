@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: bf9e22556c7015043916ecd4274e8998
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 318845
+  packageName: 3D_Game_Assets_City
+  packageVersion: 1.0.0
+  assetPath: Assets/3D_Game_Assets_City/Models/Home/Chimney/Material/Chimney_Var_1_Material.mat
+  uploadId: 752907

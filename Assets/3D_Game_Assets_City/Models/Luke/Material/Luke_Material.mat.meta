@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d3ac4b827ace164438c09172d91ac990
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 318845
+  packageName: 3D_Game_Assets_City
+  packageVersion: 1.0.0
+  assetPath: Assets/3D_Game_Assets_City/Models/Luke/Material/Luke_Material.mat
+  uploadId: 752907

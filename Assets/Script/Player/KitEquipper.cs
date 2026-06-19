@@ -32,8 +32,18 @@ namespace ProjectM.Player
         [SerializeField] private LayerMask hitMask = ~0;
 
         [Header("효과 수치 (Inspector 조절)")]
+        [Tooltip("힐킷 단계 진행표가 비어있을 때 사용되는 폴백 값.")]
         [SerializeField] private float healAmount = 50f;
         [SerializeField] private float repairAmount = 50f;
+
+        [Header("힐킷 티어")]
+        [Tooltip("힐킷 단계 진행표. 비우면 위 healAmount/heldViewModels 매핑이 폴백으로 사용된다.")]
+        [SerializeField] private HealKitProgression healProgression;
+        [SerializeField] private int currentHealTier = 0;
+        public int CurrentHealTier => currentHealTier;
+        public HealKitProgression HealProgression => healProgression;
+        public HealKitDefinition CurrentHealDef => healProgression != null ? healProgression.GetTier(currentHealTier) : null;
+        public event Action<int> OnHealTierChanged;
 
         [Header("탭 사이클")]
         [Tooltip("3번키를 누를 때마다 이 순서대로 보유 키트를 순환 장착합니다. (Inspector 에서 자유롭게 재정렬)")]
@@ -50,6 +60,21 @@ namespace ProjectM.Player
 
         [Header("연동")]
         [SerializeField] private ThrowableEquipper throwableEquipper; // 키트 장착 시 투척 내려놓기
+
+        [Header("비주얼 (1인칭 뷰모델)")]
+        [Tooltip("카메라 자식의 빈 GameObject. 장착한 키트 모델이 이 곳의 자식으로 인스턴스화된다.")]
+        [SerializeField] private Transform viewModelSocket;
+        [Tooltip("KitType 별 들고 있는 모델 프리팹 매핑. None 은 무시.")]
+        [SerializeField] private KitHeldVisual[] heldViewModels;
+        private GameObject viewModelInstance;
+        private KitType viewModelType = KitType.None;
+
+        [Serializable]
+        public struct KitHeldVisual
+        {
+            public KitType type;
+            public GameObject prefab;
+        }
 
         // ── 장착 상태 ──
         public KitType EquippedKit { get; private set; } = KitType.None;
@@ -152,12 +177,97 @@ namespace ProjectM.Player
             if (EquippedKit == type) return;
             EquippedKit = type;
             if (type != KitType.None) throwableEquipper?.Holster(); // 투척과 배타
+            SwapHeldViewModel(type);
             OnEquippedChanged?.Invoke(type);
             Debug.Log($"[Kit] 장착: {type}");
         }
 
+        private void SwapHeldViewModel(KitType type)
+        {
+            if (viewModelType == type && viewModelInstance != null) return;
+
+            if (viewModelInstance != null) Destroy(viewModelInstance);
+            viewModelInstance = null;
+            viewModelType = KitType.None;
+
+            if (type == KitType.None || viewModelSocket == null) return;
+
+            var prefab = GetHeldPrefab(type);
+            if (prefab == null) return;
+
+            viewModelInstance = Instantiate(prefab, viewModelSocket);
+            viewModelInstance.transform.localPosition = Vector3.zero;
+            viewModelInstance.transform.localRotation = Quaternion.identity;
+            viewModelType = type;
+        }
+
+        private GameObject GetHeldPrefab(KitType type)
+        {
+            // HealKit 은 현재 티어 정의의 prefab 을 우선 사용
+            if (type == KitType.HealKit && CurrentHealDef != null && CurrentHealDef.heldViewModelPrefab != null)
+                return CurrentHealDef.heldViewModelPrefab;
+
+            if (heldViewModels == null) return null;
+            for (int i = 0; i < heldViewModels.Length; i++)
+                if (heldViewModels[i].type == type) return heldViewModels[i].prefab;
+            return null;
+        }
+
         /// <summary>키트를 내려놓는다(무기로 복귀). 무기 전환 시 PlayerArsenal 이 호출.</summary>
         public void Holster() => SetEquipped(KitType.None);
+
+        // ── 힐킷 업그레이드 (PlayerArsenal.TryUpgrade 와 동일 패턴) ──────
+        public HealKitDefinition NextHealTier()
+            => healProgression != null ? healProgression.GetTier(currentHealTier + 1) : null;
+
+        public bool CanUpgradeHealKit() => NextHealTier() != null;
+
+        public int NextHealUpgradePrice()
+        {
+            var d = NextHealTier();
+            return d != null ? d.price : 0;
+        }
+
+        /// <summary>다음 단계로 업그레이드(화폐 차감은 호출자 책임).</summary>
+        public bool TryUpgradeHealKit()
+        {
+            if (!CanUpgradeHealKit()) return false;
+            return TrySetHealTier(currentHealTier + 1);
+        }
+
+        /// <summary>지정 단계로 바로 설정(상점에서 임의 티어 구매).</summary>
+        public bool TrySetHealTier(int tierIndex)
+        {
+            if (healProgression == null) return false;
+            if (healProgression.GetTier(tierIndex) == null) return false;
+
+            currentHealTier = tierIndex;
+            OnHealTierChanged?.Invoke(currentHealTier);
+
+            // 현재 들고 있는 게 힐킷이면 새 티어 모델로 즉시 갱신
+            if (EquippedKit == KitType.HealKit)
+            {
+                viewModelType = KitType.None; // 강제 재인스턴스화
+                SwapHeldViewModel(KitType.HealKit);
+            }
+
+            Debug.Log($"[Kit] HealKit → 티어 {tierIndex} ({CurrentHealDef?.displayName})");
+            return true;
+        }
+
+        public int GetHealTierPrice(int tierIndex)
+        {
+            var def = healProgression != null ? healProgression.GetTier(tierIndex) : null;
+            return def != null ? def.price : 0;
+        }
+
+        /// <summary>아직 보유하지 않은 티어만 구매 가능 (0티어는 기본 지급).</summary>
+        public bool CanPurchaseHealTier(int tierIndex)
+        {
+            if (healProgression == null || tierIndex <= 0) return false;
+            if (tierIndex <= currentHealTier) return false;
+            return healProgression.GetTier(tierIndex) != null;
+        }
 
         // ─────────────────────────────────────────────────────────────
         // 사용
@@ -179,8 +289,9 @@ namespace ProjectM.Player
         {
             if (playerHealth == null || !playerHealth.IsAlive) return false;
             if (!inventory.TryConsume(KitType.HealKit)) return false;
-            playerHealth.Heal(healAmount);
-            Debug.Log($"[Kit] HealKit 사용 (+{healAmount} HP)");
+            float amount = CurrentHealDef != null ? CurrentHealDef.healAmount : healAmount;
+            playerHealth.Heal(amount);
+            Debug.Log($"[Kit] HealKit 사용 (+{amount} HP, tier {currentHealTier})");
             return true;
         }
 

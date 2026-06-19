@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 942ffe03bbb54014b85c188fb53c9b3c
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 318845
+  packageName: 3D_Game_Assets_City
+  packageVersion: 1.0.0
+  assetPath: Assets/3D_Game_Assets_City/Models/Home/Home_Base/Material/House_Sand_M_Material.mat
+  uploadId: 752907

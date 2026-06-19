@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 603cf3687ffa53043b7e7f746127bf76
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 318845
+  packageName: 3D_Game_Assets_City
+  packageVersion: 1.0.0
+  assetPath: Assets/3D_Game_Assets_City/Models/Fountain/Material/Fountain_Material.mat
+  uploadId: 752907

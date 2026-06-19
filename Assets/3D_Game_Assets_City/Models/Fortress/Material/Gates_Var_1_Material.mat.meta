@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a89b5ad17032e2449bf493c970a62aaf
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 318845
+  packageName: 3D_Game_Assets_City
+  packageVersion: 1.0.0
+  assetPath: Assets/3D_Game_Assets_City/Models/Fortress/Material/Gates_Var_1_Material.mat
+  uploadId: 752907
