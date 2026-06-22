@@ -63,17 +63,8 @@ namespace ProjectM.Economy
 
             if (NetworkSessionHelper.IsMultiplayerSession)
             {
-                foreach (var player in NetworkPlayerRegistry.All)
-                {
-                    if (player == null) continue;
-                    if (player.TryGetComponent<NetworkCurrencyWallet>(out var netWallet))
-                        netWallet.ServerAdd(amount);
-                    else if (player.TryGetComponent<CurrencyWallet>(out var w))
-                        w.Add(amount);
-                }
-
+                PlayerWalletUtility.ServerAddToAllPlayers(amount, reason);
                 LastReward = amount;
-                Debug.Log($"[Reward] {reason}: +{amount} × {NetworkPlayerRegistry.All.Count}명");
                 return;
             }
 

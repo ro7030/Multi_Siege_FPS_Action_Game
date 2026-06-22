@@ -180,46 +180,19 @@ namespace ProjectM.Economy
         /// <summary>플레이어가 F 키로 수확 시도. FarmPlot 의 누적분을 팀 전원 지갑에 균등 분배.</summary>
         public void HarvestFarm(FarmPlot plot)
         {
+            if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer)
+                return;
+
             if (plot == null || !plot.HasYieldToHarvest) return;
 
             int yieldPerPlayer = plot.HarvestNow();
             if (yieldPerPlayer <= 0) return;
 
-            var wallets = FindAllWallets();
-            DistributeToTeam(wallets, yieldPerPlayer);
+            var wallets = PlayerWalletUtility.FindAllPlayerWallets();
+            PlayerWalletUtility.ServerAddToAllPlayers(yieldPerPlayer, $"Farm harvest +{yieldPerPlayer}");
 
             OnFarmHarvested?.Invoke(plot, yieldPerPlayer);
             Debug.Log($"[FarmManager] 수확! +{yieldPerPlayer} × {wallets.Count}명");
-        }
-
-        private void DistributeToTeam(List<CurrencyWallet> wallets, int amountPerPlayer)
-        {
-            if (wallets == null || wallets.Count == 0) return;
-            foreach (var w in wallets)
-            {
-                if (w == null) continue;
-                if (w.TryGetComponent<NetworkCurrencyWallet>(out var netWallet))
-                    netWallet.ServerAdd(amountPerPlayer);
-                else
-                    w.Add(amountPerPlayer);
-            }
-        }
-
-        private List<CurrencyWallet> FindAllWallets()
-        {
-            if (NetworkSessionHelper.IsMultiplayerSession)
-            {
-                var wallets = new List<CurrencyWallet>();
-                foreach (var player in NetworkPlayerRegistry.All)
-                {
-                    if (player != null && player.TryGetComponent<CurrencyWallet>(out var wallet))
-                        wallets.Add(wallet);
-                }
-                return wallets;
-            }
-
-            var found = FindObjectsByType<CurrencyWallet>(FindObjectsSortMode.None);
-            return new List<CurrencyWallet>(found);
         }
     }
 }

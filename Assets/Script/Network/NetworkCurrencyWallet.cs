@@ -24,11 +24,12 @@ namespace ProjectM.Network
             if (IsServer)
             {
                 netBalance.Value = wallet.Balance;
+                wallet.NotifyBalance(netBalance.Value);
             }
             else
             {
                 netBalance.OnValueChanged += HandleBalanceChanged;
-                wallet.SetBalance(netBalance.Value);
+                wallet.NotifyBalance(netBalance.Value);
             }
         }
 
@@ -43,8 +44,14 @@ namespace ProjectM.Network
             if (!IsServer || amount <= 0)
                 return;
 
+            if (!IsSpawned)
+            {
+                wallet.NotifyBalance(wallet.Balance + amount, added: amount);
+                return;
+            }
+
             netBalance.Value += amount;
-            wallet.SetBalance(netBalance.Value);
+            wallet.NotifyBalance(netBalance.Value, added: amount);
         }
 
         public bool ServerTrySpend(int amount)
@@ -52,14 +59,17 @@ namespace ProjectM.Network
             if (!IsServer || amount <= 0)
                 return true;
 
+            if (!IsSpawned)
+                return wallet.Balance >= amount;
+
             if (netBalance.Value < amount)
                 return false;
 
             netBalance.Value -= amount;
-            wallet.SetBalance(netBalance.Value);
+            wallet.NotifyBalance(netBalance.Value, spent: amount);
             return true;
         }
 
-        private void HandleBalanceChanged(int _, int value) => wallet.SetBalance(value);
+        private void HandleBalanceChanged(int _, int value) => wallet.NotifyBalance(value);
     }
 }

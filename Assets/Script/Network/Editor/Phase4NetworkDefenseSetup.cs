@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 using ProjectM.Defense;
 using ProjectM.Economy;
 using ProjectM.Network;
+using ProjectM.Player;
 
 namespace ProjectM.Network.Editor
 {
@@ -122,8 +123,33 @@ namespace ProjectM.Network.Editor
             if (root.GetComponent<NetworkCurrencyWallet>() == null)
                 root.AddComponent<NetworkCurrencyWallet>();
 
+            if (root.GetComponent<NetworkKitInventory>() == null)
+                root.AddComponent<NetworkKitInventory>();
+
+            if (root.GetComponent<NetworkThrowableInventory>() == null)
+                root.AddComponent<NetworkThrowableInventory>();
+
+            if (root.GetComponent<NetworkPlayerArsenal>() == null)
+                root.AddComponent<NetworkPlayerArsenal>();
+
             PrefabUtility.SaveAsPrefabAsset(root, NetworkPlayerPrefabPath);
             PrefabUtility.UnloadPrefabContents(root);
+        }
+
+        [MenuItem("ProjectM/Setup Phase 4 W3 Player Inventory NGO")]
+        public static void SetupW3PlayerInventory()
+        {
+            ConfigureNetworkPlayerWallet();
+            AssetDatabase.SaveAssets();
+            Debug.Log("[Phase4] W3 NetworkThrowableInventory + NetworkPlayerArsenal — NetworkPlayer prefab 적용 완료");
+        }
+
+        [MenuItem("ProjectM/Setup Phase 4 W2 Network Kit Inventory")]
+        public static void SetupNetworkKitInventoryOnly()
+        {
+            ConfigureNetworkPlayerWallet();
+            AssetDatabase.SaveAssets();
+            Debug.Log("[Phase4] W2 NetworkKitInventory — NetworkPlayer prefab 적용 완료");
         }
 
         private static void SetupGamePlayScene()
@@ -134,6 +160,7 @@ namespace ProjectM.Network.Editor
             RemoveLegacyRepairZones();
             SetupNetworkGameplayBridge();
             SetupSceneDefenses();
+            SetupGateDefenseBodies();
             SetupGateInstallers();
 
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
@@ -157,24 +184,83 @@ namespace ProjectM.Network.Editor
 
         private static void SetupSceneDefenses()
         {
-            foreach (var defense in Object.FindObjectsByType<DefenseObject>(FindObjectsSortMode.None))
+            int count = 0;
+            foreach (var defense in Object.FindObjectsByType<DefenseObject>(
+                         FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
                 if (defense == null) continue;
                 EnsureDefenseNetworkComponents(defense.gameObject);
+                count++;
             }
 
-            foreach (var plot in Object.FindObjectsByType<FarmPlot>(FindObjectsSortMode.None))
+            foreach (var plot in Object.FindObjectsByType<FarmPlot>(
+                         FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
                 if (plot == null) continue;
                 EnsureDefenseNetworkComponents(plot.gameObject);
                 if (plot.GetComponent<NetworkFarmBridge>() == null)
                     plot.gameObject.AddComponent<NetworkFarmBridge>();
             }
+
+            Debug.Log($"[Phase4] 씬 DefenseObject NGO 적용: {count}개 (비활성 포함)");
+        }
+
+        /// <summary>GateInstaller가 참조하는 Gate Body(비활성)에 NGO HP 브릿지를 붙인다.</summary>
+        private static void SetupGateDefenseBodies()
+        {
+            int count = 0;
+            foreach (var installer in Object.FindObjectsByType<GateInstaller>(
+                         FindObjectsInactive.Include, FindObjectsSortMode.None))
+            {
+                if (installer == null) continue;
+                var gateBody = GetGateObjectReference(installer);
+                if (gateBody == null) continue;
+
+                EnsureGateBodyNetworkComponents(gateBody);
+                count++;
+            }
+
+            Debug.Log($"[Phase4] Gate Body NGO 적용: {count}개");
+        }
+
+        private static void EnsureGateBodyNetworkComponents(GameObject go)
+        {
+            EnsureDefenseNetworkComponents(go);
+
+            if (go.GetComponent<NetworkGateBodyBridge>() == null)
+                go.AddComponent<NetworkGateBodyBridge>();
+
+            if (go.TryGetComponent<HealthSystem>(out var health))
+            {
+                var so = new SerializedObject(health);
+                so.FindProperty("destroyOnDeath").boolValue = false;
+                so.ApplyModifiedPropertiesWithoutUndo();
+            }
+        }
+
+        private static GameObject GetGateObjectReference(GateInstaller installer)
+        {
+            var so = new SerializedObject(installer);
+            return so.FindProperty("gateObject").objectReferenceValue as GameObject;
+        }
+
+        [MenuItem("ProjectM/Setup Phase 4 W2 Gate Defense NGO")]
+        public static void SetupGateDefenseOnly()
+        {
+            if (SceneManager.GetActiveScene().path != GamePlayScenePath)
+                EditorSceneManager.OpenScene(GamePlayScenePath);
+
+            SetupSceneDefenses();
+            SetupGateDefenseBodies();
+
+            EditorSceneManager.SaveScene(SceneManager.GetActiveScene());
+            Debug.Log("[Phase4] W2 Gate Defense NGO 씬 적용 완료");
         }
 
         private static void SetupGateInstallers()
         {
-            foreach (var installer in Object.FindObjectsByType<GateInstaller>(FindObjectsSortMode.None))
+            foreach (var installer in Object.FindObjectsByType<GateInstaller>(
+                         FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
                 if (installer == null) continue;
 

@@ -22,6 +22,8 @@ namespace ProjectM.Network
         private NetworkVariable<int> netSpawnedCount = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         private NetworkVariable<bool> netIsSpawning = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
+        public float SyncedPrepRemaining => netPrepRemaining.Value;
+
         private void Awake()
         {
             if (session == null) session = FindAnyObjectByType<GameSessionManager>();
@@ -45,6 +47,7 @@ namespace ProjectM.Network
             {
                 netWave.OnValueChanged += (_, _) => ApplyClientSnapshot(false);
                 netPhase.OnValueChanged += (_, _) => ApplyClientSnapshot(false);
+                netPrepRemaining.OnValueChanged += (_, _) => ApplyClientSnapshot(false);
                 netTotalToSpawn.OnValueChanged += (_, _) => ApplyClientSnapshot(false);
                 netSpawnedCount.OnValueChanged += (_, _) => ApplyClientSnapshot(false);
                 netIsSpawning.OnValueChanged += (_, _) => ApplyClientSnapshot(false);

@@ -49,6 +49,9 @@ namespace ProjectM.Network
                 netAccumulatedYield.OnValueChanged -= HandleYieldChanged;
                 netState.OnValueChanged -= HandleStateChanged;
             }
+
+            if (plot != null && plot.State == FarmPlot.FarmState.Destroyed)
+                plot.ApplyDestroyedPresentation();
         }
 
         public void RequestHarvest()

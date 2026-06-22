@@ -118,6 +118,24 @@ namespace ProjectM.Player
             // 사용 중인 키트가 0이 되면 자동 해제
             if (EquippedKit == type && newCount <= 0)
                 SetEquipped(KitType.None);
+
+            if (newCount <= 0 && LastSelected == type)
+                UpdateLastSelectedToOwnedKit();
+        }
+
+        private void UpdateLastSelectedToOwnedKit()
+        {
+            if (inventory == null || cycleOrder == null) return;
+
+            foreach (var kit in cycleOrder)
+            {
+                if (kit == KitType.None) continue;
+                if (!inventory.Has(kit)) continue;
+                LastSelected = kit;
+                return;
+            }
+
+            LastSelected = KitType.None;
         }
 
         // ─────────────────────────────────────────────────────────────
@@ -244,13 +262,29 @@ namespace ProjectM.Player
             if (healProgression == null) return false;
             if (healProgression.GetTier(tierIndex) == null) return false;
 
+            if (TryGetComponent<NetworkKitInventory>(out var netKit)
+                && NetworkSessionHelper.IsMultiplayerSession
+                && netKit.IsSpawned
+                && NetworkSessionHelper.IsServer)
+            {
+                return netKit.ServerSetHealTier(tierIndex);
+            }
+
+            return ApplyNetworkHealTier(tierIndex);
+        }
+
+        /// <summary>네트워크 미러 또는 오프라인 로컬 적용.</summary>
+        public bool ApplyNetworkHealTier(int tierIndex)
+        {
+            if (healProgression == null || healProgression.GetTier(tierIndex) == null)
+                return false;
+
             currentHealTier = tierIndex;
             OnHealTierChanged?.Invoke(currentHealTier);
 
-            // 현재 들고 있는 게 힐킷이면 새 티어 모델로 즉시 갱신
             if (EquippedKit == KitType.HealKit)
             {
-                viewModelType = KitType.None; // 강제 재인스턴스화
+                viewModelType = KitType.None;
                 SwapHeldViewModel(KitType.HealKit);
             }
 
@@ -291,8 +325,21 @@ namespace ProjectM.Player
         private bool UseHealKit()
         {
             if (playerHealth == null || !playerHealth.IsAlive) return false;
-            if (!inventory.TryConsume(KitType.HealKit)) return false;
             float amount = CurrentHealDef != null ? CurrentHealDef.healAmount : healAmount;
+
+            if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer)
+            {
+                if (TryGetComponent<NetworkKitInventory>(out var netKit) && netKit.IsSpawned)
+                {
+                    netKit.RequestUseHealKitFromOwner(amount);
+                    Debug.Log($"[Kit] HealKit 사용 요청 (+{amount} HP, tier {currentHealTier})");
+                    return true;
+                }
+
+                return false;
+            }
+
+            if (!inventory.TryConsume(KitType.HealKit)) return false;
             playerHealth.Heal(amount);
             Debug.Log($"[Kit] HealKit 사용 (+{amount} HP, tier {currentHealTier})");
             return true;

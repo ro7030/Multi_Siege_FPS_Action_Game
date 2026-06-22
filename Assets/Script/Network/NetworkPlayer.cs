@@ -5,6 +5,7 @@ using ProjectM.Auth;
 using ProjectM.CharacterSelect;
 using ProjectM.Economy;
 using ProjectM.Player;
+using ProjectM.UI;
 
 namespace ProjectM.Network
 {
@@ -102,27 +103,63 @@ namespace ProjectM.Network
         public void RequestShopPurchaseServerRpc(FixedString64Bytes itemId)
         {
             var shop = Object.FindAnyObjectByType<ShopController>();
-            shop?.TryPurchaseForPlayer(gameObject, itemId.ToString());
+            bool success = shop != null && shop.TryPurchaseForPlayer(gameObject, itemId.ToString());
+            NotifyShopResultClientRpc(success, itemId);
+        }
+
+        [ClientRpc]
+        private void NotifyShopResultClientRpc(bool success, FixedString64Bytes itemId)
+        {
+            if (!IsOwner) return;
+
+            var shopView = Object.FindAnyObjectByType<ShopView>();
+            shopView?.RefreshFromNetwork();
+
+            if (!success)
+                Debug.LogWarning($"[Shop] 구매 실패: {itemId}");
         }
 
         [ServerRpc]
         public void RequestWeaponUpgradeServerRpc(int slot)
         {
             var shop = Object.FindAnyObjectByType<ShopController>();
-            if (shop == null) return;
+            if (shop == null)
+            {
+                NotifyWeaponTierResultClientRpc(false, slot, -1);
+                return;
+            }
 
             var arsenal = GetComponent<PlayerArsenal>();
-            if (arsenal == null) return;
+            if (arsenal == null)
+            {
+                NotifyWeaponTierResultClientRpc(false, slot, -1);
+                return;
+            }
 
             int next = arsenal.CurrentTierIndex((WeaponSlot)slot) + 1;
-            shop.TryPurchaseWeaponTierForPlayer(gameObject, (WeaponSlot)slot, next);
+            bool success = shop.TryPurchaseWeaponTierForPlayer(gameObject, (WeaponSlot)slot, next);
+            NotifyWeaponTierResultClientRpc(success, slot, next);
         }
 
         [ServerRpc]
         public void RequestWeaponTierPurchaseServerRpc(int slot, int tierIndex)
         {
             var shop = Object.FindAnyObjectByType<ShopController>();
-            shop?.TryPurchaseWeaponTierForPlayer(gameObject, (WeaponSlot)slot, tierIndex);
+            bool success = shop != null
+                && shop.TryPurchaseWeaponTierForPlayer(gameObject, (WeaponSlot)slot, tierIndex);
+            NotifyWeaponTierResultClientRpc(success, slot, tierIndex);
+        }
+
+        [ClientRpc]
+        private void NotifyWeaponTierResultClientRpc(bool success, int slot, int tierIndex)
+        {
+            if (!IsOwner) return;
+
+            var shopView = Object.FindAnyObjectByType<ShopView>();
+            shopView?.RefreshFromNetwork();
+
+            if (!success)
+                Debug.LogWarning($"[Shop] 무기 티어 구매 실패: slot={slot}, tier={tierIndex}");
         }
     }
 }

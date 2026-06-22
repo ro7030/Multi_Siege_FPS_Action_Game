@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using ProjectM.Network;
 
 namespace ProjectM.Player
 {
@@ -137,6 +138,23 @@ namespace ProjectM.Player
         {
             if (progression == null) return false;
             if (progression.GetTier(slot, tierIndex) == null) return false;
+
+            if (TryGetComponent<NetworkPlayerArsenal>(out var netArsenal)
+                && NetworkSessionHelper.IsMultiplayerSession
+                && netArsenal.IsSpawned
+                && NetworkSessionHelper.IsServer)
+            {
+                return netArsenal.ServerSetTier(slot, tierIndex);
+            }
+
+            return ApplyNetworkTier(slot, tierIndex);
+        }
+
+        /// <summary>네트워크 미러 또는 오프라인 로컬 적용.</summary>
+        public bool ApplyNetworkTier(WeaponSlot slot, int tierIndex)
+        {
+            if (progression == null || progression.GetTier(slot, tierIndex) == null)
+                return false;
 
             if (slot == WeaponSlot.Primary) primaryTierIndex = tierIndex;
             else                            secondaryTierIndex = tierIndex;

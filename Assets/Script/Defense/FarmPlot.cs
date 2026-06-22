@@ -77,8 +77,9 @@ namespace ProjectM.Defense
         private void HandleDestroyed(DefenseObject _)
         {
             State = FarmState.Destroyed;
-            AccumulatedYield = 0;  // 파괴 시 누적분 손실
+            AccumulatedYield = 0;
             ApplyVisual();
+            ApplyDestroyedPresentation();
             OnDestroyedByEnemy?.Invoke(this);
 
             if (TryGetComponent<NetworkFarmBridge>(out var bridge) && NetworkSessionHelper.IsServer)
@@ -152,6 +153,19 @@ namespace ProjectM.Defense
             AccumulatedYield = accumulatedYield;
             State = state;
             ApplyVisual();
+
+            if (state == FarmState.Destroyed)
+                ApplyDestroyedPresentation();
+        }
+
+        /// <summary>파괴 시 비주얼·콜라이더 비활성화 (서버/클라이언트 공통).</summary>
+        internal void ApplyDestroyedPresentation()
+        {
+            foreach (var renderer in GetComponentsInChildren<Renderer>(true))
+                renderer.enabled = false;
+
+            foreach (var collider in GetComponentsInChildren<Collider>(true))
+                collider.enabled = false;
         }
 
         // ─────────────────────────────────────────────────────────────

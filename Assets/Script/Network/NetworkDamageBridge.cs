@@ -186,6 +186,15 @@ namespace ProjectM.Network
             netReviveProgress.Value = revive != null ? revive.ReviveProgress : 0f;
         }
 
+        /// <summary>게이트 설치 등 비활성→활성 전환 후 서버 HP 스냅샷을 즉시 밀어넣는다.</summary>
+        public void ServerSyncHealthNow()
+        {
+            if (!IsServer || !IsSpawned || health == null)
+                return;
+
+            PushHealthSnapshot();
+        }
+
         private byte ResolveLifeState()
         {
             if (revive == null)

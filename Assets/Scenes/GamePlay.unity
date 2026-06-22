@@ -272,6 +272,9 @@ GameObject:
   - component: {fileID: 66922208}
   - component: {fileID: 66922207}
   - component: {fileID: 66922206}
+  - component: {fileID: 66922214}
+  - component: {fileID: 66922215}
+  - component: {fileID: 66922216}
   m_Layer: 0
   m_Name: Body
   m_TagString: DefenseObject
@@ -338,7 +341,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.HealthSystem
   maxHp: 500
   currentHp: 500
-  destroyOnDeath: 1
+  destroyOnDeath: 0
 --- !u!65 &66922210
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -432,6 +435,57 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1574365154}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &66922214
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 66922205}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 2916064335
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &66922215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 66922205}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e5f6a7b8c9d0e1f2a3b4c5d6e7f8091, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Network.NetworkDamageBridge
+  ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &66922216
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 66922205}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3f2e8c91b4d6e7f8091a2b3c4d5e6f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Network.NetworkGateBodyBridge
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &119053788
 GameObject:
   m_ObjectHideFlags: 0
@@ -1245,6 +1299,9 @@ GameObject:
   - component: {fileID: 249252128}
   - component: {fileID: 249252127}
   - component: {fileID: 249252126}
+  - component: {fileID: 249252134}
+  - component: {fileID: 249252135}
+  - component: {fileID: 249252136}
   m_Layer: 0
   m_Name: Body
   m_TagString: DefenseObject
@@ -1311,7 +1368,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.HealthSystem
   maxHp: 500
   currentHp: 500
-  destroyOnDeath: 1
+  destroyOnDeath: 0
 --- !u!65 &249252130
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1405,6 +1462,57 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1582469547}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &249252134
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 249252125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 868763457
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &249252135
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 249252125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e5f6a7b8c9d0e1f2a3b4c5d6e7f8091, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Network.NetworkDamageBridge
+  ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &249252136
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 249252125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3f2e8c91b4d6e7f8091a2b3c4d5e6f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Network.NetworkGateBodyBridge
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &250406380
 GameObject:
   m_ObjectHideFlags: 0
@@ -4169,19 +4277,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 529257445}
   m_CullTransparentMesh: 1
---- !u!134 &558470911
-PhysicsMaterial:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  serializedVersion: 2
-  m_DynamicFriction: 0.6
-  m_StaticFriction: 0.6
-  m_Bounciness: 0
-  m_FrictionCombine: 0
-  m_BounceCombine: 0
 --- !u!1 &561700099
 GameObject:
   m_ObjectHideFlags: 0
@@ -10289,6 +10384,9 @@ GameObject:
   - component: {fileID: 1540781573}
   - component: {fileID: 1540781572}
   - component: {fileID: 1540781571}
+  - component: {fileID: 1540781579}
+  - component: {fileID: 1540781580}
+  - component: {fileID: 1540781581}
   m_Layer: 0
   m_Name: Body
   m_TagString: DefenseObject
@@ -10355,7 +10453,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.HealthSystem
   maxHp: 500
   currentHp: 500
-  destroyOnDeath: 1
+  destroyOnDeath: 0
 --- !u!65 &1540781575
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -10449,6 +10547,57 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1248360287}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1540781579
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1540781570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 4191464288
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &1540781580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1540781570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e5f6a7b8c9d0e1f2a3b4c5d6e7f8091, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Network.NetworkDamageBridge
+  ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &1540781581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1540781570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3f2e8c91b4d6e7f8091a2b3c4d5e6f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Network.NetworkGateBodyBridge
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &1574365146
 GameObject:
   m_ObjectHideFlags: 0
@@ -12304,6 +12453,9 @@ GameObject:
   - component: {fileID: 1937472540}
   - component: {fileID: 1937472539}
   - component: {fileID: 1937472538}
+  - component: {fileID: 1937472546}
+  - component: {fileID: 1937472547}
+  - component: {fileID: 1937472548}
   m_Layer: 0
   m_Name: Body
   m_TagString: DefenseObject
@@ -12370,7 +12522,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.HealthSystem
   maxHp: 500
   currentHp: 500
-  destroyOnDeath: 1
+  destroyOnDeath: 0
 --- !u!65 &1937472542
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -12464,6 +12616,57 @@ Transform:
   m_Children: []
   m_Father: {fileID: 465430820}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1937472546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1937472537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 101278297
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &1937472547
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1937472537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e5f6a7b8c9d0e1f2a3b4c5d6e7f8091, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Network.NetworkDamageBridge
+  ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &1937472548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1937472537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3f2e8c91b4d6e7f8091a2b3c4d5e6f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Network.NetworkGateBodyBridge
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &1938380372
 GameObject:
   m_ObjectHideFlags: 0
@@ -14540,86 +14743,12 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2135066011}
   m_CullTransparentMesh: 1
---- !u!1001 &793522823575776484
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1140569608176417595, guid: eb467faf93422ae4fb26f44b6940daf4, type: 3}
-      propertyPath: m_Name
-      value: Farm_01
-      objectReference: {fileID: 0}
-    - target: {fileID: 1342423059089666324, guid: eb467faf93422ae4fb26f44b6940daf4, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -25.83
-      objectReference: {fileID: 0}
-    - target: {fileID: 1342423059089666324, guid: eb467faf93422ae4fb26f44b6940daf4, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1342423059089666324, guid: eb467faf93422ae4fb26f44b6940daf4, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -19.78
-      objectReference: {fileID: 0}
-    - target: {fileID: 1342423059089666324, guid: eb467faf93422ae4fb26f44b6940daf4, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1342423059089666324, guid: eb467faf93422ae4fb26f44b6940daf4, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1342423059089666324, guid: eb467faf93422ae4fb26f44b6940daf4, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1342423059089666324, guid: eb467faf93422ae4fb26f44b6940daf4, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1342423059089666324, guid: eb467faf93422ae4fb26f44b6940daf4, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1342423059089666324, guid: eb467faf93422ae4fb26f44b6940daf4, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1342423059089666324, guid: eb467faf93422ae4fb26f44b6940daf4, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1568789226742087048, guid: eb467faf93422ae4fb26f44b6940daf4, type: 3}
-      propertyPath: m_Material
-      value: 
-      objectReference: {fileID: 558470911}
-    - target: {fileID: 2689993709324648697, guid: eb467faf93422ae4fb26f44b6940daf4, type: 3}
-      propertyPath: GlobalObjectIdHash
-      value: 2174065579
-      objectReference: {fileID: 0}
-    - target: {fileID: 2689993709324648697, guid: eb467faf93422ae4fb26f44b6940daf4, type: 3}
-      propertyPath: SceneMigrationSynchronization
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2689993709324648697, guid: eb467faf93422ae4fb26f44b6940daf4, type: 3}
-      propertyPath: InScenePlacedSourceGlobalObjectIdHash
-      value: 1073121941
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: eb467faf93422ae4fb26f44b6940daf4, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1801368035}
   - {fileID: 599986491}
-  - {fileID: 793522823575776484}
   - {fileID: 1209382975}
   - {fileID: 1530639495}
   - {fileID: 1016349637}

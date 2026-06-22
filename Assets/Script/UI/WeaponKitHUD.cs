@@ -160,14 +160,18 @@ namespace ProjectM.UI
                 secondarySlot.SetHighlight(active);
             }
 
-            // 슬롯 3: 키트 — 장착 시 강조, 미장착이어도 LastSelected 종류의 normal 아이콘을 유지
+            // 슬롯 3: 키트 — 보유량 0이면 아이콘/카운트 미표시
             if (kitSlot != null)
             {
                 KitType iconType = KitType.None;
                 if (kitEquipper != null)
                 {
-                    if (kitEquipped) iconType = kitEquipper.EquippedKit;
-                    else if (kitShowLastSelectedWhenIdle) iconType = kitEquipper.LastSelected;
+                    if (kitEquipped && kitInventory != null && kitInventory.Has(kitEquipper.EquippedKit))
+                        iconType = kitEquipper.EquippedKit;
+                    else if (kitShowLastSelectedWhenIdle
+                        && kitInventory != null
+                        && kitInventory.Has(kitEquipper.LastSelected))
+                        iconType = kitEquipper.LastSelected;
                 }
                 ApplyKitSlotIcon(iconType);
                 kitSlot.SetHighlight(kitEquipped);
@@ -175,18 +179,26 @@ namespace ProjectM.UI
                 if (kitInventory != null && kitEquipper != null)
                 {
                     var t = kitEquipper.IsKitEquipped ? kitEquipper.EquippedKit : kitEquipper.LastSelected;
-                    kitSlot.SetInfo(t != KitType.None ? $"{kitInventory.GetCount(t)}" : "");
+                    kitSlot.SetInfo(t != KitType.None && kitInventory.Has(t)
+                        ? $"{kitInventory.GetCount(t)}"
+                        : "");
                 }
             }
 
-            // 슬롯 4: 투척무기 — 장착(선택) 시 강조 + 현재 선택 종류의 개수 + 종류별 아이콘 교체
+            // 슬롯 4: 투척무기 — 보유량 0이면 아이콘/카운트 미표시
             if (throwableSlot != null)
             {
                 ThrowableType iconType = ThrowableType.None;
                 if (throwableEquipper != null)
                 {
-                    if (throwEquipped) iconType = throwableEquipper.EquippedThrowable;
-                    else if (throwableShowLastSelectedWhenIdle) iconType = throwableEquipper.LastSelected;
+                    if (throwEquipped
+                        && throwableInventory != null
+                        && throwableInventory.Has(throwableEquipper.EquippedThrowable))
+                        iconType = throwableEquipper.EquippedThrowable;
+                    else if (throwableShowLastSelectedWhenIdle
+                        && throwableInventory != null
+                        && throwableInventory.Has(throwableEquipper.LastSelected))
+                        iconType = throwableEquipper.LastSelected;
                 }
                 ApplyThrowableSlotIcon(iconType);
                 throwableSlot.SetHighlight(throwEquipped);
@@ -196,7 +208,9 @@ namespace ProjectM.UI
                     var t = throwableEquipper.IsThrowableEquipped
                         ? throwableEquipper.EquippedThrowable
                         : throwableEquipper.LastSelected;
-                    throwableSlot.SetInfo($"{throwableInventory.GetCount(t)}");
+                    throwableSlot.SetInfo(t != ThrowableType.None && throwableInventory.Has(t)
+                        ? $"{throwableInventory.GetCount(t)}"
+                        : "");
                 }
             }
         }

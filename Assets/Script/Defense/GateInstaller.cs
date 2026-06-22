@@ -59,6 +59,16 @@ namespace ProjectM.Defense
             if (gateDefense != null) gateDefense.OnDestroyed -= HandleGateDestroyed;
         }
 
+        private bool IsSlotInstalled()
+        {
+            if (TryGetComponent<NetworkGateInstaller>(out var netBridge)
+                && NetworkSessionHelper.IsMultiplayerSession
+                && netBridge.IsSpawned)
+                return netBridge.IsGateInstalled;
+
+            return installed;
+        }
+
         private void HandleGateDestroyed(DefenseObject _)
         {
             installed = false;
@@ -71,11 +81,14 @@ namespace ProjectM.Defense
         // ── IInteractable ──
         public bool CanInteract(GameObject interactor)
         {
-            if (installed || gateObject == null) return false;
+            if (IsSlotInstalled() || gateObject == null) return false;
             if (interactor == null) return false;
-            // 단순 보유가 아니라 "장착(EquippedKit)" 상태에서만 프롬프트가 뜨도록 한다.
             var equipper = interactor.GetComponent<KitEquipper>();
-            return equipper != null && equipper.EquippedKit == requiredKit;
+            var inventory = interactor.GetComponent<KitInventory>();
+            return equipper != null
+                && inventory != null
+                && equipper.EquippedKit == requiredKit
+                && inventory.Has(requiredKit);
         }
 
         public string PromptText => promptText;
@@ -88,17 +101,26 @@ namespace ProjectM.Defense
 
         public void InteractHold(GameObject interactor, float deltaTime)
         {
-            if (installed || gateObject == null) return;
+            if (IsSlotInstalled() || gateObject == null) return;
             if (interactor == null) { holdProgress = 0f; return; }
 
-            // 홀드 도중에도 키트가 장착 해제되면 진행도 리셋
             var equipper = interactor.GetComponent<KitEquipper>();
-            if (equipper == null || equipper.EquippedKit != requiredKit) { holdProgress = 0f; return; }
+            var inventory = interactor.GetComponent<KitInventory>();
+            if (equipper == null
+                || inventory == null
+                || equipper.EquippedKit != requiredKit
+                || !inventory.Has(requiredKit))
+            {
+                holdProgress = 0f;
+                return;
+            }
 
             holdProgress += deltaTime;
             if (holdProgress < holdDuration) return;
 
             holdProgress = 0f;
+            if (!inventory.Has(requiredKit))
+                return;
             if (TryGetComponent<NetworkGateInstaller>(out var bridge))
                 bridge.RequestInstall(interactor);
             else
@@ -107,16 +129,67 @@ namespace ProjectM.Defense
 
         public bool TryInstallFromInteractor(GameObject interactor)
         {
-            if (installed || gateObject == null || interactor == null)
+            if (IsSlotInstalled() || gateObject == null || interactor == null)
                 return false;
 
             var equipper = interactor.GetComponent<KitEquipper>();
             if (equipper == null || equipper.EquippedKit != requiredKit)
                 return false;
 
-            var inv = interactor.GetComponent<KitInventory>();
-            if (inv == null || !inv.TryConsume(requiredKit))
+            return TryInstallFromServer(interactor, requireEquippedKit: true);
+        }
+
+        /// <summary>서버 권한 설치. NGO 클라이언트는 장착 상태 대신 인벤토리만 검증한다.</summary>
+        public bool TryInstallFromServer(GameObject interactor, bool requireEquippedKit = false)
+        {
+            return TryInstallFromServer(interactor, requireEquippedKit, out _);
+        }
+
+        public bool TryInstallFromServer(
+            GameObject interactor,
+            bool requireEquippedKit,
+            out string failReason)
+        {
+            failReason = string.Empty;
+
+            if (IsSlotInstalled() || gateObject == null || interactor == null)
+            {
+                failReason = "invalid_state";
                 return false;
+            }
+
+            if (requireEquippedKit)
+            {
+                var equipper = interactor.GetComponent<KitEquipper>();
+                if (equipper == null || equipper.EquippedKit != requiredKit)
+                {
+                    failReason = "kit_not_equipped";
+                    return false;
+                }
+            }
+
+            var inv = interactor.GetComponent<KitInventory>();
+            if (inv == null)
+            {
+                failReason = "no_inventory";
+                return false;
+            }
+
+            if (!inv.Has(requiredKit))
+            {
+                failReason = "no_kit";
+                Debug.LogWarning(
+                    $"[GateInstaller] {requiredKit} 없음 — local={inv.GetCount(requiredKit)}");
+                return false;
+            }
+
+            if (!inv.TryConsume(requiredKit))
+            {
+                failReason = "consume_failed";
+                Debug.LogWarning(
+                    $"[GateInstaller] {requiredKit} 소모 실패 — local={inv.GetCount(requiredKit)}");
+                return false;
+            }
 
             ApplyInstalledLocal(true);
             Debug.Log($"[GateInstaller] 문 설치됨 ({gateObject.name})");
@@ -126,8 +199,29 @@ namespace ProjectM.Defense
         public void ApplyNetworkInstalled(bool value)
         {
             installed = value;
-            if (gateObject != null)
-                gateObject.SetActive(value);
+            if (gateObject == null) return;
+
+            if (value)
+            {
+                if (NetworkSessionHelper.IsServer
+                    && gateObject.TryGetComponent<NetworkGateBodyBridge>(out var bodyBridge))
+                {
+                    bodyBridge.ServerPrepareForInstall();
+                }
+                else
+                {
+                    if (gateObject.TryGetComponent<HealthSystem>(out var health))
+                        health.ResetHp();
+                    if (gateObject.TryGetComponent<GateController>(out var gateController))
+                        gateController.RestoreAliveState();
+                }
+
+                gateObject.SetActive(true);
+            }
+            else
+            {
+                gateObject.SetActive(false);
+            }
         }
 
         private void ApplyInstalledLocal(bool value)

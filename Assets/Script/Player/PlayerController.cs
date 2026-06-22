@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using ProjectM.UI;
 
 namespace ProjectM.Player
 {
@@ -102,6 +103,7 @@ namespace ProjectM.Player
         private void Update()
         {
             if (!isLocalPlayer || !canControl) return;
+            if (UIInputModal.IsBlockingGameplayInput) return;
 
             HandleCursorInput();
             HandleLook();

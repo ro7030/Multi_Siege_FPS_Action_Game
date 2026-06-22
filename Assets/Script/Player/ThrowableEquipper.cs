@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using ProjectM.Network;
 
 namespace ProjectM.Player
 {
@@ -30,6 +31,9 @@ namespace ProjectM.Player
         [SerializeField] private float throwForce = 14f;
         [SerializeField] private float throwUpward = 3f;
         [SerializeField] private float spawnForward = 0.8f;
+
+        public float SpawnForward => spawnForward;
+        public Camera ViewCamera => viewCamera;
 
         [Header("비주얼 (1인칭 뷰모델)")]
         [Tooltip("카메라 자식의 빈 GameObject. 장착한 투척무기 모델이 이 곳의 자식으로 인스턴스화된다.")]
@@ -166,7 +170,7 @@ namespace ProjectM.Player
 
             if (type == ThrowableType.None || viewModelSocket == null) return;
 
-            var def = GetDef(type);
+            var def = GetDefinition(type);
             if (def == null || def.heldViewModelPrefab == null) return;
 
             viewModelInstance = Instantiate(def.heldViewModelPrefab, viewModelSocket);
@@ -183,36 +187,30 @@ namespace ProjectM.Player
             if (type == ThrowableType.None || inventory == null) return;
             if (!inventory.Has(type)) { Debug.Log($"[Throw] {type} 없음"); return; }
 
-            var def = GetDef(type);
+            var def = GetDefinition(type);
             if (def == null) { Debug.LogWarning($"[Throw] {type} 정의 미설정"); return; }
             if (viewCamera == null) return;
-
-            if (!inventory.TryConsume(type)) return;
 
             Vector3 origin = viewCamera.transform.position + viewCamera.transform.forward * spawnForward;
             Vector3 velocity = viewCamera.transform.forward * throwForce + Vector3.up * throwUpward;
 
-            GameObject go = def.projectilePrefab != null
-                ? Instantiate(def.projectilePrefab, origin, Quaternion.identity)
-                : CreateDefaultProjectile(origin);
+            if (NetworkSessionHelper.IsMultiplayerSession
+                && TryGetComponent<NetworkThrowableInventory>(out var netThrow)
+                && netThrow.IsSpawned
+                && !NetworkSessionHelper.IsServer)
+            {
+                netThrow.RequestThrowFromOwner(type, origin, velocity);
+                Debug.Log($"[Throw] {def.displayName} 투척 요청");
+                return;
+            }
 
-            var proj = go.GetComponent<ThrowableProjectile>();
-            if (proj == null) proj = go.AddComponent<ThrowableProjectile>();
-            proj.Launch(def, gameObject, velocity);
+            if (!inventory.TryConsume(type)) return;
 
+            ThrowableSpawner.SpawnProjectile(def, gameObject, origin, velocity);
             Debug.Log($"[Throw] {def.displayName} 투척");
         }
 
-        private GameObject CreateDefaultProjectile(Vector3 pos)
-        {
-            var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            go.transform.position = pos;
-            go.transform.localScale = Vector3.one * 0.3f;
-            if (go.GetComponent<Rigidbody>() == null) go.AddComponent<Rigidbody>();
-            return go;
-        }
-
-        private ThrowableDefinition GetDef(ThrowableType type) => type switch
+        public ThrowableDefinition GetDefinition(ThrowableType type) => type switch
         {
             ThrowableType.Grenade => grenadeDef,
             ThrowableType.Molotov => molotovDef,

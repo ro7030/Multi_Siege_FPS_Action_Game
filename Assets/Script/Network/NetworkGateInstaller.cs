@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using ProjectM.Defense;
@@ -20,6 +21,8 @@ namespace ProjectM.Network
 
         private void Awake() => installer = GetComponent<GateInstaller>();
 
+        public bool IsGateInstalled => IsSpawned && netInstalled.Value;
+
         public override void OnNetworkSpawn()
         {
             if (IsServer)
@@ -36,16 +39,21 @@ namespace ProjectM.Network
 
         public void RequestInstall(GameObject interactor)
         {
-            if (!NetworkSessionHelper.IsMultiplayerSession || !IsSpawned)
+            if (!NetworkSessionHelper.IsMultiplayerSession)
             {
                 installer?.TryInstallFromInteractor(interactor);
                 return;
             }
 
+            if (!IsSpawned)
+            {
+                Debug.LogWarning("[NetworkGateInstaller] NGO 미스폰 — 멀티 설치 요청 무시");
+                return;
+            }
+
             if (IsServer)
             {
-                if (installer != null && installer.TryInstallFromInteractor(interactor))
-                    ServerSetInstalled(true);
+                installer?.TryInstallFromInteractor(interactor);
                 return;
             }
 
@@ -64,14 +72,59 @@ namespace ProjectM.Network
         [ServerRpc(RequireOwnership = false)]
         private void RequestInstallServerRpc(ServerRpcParams rpcParams = default)
         {
-            var player = ResolvePlayer(rpcParams.Receive.SenderClientId);
-            if (installer == null || player == null)
-                return;
+            ulong clientId = rpcParams.Receive.SenderClientId;
 
-            if (!installer.TryInstallFromInteractor(player))
+            if (installer == null)
+            {
+                NotifyInstallResult(clientId, false, "installer_missing");
                 return;
+            }
 
-            ServerSetInstalled(true);
+            if (IsGateInstalled || (installer != null && installer.IsInstalled))
+            {
+                NotifyInstallResult(clientId, false, "already_installed");
+                return;
+            }
+
+            var player = ResolvePlayer(clientId);
+            if (player == null)
+            {
+                NotifyInstallResult(clientId, false, "player_missing");
+                return;
+            }
+
+            if (!installer.TryInstallFromServer(player, requireEquippedKit: false, out var failReason))
+            {
+                NotifyInstallResult(clientId, false, failReason);
+                return;
+            }
+
+            NotifyInstallResult(clientId, true, "ok");
+        }
+
+        [ClientRpc]
+        private void NotifyInstallResultClientRpc(
+            bool success,
+            FixedString32Bytes reason,
+            ClientRpcParams clientRpcParams = default)
+        {
+            if (success)
+                Debug.Log("[NetworkGateInstaller] 문 설치 성공");
+            else
+                Debug.LogWarning($"[NetworkGateInstaller] 문 설치 실패: {reason}");
+        }
+
+        private void NotifyInstallResult(ulong clientId, bool success, string reason)
+        {
+            var clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new[] { clientId }
+                }
+            };
+
+            NotifyInstallResultClientRpc(success, reason, clientRpcParams);
         }
 
         private void HandleInstalledChanged(bool _, bool installed) => ApplyInstalled(installed);

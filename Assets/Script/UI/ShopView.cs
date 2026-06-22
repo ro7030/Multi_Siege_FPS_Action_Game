@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -6,6 +7,7 @@ using UnityEngine.UI;
 using TMPro;
 using ProjectM.Core;
 using ProjectM.Economy;
+using ProjectM.Network;
 using ProjectM.Player;
 
 namespace ProjectM.UI
@@ -73,6 +75,9 @@ namespace ProjectM.UI
         // 명도 변환은 항상 이 기준 색에 selectedBrightness/unselectedBrightness 를 곱해서 적용.
         private readonly Dictionary<Image, Color> originalImageColors = new();
         private bool isOpen;
+        private float walletRebindTimer;
+
+        public bool IsOpen => isOpen;
 
         private void Awake()
         {
@@ -97,14 +102,89 @@ namespace ProjectM.UI
                 shop.OnPurchased += _ => RefreshAll();
                 shop.OnPurchaseFailed += (_, __) => RefreshAll();
             }
-            if (wallet != null) wallet.OnChanged += _ => RefreshAll();
             if (session != null) session.OnWaveStarted += _ => { if (isOpen) Hide(); };
 
+            StartCoroutine(RebindLocalWalletRoutine());
             Hide();
+        }
+
+        /// <summary>NGO 구매 결과·지갑 동기화 후 UI 갱신.</summary>
+        public void RefreshFromNetwork()
+        {
+            TryRebindLocalWallet();
+            RefreshAll();
+        }
+
+        private IEnumerator RebindLocalWalletRoutine()
+        {
+            for (int i = 0; i < 30; i++)
+            {
+                if (TryRebindLocalWallet())
+                    yield break;
+                yield return new WaitForSeconds(0.5f);
+            }
+        }
+
+        private bool TryRebindLocalWallet()
+        {
+            var localWallet = LocalPlayerUtility.FindLocalCurrencyWallet();
+            if (localWallet == null)
+                return false;
+
+            if (wallet == localWallet)
+                return true;
+
+            if (wallet != null)
+                wallet.OnChanged -= OnWalletChanged;
+
+            wallet = localWallet;
+            wallet.OnChanged += OnWalletChanged;
+
+            var localPlayer = LocalPlayerUtility.FindLocalPlayerObject();
+            if (localPlayer != null)
+            {
+                if (localPlayer.TryGetComponent(out PlayerArsenal localArsenal))
+                {
+                    arsenal = localArsenal;
+                    weaponProgression = localArsenal.Progression;
+                }
+            }
+
+            RefreshAll();
+            return true;
+        }
+
+        private void OnWalletChanged(int _) => RefreshAll();
+
+        private void OnDestroy()
+        {
+            if (wallet != null)
+                wallet.OnChanged -= OnWalletChanged;
+
+            ReleaseModalIfOpen();
+        }
+
+        private void OnDisable() => ReleaseModalIfOpen();
+
+        private void ReleaseModalIfOpen()
+        {
+            if (!isOpen) return;
+
+            isOpen = false;
+            UIInputModal.Pop();
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
 
         private void Update()
         {
+            walletRebindTimer += Time.deltaTime;
+            if (walletRebindTimer >= 0.5f)
+            {
+                walletRebindTimer = 0f;
+                TryRebindLocalWallet();
+            }
+
             var kb = Keyboard.current;
             if (kb == null) return;
             if (kb[toggleKey].wasPressedThisFrame) Toggle();
@@ -126,8 +206,10 @@ namespace ProjectM.UI
                 return;
             }
 
+            TryRebindLocalWallet();
             panelRoot.SetActive(true);
             isOpen = true;
+            UIInputModal.Push();
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
             SelectTopTab(ShopTopTab.Weapon);
@@ -136,10 +218,15 @@ namespace ProjectM.UI
         public void Hide()
         {
             if (panelRoot == null) return;
+
+            ReleaseModalIfOpen();
             panelRoot.SetActive(false);
-            isOpen = false;
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+
+            if (!UIInputModal.IsBlockingGameplayInput)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
         }
 
         // ── 탭 (구매 없음, 목록만 갱신) ───────────────────────────
@@ -184,10 +271,10 @@ namespace ProjectM.UI
 
         private void RefreshAll()
         {
-            if (!isOpen) return;
-
             if (balanceText != null && wallet != null)
                 balanceText.text = wallet.Balance.ToString();
+
+            if (!isOpen) return;
 
             currentEntries.Clear();
             currentEntries.AddRange(ShopCatalogBuilder.BuildEntries(

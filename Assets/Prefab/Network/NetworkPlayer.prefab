@@ -186,6 +186,9 @@ GameObject:
   - component: {fileID: 9200000000000000005}
   - component: {fileID: 9200000000000000006}
   - component: {fileID: 6057384098685604910}
+  - component: {fileID: 9200000000000000007}
+  - component: {fileID: 9200000000000000008}
+  - component: {fileID: 9200000000000000009}
   m_Layer: 0
   m_Name: NetworkPlayer
   m_TagString: Player
@@ -382,10 +385,14 @@ MonoBehaviour:
     m_Bits: 4294967295
   healAmount: 50
   repairAmount: 50
+  healProgression: {fileID: 0}
+  currentHealTier: 0
   cycleOrder: 010000000200000003000000
   cycleKey: 43
   isLocalPlayer: 1
   throwableEquipper: {fileID: 0}
+  viewModelSocket: {fileID: 0}
+  heldViewModels: []
 --- !u!114 &110250995191422668
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -645,4 +652,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79693e0b24b4d479dacccef512c18201, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Network.NetworkCurrencyWallet
+  ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &9200000000000000007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8514623158254487877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bc83113c33e643d8b85bc663fd3f60b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Network.NetworkKitInventory
+  ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &9200000000000000008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8514623158254487877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bafafa8f3bfa841febbca27cbfd4f475, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Network.NetworkThrowableInventory
+  ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &9200000000000000009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8514623158254487877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71cdb385b6955472893051165134f97a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Network.NetworkPlayerArsenal
   ShowTopMostFoldoutHeaderGroup: 1

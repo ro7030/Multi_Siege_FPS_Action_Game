@@ -35,6 +35,9 @@ namespace ProjectM.Defense
 
         private void HandleDestroyed(DefenseObject _) => ApplyState(true);
 
+        /// <summary>재설치 시 NavMesh·비주얼을 살아있는 상태로 되돌린다.</summary>
+        public void RestoreAliveState() => ApplyState(false);
+
         private void ApplyState(bool destroyed)
         {
             if (navObstacle != null) navObstacle.enabled = !destroyed;

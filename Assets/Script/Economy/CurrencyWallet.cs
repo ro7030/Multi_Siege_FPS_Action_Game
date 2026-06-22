@@ -71,7 +71,15 @@ namespace ProjectM.Economy
 
         public void SetBalance(int value)
         {
+            NotifyBalance(value);
+        }
+
+        /// <summary>서버/네트워크 동기화용. 잔액 갱신 + 이벤트 발행.</summary>
+        public void NotifyBalance(int value, int added = 0, int spent = 0)
+        {
             balance = Mathf.Max(0, value);
+            if (added > 0) OnAdded?.Invoke(added);
+            if (spent > 0) OnSpent?.Invoke(spent);
             OnChanged?.Invoke(balance);
         }
     }

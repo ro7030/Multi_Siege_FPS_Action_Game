@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using ProjectM.Core;
+using ProjectM.Network;
 
 namespace ProjectM.UI
 {
@@ -13,6 +14,7 @@ namespace ProjectM.UI
         [SerializeField] private TMP_Text timerText;
         [SerializeField] private MatchBootstrapper bootstrap;
         [SerializeField] private GameSessionManager session;
+        [SerializeField] private NetworkMatchDirector director;
 
         [Header("표시")]
         [Tooltip("비우면 숫자만 (예: 60). {0} = 남은 초")]
@@ -24,6 +26,7 @@ namespace ProjectM.UI
         {
             if (bootstrap == null) bootstrap = FindAnyObjectByType<MatchBootstrapper>();
             if (session == null) session = FindAnyObjectByType<GameSessionManager>();
+            if (director == null) director = FindAnyObjectByType<NetworkMatchDirector>();
 
             if (timerText == null)
                 timerText = GetComponent<TMP_Text>();
@@ -40,7 +43,11 @@ namespace ProjectM.UI
             if (timerText == null) return;
 
             bool inPrepPhase = session != null && session.State.CurrentPhase == GamePhase.Preparation;
-            bool counting = bootstrap != null && bootstrap.IsPreparationCounting;
+            bool useNet = NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer;
+            float remaining = useNet && director != null
+                ? director.SyncedPrepRemaining
+                : bootstrap != null ? bootstrap.PreparationRemaining : 0f;
+            bool counting = inPrepPhase && remaining > 0f;
 
             if (hideOutsidePreparation && (!inPrepPhase || !counting))
             {
@@ -48,9 +55,7 @@ namespace ProjectM.UI
                 return;
             }
 
-            int seconds = bootstrap != null
-                ? Mathf.Max(0, Mathf.CeilToInt(bootstrap.PreparationRemaining))
-                : 0;
+            int seconds = Mathf.Max(0, Mathf.CeilToInt(remaining));
 
             if (hideWhenZero && seconds <= 0)
             {

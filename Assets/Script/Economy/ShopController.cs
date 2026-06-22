@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.Collections;
 using UnityEngine;
 using ProjectM.Core;
 using ProjectM.Network;
@@ -41,21 +42,36 @@ namespace ProjectM.Economy
             if (playerArsenal == null) playerArsenal = FindAnyObjectByType<PlayerArsenal>();
         }
 
-        // ── 무기 업그레이드 ────────────────────────────────────────
-        public bool CanUpgradeWeapon(WeaponSlot slot) => playerArsenal != null && playerArsenal.CanUpgrade(slot);
+        private PlayerArsenal ResolveLocalArsenal()
+        {
+            var resolved = LocalPlayerUtility.FindLocalComponent<PlayerArsenal>();
+            if (resolved != null)
+                playerArsenal = resolved;
+            return resolved ?? playerArsenal;
+        }
 
-        public int WeaponUpgradePrice(WeaponSlot slot) => playerArsenal != null ? playerArsenal.NextUpgradePrice(slot) : 0;
+        // ── 무기 업그레이드 ────────────────────────────────────────
+        public bool CanUpgradeWeapon(WeaponSlot slot)
+        {
+            var arsenal = ResolveLocalArsenal();
+            return arsenal != null && arsenal.CanUpgrade(slot);
+        }
+
+        public int WeaponUpgradePrice(WeaponSlot slot)
+        {
+            var arsenal = ResolveLocalArsenal();
+            return arsenal != null ? arsenal.NextUpgradePrice(slot) : 0;
+        }
 
         public string WeaponUpgradeName(WeaponSlot slot)
         {
-            var d = playerArsenal != null ? playerArsenal.NextTier(slot) : null;
+            var arsenal = ResolveLocalArsenal();
+            var d = arsenal != null ? arsenal.NextTier(slot) : null;
             return d != null ? d.displayName : "MAX";
         }
 
         public bool TryUpgradeWeapon(WeaponSlot slot)
         {
-            if (playerArsenal == null) { Fail(null, "무기고 없음"); return false; }
-
             if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer)
             {
                 var local = NetworkPlayerRegistry.LocalPlayer;
@@ -64,15 +80,16 @@ namespace ProjectM.Economy
                 return false;
             }
 
-            int next = playerArsenal.CurrentTierIndex(slot) + 1;
+            var arsenal = ResolveLocalArsenal();
+            if (arsenal == null) { Fail(null, "무기고 없음"); return false; }
+
+            int next = arsenal.CurrentTierIndex(slot) + 1;
             return TryPurchaseWeaponTier(slot, next);
         }
 
         /// <summary>원하는 무기 티어를 바로 구매(순서 무관, 미보유 티어만).</summary>
         public bool TryPurchaseWeaponTier(WeaponSlot slot, int tierIndex)
         {
-            if (playerArsenal == null) { Fail(null, "무기고 없음"); return false; }
-
             if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer)
             {
                 var local = NetworkPlayerRegistry.LocalPlayer;
@@ -111,7 +128,7 @@ namespace ProjectM.Economy
             {
                 var local = NetworkPlayerRegistry.LocalPlayer;
                 if (local == null) { Fail(item, "플레이어 없음"); return false; }
-                local.RequestShopPurchaseServerRpc(item.id);
+                local.RequestShopPurchaseServerRpc(new FixedString64Bytes(item.id));
                 return false;
             }
 

@@ -96,6 +96,8 @@ namespace ProjectM.Network
             if (IsInSession)
                 await LeaveSessionAsync();
 
+            await CleanupRemoteLobbyMembershipAsync();
+
             int connectionCount = Mathf.Max(1, maxPlayers - 1);
             Allocation allocation = await RelayService.Instance.CreateAllocationAsync(connectionCount);
             string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
@@ -190,6 +192,8 @@ namespace ProjectM.Network
             if (IsInSession)
                 await LeaveSessionAsync();
 
+            ShutdownNetworkIfListening();
+
             if (string.IsNullOrEmpty(lobbyId))
                 throw new ArgumentException("Lobby id is required.");
 
@@ -200,22 +204,14 @@ namespace ProjectM.Network
             if (!string.IsNullOrEmpty(password))
                 joinOptions = new JoinLobbyByIdOptions { Password = password };
 
-            Lobby lobby;
-            try
-            {
-                lobby = joinOptions != null
-                    ? await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId, joinOptions)
-                    : await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId);
-            }
-            catch (LobbyServiceException ex)
-            {
-                throw new InvalidOperationException("비밀번호가 올바르지 않거나 방에 참여할 수 없습니다.", ex);
-            }
+            await CleanupRemoteLobbyMembershipAsync(exceptLobbyId: lobbyId);
+
+            Lobby lobby = await ResolveLobbyMembershipAsync(lobbyId, joinOptions);
 
             if (lobby.Data == null || !lobby.Data.TryGetValue(DataRelayJoinCode, out var relayData)
                 || string.IsNullOrEmpty(relayData.Value))
             {
-                await LobbyService.Instance.RemovePlayerAsync(lobby.Id, AuthenticationService.Instance.PlayerId);
+                await SafeRemovePlayerAsync(lobby.Id);
                 throw new InvalidOperationException("Relay join code not found in lobby data.");
             }
 
@@ -226,7 +222,7 @@ namespace ProjectM.Network
             NetworkPlayerSessionGuard.ApplyManagerSettings(networkManager);
             if (!networkManager.StartClient())
             {
-                await LobbyService.Instance.RemovePlayerAsync(lobby.Id, AuthenticationService.Instance.PlayerId);
+                await SafeRemovePlayerAsync(lobby.Id);
                 throw new InvalidOperationException("Failed to start NGO Client.");
             }
 
@@ -242,12 +238,119 @@ namespace ProjectM.Network
             Debug.Log($"[LobbyRelay] Joined room: {lobby.Name} lobbyId={lobby.Id}");
         }
 
+        private async Task<Lobby> ResolveLobbyMembershipAsync(string lobbyId, JoinLobbyByIdOptions joinOptions)
+        {
+            if (await IsAlreadyInLobbyAsync(lobbyId))
+            {
+                Debug.Log("[LobbyRelay] 이미 로비 멤버 — GetLobbyAsync로 재연결합니다.");
+                return await LobbyService.Instance.GetLobbyAsync(lobbyId);
+            }
+
+            try
+            {
+                return joinOptions != null
+                    ? await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId, joinOptions)
+                    : await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId);
+            }
+            catch (LobbyServiceException ex) when (IsAlreadyMemberError(ex))
+            {
+                Debug.Log("[LobbyRelay] JoinLobby conflict — 이미 멤버, GetLobbyAsync로 재연결합니다.");
+                return await LobbyService.Instance.GetLobbyAsync(lobbyId);
+            }
+            catch (LobbyServiceException ex) when (IsIncorrectPasswordError(ex))
+            {
+                throw new InvalidOperationException("비밀번호가 올바르지 않습니다.", ex);
+            }
+            catch (LobbyServiceException ex)
+            {
+                throw new InvalidOperationException("방에 참여할 수 없습니다.", ex);
+            }
+        }
+
+        private static bool IsAlreadyMemberError(LobbyServiceException ex)
+        {
+            if (ex.Reason == LobbyExceptionReason.LobbyConflict
+                || ex.Reason == LobbyExceptionReason.Conflict)
+                return true;
+
+            return ex.Message != null
+                   && ex.Message.IndexOf("already a member", StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        private static bool IsIncorrectPasswordError(LobbyServiceException ex)
+        {
+            if (ex.Reason == LobbyExceptionReason.IncorrectPassword)
+                return true;
+
+            return ex.Message != null
+                   && ex.Message.IndexOf("password", StringComparison.OrdinalIgnoreCase) >= 0
+                   && ex.Message.IndexOf("incorrect", StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        private async Task<bool> IsAlreadyInLobbyAsync(string lobbyId)
+        {
+            try
+            {
+                var joined = await LobbyService.Instance.GetJoinedLobbiesAsync();
+                return joined != null && joined.Contains(lobbyId);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[LobbyRelay] GetJoinedLobbiesAsync failed: {ex.Message}");
+                return false;
+            }
+        }
+
+        private async Task CleanupRemoteLobbyMembershipAsync(string exceptLobbyId = null)
+        {
+            if (!AuthenticationService.Instance.IsSignedIn)
+                return;
+
+            try
+            {
+                var joined = await LobbyService.Instance.GetJoinedLobbiesAsync();
+                if (joined == null) return;
+
+                foreach (string lobbyId in joined)
+                {
+                    if (!string.IsNullOrEmpty(exceptLobbyId) && lobbyId == exceptLobbyId)
+                        continue;
+
+                    await SafeRemovePlayerAsync(lobbyId);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[LobbyRelay] CleanupRemoteLobbyMembership failed: {ex.Message}");
+            }
+        }
+
+        private async Task SafeRemovePlayerAsync(string lobbyId)
+        {
+            if (string.IsNullOrEmpty(lobbyId) || !AuthenticationService.Instance.IsSignedIn)
+                return;
+
+            try
+            {
+                await LobbyService.Instance.RemovePlayerAsync(lobbyId, AuthenticationService.Instance.PlayerId);
+                Debug.Log($"[LobbyRelay] Removed lobby membership: {lobbyId}");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[LobbyRelay] RemovePlayer({lobbyId}) warning: {ex.Message}");
+            }
+        }
+
+        private void ShutdownNetworkIfListening()
+        {
+            if (networkManager != null && networkManager.IsListening)
+                networkManager.Shutdown();
+        }
+
         public async Task LeaveSessionAsync()
         {
             StopHostHeartbeat();
-
-            if (networkManager != null && networkManager.IsListening)
-                networkManager.Shutdown();
+            ShutdownNetworkIfListening();
 
             if (!string.IsNullOrEmpty(CurrentLobbyId) && AuthenticationService.Instance.IsSignedIn)
             {
@@ -256,12 +359,16 @@ namespace ProjectM.Network
                     if (IsHost)
                         await LobbyService.Instance.DeleteLobbyAsync(CurrentLobbyId);
                     else
-                        await LobbyService.Instance.RemovePlayerAsync(CurrentLobbyId, AuthenticationService.Instance.PlayerId);
+                        await SafeRemovePlayerAsync(CurrentLobbyId);
                 }
                 catch (Exception ex)
                 {
                     Debug.LogWarning($"[LobbyRelay] Leave lobby warning: {ex.Message}");
                 }
+            }
+            else
+            {
+                await CleanupRemoteLobbyMembershipAsync();
             }
 
             IsInSession = false;

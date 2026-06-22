@@ -68,8 +68,28 @@ namespace ProjectM.Player
             if (currentHp <= 0f)
             {
                 OnDied?.Invoke(attacker);
-                if (destroyOnDeath) Destroy(gameObject);
+                HandleDeathCleanup();
             }
+        }
+
+        private void HandleDeathCleanup()
+        {
+            // 다운/부활 플레이어는 Despawn·Destroy 하지 않는다.
+            if (TryGetComponent<ReviveSystem>(out _))
+                return;
+
+            if (TryGetComponent<NetworkObject>(out var netObj)
+                && netObj.IsSpawned
+                && NetworkSessionHelper.IsServer)
+            {
+                bool isSceneObject = netObj.IsSceneObject == true;
+                bool destroy = destroyOnDeath && !isSceneObject;
+                netObj.Despawn(destroy);
+                return;
+            }
+
+            if (destroyOnDeath)
+                Destroy(gameObject);
         }
 
         public void ApplyHealLocal(float amount)
