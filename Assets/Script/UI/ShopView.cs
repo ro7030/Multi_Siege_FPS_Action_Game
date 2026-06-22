@@ -219,14 +219,11 @@ namespace ProjectM.UI
         {
             if (panelRoot == null) return;
 
-            ReleaseModalIfOpen();
             panelRoot.SetActive(false);
-
-            if (!UIInputModal.IsBlockingGameplayInput)
-            {
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
-            }
+            isOpen = false;
+            UIInputModal.Pop();
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
 
         // ── 탭 (구매 없음, 목록만 갱신) ───────────────────────────

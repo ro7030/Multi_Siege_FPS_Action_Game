@@ -64,7 +64,10 @@ namespace ProjectM.Network
 
             if (IsServer)
             {
-                FarmManager.Instance?.HarvestFarm(plot);
+                ulong clientId = NetworkManager.Singleton != null
+                    ? NetworkManager.Singleton.LocalClientId
+                    : ulong.MaxValue;
+                FarmManager.Instance?.HarvestFarm(plot, clientId);
                 return;
             }
 
@@ -81,9 +84,9 @@ namespace ProjectM.Network
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void RequestHarvestServerRpc()
+        private void RequestHarvestServerRpc(ServerRpcParams rpcParams = default)
         {
-            FarmManager.Instance?.HarvestFarm(plot);
+            FarmManager.Instance?.HarvestFarm(plot, rpcParams.Receive.SenderClientId);
         }
 
         private void HandleYieldChanged(int _, int __) => ApplyClientMirror();

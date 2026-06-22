@@ -36,6 +36,7 @@ namespace ProjectM.Network
 
         private HealthSystem health;
         private ReviveSystem revive;
+        private ulong lastReviverClientId = ulong.MaxValue;
 
         private void Awake()
         {
@@ -104,7 +105,7 @@ namespace ProjectM.Network
             return true;
         }
 
-        public void RequestReviveHold(float deltaTime)
+        public void RequestReviveHold(float deltaTime, GameObject interactor = null)
         {
             if (!NetworkSessionHelper.IsMultiplayerSession || !IsSpawned)
             {
@@ -114,6 +115,7 @@ namespace ProjectM.Network
 
             if (IsServer)
             {
+                TrackReviver(interactor);
                 revive?.ProgressRevive(deltaTime);
                 PushHealthSnapshot();
                 return;
@@ -140,8 +142,9 @@ namespace ProjectM.Network
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void RequestReviveHoldServerRpc(float deltaTime)
+        private void RequestReviveHoldServerRpc(float deltaTime, ServerRpcParams rpcParams = default)
         {
+            lastReviverClientId = rpcParams.Receive.SenderClientId;
             revive?.ProgressRevive(deltaTime);
             PushHealthSnapshot();
         }
@@ -211,7 +214,7 @@ namespace ProjectM.Network
             if (revive == null) return;
 
             revive.OnDowned += HandleReviveStateChanged;
-            revive.OnRevived += HandleReviveStateChanged;
+            revive.OnRevived += HandleReviveCompleted;
             revive.OnFullDeath += HandleReviveStateChanged;
         }
 
@@ -220,11 +223,41 @@ namespace ProjectM.Network
             if (revive == null) return;
 
             revive.OnDowned -= HandleReviveStateChanged;
-            revive.OnRevived -= HandleReviveStateChanged;
+            revive.OnRevived -= HandleReviveCompleted;
             revive.OnFullDeath -= HandleReviveStateChanged;
         }
 
         private void HandleReviveStateChanged() => PushHealthSnapshot();
+
+        private void HandleReviveCompleted()
+        {
+            if (lastReviverClientId != ulong.MaxValue)
+                NetworkMatchStats.Instance?.RecordRevive(lastReviverClientId);
+
+            lastReviverClientId = ulong.MaxValue;
+            PushHealthSnapshot();
+        }
+
+        private void TrackReviver(GameObject interactor)
+        {
+            lastReviverClientId = ResolveInteractorClientId(interactor);
+        }
+
+        private static ulong ResolveInteractorClientId(GameObject interactor)
+        {
+            if (interactor == null)
+            {
+                return NetworkManager.Singleton != null
+                    ? NetworkManager.Singleton.LocalClientId
+                    : ulong.MaxValue;
+            }
+
+            var netObj = interactor.GetComponentInParent<NetworkObject>();
+            if (netObj != null && netObj.IsSpawned)
+                return netObj.OwnerClientId;
+
+            return ulong.MaxValue;
+        }
 
         private void HandleClientHpChanged(float _, float __) => ApplyClientHealthSnapshot();
 

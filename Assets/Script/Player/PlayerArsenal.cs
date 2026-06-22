@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using ProjectM.Network;
+using ProjectM.UI;
 
 namespace ProjectM.Player
 {
@@ -70,8 +71,17 @@ namespace ProjectM.Player
             if (throwableEquipper != null) throwableEquipper.OnEquippedChanged -= HandleThrowableChanged;
         }
 
-        private void HandleKitChanged(KitType _)             => RefreshWeaponVisibility();
-        private void HandleThrowableChanged(ThrowableType _) => RefreshWeaponVisibility();
+        private void HandleKitChanged(KitType _)
+        {
+            SyncWeaponInputState();
+            SyncWeaponViewModels();
+        }
+
+        private void HandleThrowableChanged(ThrowableType _)
+        {
+            SyncWeaponInputState();
+            SyncWeaponViewModels();
+        }
 
         private void Start()
         {
@@ -83,6 +93,8 @@ namespace ProjectM.Player
         private void Update()
         {
             if (!isLocalPlayer) return;
+            if (UIInputModal.IsBlockingGameplayInput) return;
+
             var kb = Keyboard.current;
             if (kb == null) return;
 
@@ -99,10 +111,8 @@ namespace ProjectM.Player
             if (kitEquipper != null) kitEquipper.Holster();
             if (throwableEquipper != null) throwableEquipper.Holster();
 
-            if (rangedWeapon != null) rangedWeapon.IsActive = (slot == WeaponSlot.Primary);
-            if (meleeWeapon != null)  meleeWeapon.IsActive  = (slot == WeaponSlot.Secondary);
-
-            RefreshWeaponVisibility();
+            SyncWeaponInputState();
+            SyncWeaponViewModels();
 
             OnSlotChanged?.Invoke(slot);
             Debug.Log($"[Arsenal] 슬롯 전환: {slot}");
@@ -161,9 +171,14 @@ namespace ProjectM.Player
 
             ApplySlot(slot);
             OnTierChanged?.Invoke(slot, CurrentTierIndex(slot));
+            ResyncWeaponActivation();
+
             Debug.Log($"[Arsenal] {slot} → 티어 {tierIndex} ({CurrentDefinition(slot)?.displayName})");
             return true;
         }
+
+        /// <summary>ActiveSlot 기준 IsActive만 재동기화(Holster·뷰모델 없음).</summary>
+        private void ResyncWeaponActivation() => SyncWeaponInputState();
 
         public int GetTierPrice(WeaponSlot slot, int tierIndex)
         {
@@ -191,12 +206,28 @@ namespace ProjectM.Player
                 meleeWeapon.ApplyDefinition(def);
         }
 
-        /// <summary>키트/투척 장착 상태와 ActiveSlot 을 종합해 무기 뷰모델 표시 여부를 갱신.</summary>
-        private void RefreshWeaponVisibility()
+        private bool AreWeaponsInputAllowed()
         {
             bool kitOn       = kitEquipper       != null && kitEquipper.IsKitEquipped;
             bool throwableOn = throwableEquipper != null && throwableEquipper.IsThrowableEquipped;
-            bool weaponsVisible = !kitOn && !throwableOn;
+            return !kitOn && !throwableOn;
+        }
+
+        /// <summary>ActiveSlot + 키트/투척 상태 기준으로 IsActive만 갱신(유일한 진입점).</summary>
+        private void SyncWeaponInputState()
+        {
+            bool weaponsActive = AreWeaponsInputAllowed();
+
+            if (rangedWeapon != null)
+                rangedWeapon.IsActive = weaponsActive && ActiveSlot == WeaponSlot.Primary;
+            if (meleeWeapon != null)
+                meleeWeapon.IsActive = weaponsActive && ActiveSlot == WeaponSlot.Secondary;
+        }
+
+        /// <summary>ActiveSlot + 키트/투척 상태 기준으로 1인칭 뷰모델 표시만 갱신.</summary>
+        private void SyncWeaponViewModels()
+        {
+            bool weaponsVisible = AreWeaponsInputAllowed();
 
             if (rangedWeapon != null)
                 rangedWeapon.SetViewModelVisible(weaponsVisible && ActiveSlot == WeaponSlot.Primary);

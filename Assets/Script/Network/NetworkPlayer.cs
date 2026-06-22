@@ -159,7 +159,17 @@ namespace ProjectM.Network
             shopView?.RefreshFromNetwork();
 
             if (!success)
+            {
                 Debug.LogWarning($"[Shop] 무기 티어 구매 실패: slot={slot}, tier={tierIndex}");
+                return;
+            }
+
+            if (!TryGetComponent<PlayerArsenal>(out var arsenal))
+                return;
+
+            var weaponSlot = (WeaponSlot)slot;
+            arsenal.ApplyNetworkTier(weaponSlot, tierIndex);
+            arsenal.SetActiveSlot(weaponSlot);
         }
     }
 }

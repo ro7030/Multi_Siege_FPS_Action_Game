@@ -413,7 +413,7 @@ MonoBehaviour:
   facingWeight: 1.5
   isLocalPlayer: 1
   interactKey: 20
-  debugLog: 1
+  debugLog: 0
 --- !u!114 &5816225677010246847
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -426,7 +426,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd8542ef021bef94e99d7f77f30b24c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.MeleeWeapon
-  viewCamera: {fileID: 0}
+  viewCamera: {fileID: 5686380502176844567}
   viewModelSocket: {fileID: 8724971255838169413}
   damage: 15
   attackInterval: 2.5

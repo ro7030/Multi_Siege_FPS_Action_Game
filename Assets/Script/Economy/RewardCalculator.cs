@@ -65,6 +65,7 @@ namespace ProjectM.Economy
             {
                 PlayerWalletUtility.ServerAddToAllPlayers(amount, reason);
                 LastReward = amount;
+                NetworkMatchStats.Instance?.ServerSetLastReward(amount);
                 return;
             }
 

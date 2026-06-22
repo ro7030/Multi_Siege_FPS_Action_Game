@@ -10,8 +10,8 @@ using ProjectM.Player;
 namespace ProjectM.Data
 {
     /// <summary>
-    /// 로컬 플레이어의 인게임 기여도를 누적 추적한다.
-    /// 매치 시작 시 0으로 리셋, 종료 시 ResultUploader가 DTO로 변환.
+    /// 로컬 플레이어의 인게임 기여도를 추적한다.
+    /// NGO 세션에서는 NetworkMatchStats 스냅샷을 읽는 파사드, 오프라인에서는 로컬 이벤트 구독.
     /// </summary>
     public class PlayerStatsTracker : MonoBehaviour
     {
@@ -32,6 +32,9 @@ namespace ProjectM.Data
         private readonly HashSet<HealthSystem> trackedEnemyHealth = new();
         private readonly HashSet<FarmPlot> trackedFarms = new();
         private readonly HashSet<ReviveSystem> trackedRevives = new();
+
+        private bool UseNetworkFacade =>
+            NetworkSessionHelper.IsMultiplayerSession && NetworkMatchStats.Instance != null;
 
         public void SetLocalNickname(string nickname) => localNickname = nickname;
 
@@ -68,8 +71,29 @@ namespace ProjectM.Data
 
         private void Update()
         {
+            if (UseNetworkFacade)
+            {
+                RefreshFromNetworkStats();
+                return;
+            }
+
             scanTimer += Time.deltaTime;
             if (scanTimer >= 1.5f) { scanTimer = 0; RescanSubscriptions(); }
+        }
+
+        private void RefreshFromNetworkStats()
+        {
+            var netStats = NetworkMatchStats.Instance;
+            if (netStats == null) return;
+
+            var snap = netStats.GetLocalSnapshot();
+            Kills = snap.Kills;
+            HarvestCount = snap.HarvestCount;
+            ReviveCount = snap.ReviveCount;
+            DamageDealt = snap.DamageDealt;
+
+            if (!snap.Nickname.IsEmpty)
+                localNickname = snap.Nickname.ToString();
         }
 
         private static GameObject ResolveLocalPlayerObject()

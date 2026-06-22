@@ -9,12 +9,10 @@ namespace ProjectM.UI
 {
     /// <summary>
     /// 인게임 스코어보드. Tab 키 길게 누름으로 표시.
-    /// (상점이 H 키를 사용하므로 스코어보드는 Tab 으로 이동. 커서 토글은 PlayerController 에서 F1 로 변경됨)
-    /// 현재는 RoomManager의 플레이어 목록만 표시. Phase 8에서 PlayerStatsTracker 데이터와 결합.
+    /// NGO: NetworkPlayerRegistry + NetworkMatchStats.
     /// </summary>
     public class ScoreboardView : MonoBehaviour
     {
-        [SerializeField] private RoomManager room;
         [SerializeField] private GameSessionManager session;
         [SerializeField] private Key holdKey = Key.Tab;
 
@@ -23,7 +21,6 @@ namespace ProjectM.UI
 
         private void Awake()
         {
-            if (room == null) room = FindAnyObjectByType<RoomManager>();
             if (session == null) session = FindAnyObjectByType<GameSessionManager>();
         }
 
@@ -52,7 +49,7 @@ namespace ProjectM.UI
             var rt = bg.rectTransform;
             rt.anchorMin = new Vector2(0.5f, 0.5f); rt.anchorMax = new Vector2(0.5f, 0.5f);
             rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.sizeDelta = new Vector2(720, 480);
+            rt.sizeDelta = new Vector2(920, 480);
 
             var header = UIRoot.CreateText("Header", rt, 32, TextAnchor.UpperCenter);
             header.fontStyle = FontStyles.Bold;
@@ -62,7 +59,7 @@ namespace ProjectM.UI
             hrt.anchorMin = new Vector2(0, 1); hrt.anchorMax = new Vector2(1, 1);
             hrt.offsetMin = new Vector2(20, -70); hrt.offsetMax = new Vector2(-20, -10);
 
-            bodyText = UIRoot.CreateText("Body", rt, 22, TextAnchor.UpperLeft);
+            bodyText = UIRoot.CreateText("Body", rt, 20, TextAnchor.UpperLeft);
             var brt = bodyText.rectTransform;
             brt.anchorMin = new Vector2(0, 0); brt.anchorMax = new Vector2(1, 1);
             brt.offsetMin = new Vector2(40, 30); brt.offsetMax = new Vector2(-40, -80);
@@ -74,22 +71,48 @@ namespace ProjectM.UI
             if (session != null)
                 sb.AppendLine($"Phase: {session.State.CurrentPhase}    Wave: {session.State.CurrentWave}/{session.State.MaxWave}\n");
 
-            if (room != null && room.IsInRoom && room.Players.Count > 0)
+            sb.AppendLine($"{"Nickname",-16} {"Kills",5} {"Damage",8} {"Harvest",7} {"Revive",6} {"Score",6}");
+            sb.AppendLine(new string('-', 62));
+
+            var netStats = NetworkMatchStats.Instance;
+            var players = NetworkPlayerRegistry.All;
+
+            if (NetworkSessionHelper.IsMultiplayerSession && players.Count > 0)
             {
-                sb.AppendLine($"{"Player",-20} {"Ready",-8} {"Host",-6}");
-                sb.AppendLine(new string('-', 50));
-                foreach (var kv in room.Players)
+                foreach (var player in players)
                 {
-                    var p = kv.Value;
-                    sb.AppendLine($"{p.nickname,-20} {(p.isReady ? "✓" : " "),-8} {(p.isHost ? "★" : " "),-6}");
+                    if (player == null) continue;
+                    AppendPlayerRow(sb, player.DisplayName, player.OwnerClientId, netStats);
                 }
+            }
+            else if (netStats != null)
+            {
+                for (int i = 0; i < netStats.Count; i++)
+                    AppendEntryRow(sb, netStats.GetEntryAt(i));
             }
             else
             {
-                sb.AppendLine("(로컬 솔로 플레이 — 룸 정보 없음)");
+                sb.AppendLine("(통계 없음 — 솔로 플레이)");
             }
 
             bodyText.text = sb.ToString();
+        }
+
+        private static void AppendPlayerRow(System.Text.StringBuilder sb, string nickname, ulong clientId, NetworkMatchStats netStats)
+        {
+            if (netStats != null && netStats.TryGetStat(clientId, out var entry))
+            {
+                AppendEntryRow(sb, entry);
+                return;
+            }
+
+            sb.AppendLine($"{nickname,-16} {0,5} {0f,8:F0} {0,7} {0,6} {0,6}");
+        }
+
+        private static void AppendEntryRow(System.Text.StringBuilder sb, MatchStatEntry entry)
+        {
+            string name = entry.Nickname.IsEmpty ? $"Player{entry.ClientId}" : entry.Nickname.ToString();
+            sb.AppendLine($"{name,-16} {entry.Kills,5} {entry.DamageDealt,8:F0} {entry.HarvestCount,7} {entry.ReviveCount,6} {entry.Score,6}");
         }
     }
 }

@@ -1,18 +1,17 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using TMPro;
+using ProjectM.Auth;
 using ProjectM.Core;
 using ProjectM.Data;
 using ProjectM.Economy;
+using ProjectM.Network;
 using ProjectM.Player;
 
 namespace ProjectM.UI
 {
     /// <summary>
     /// 매치 종료 시 자동으로 표시되는 결과 화면.
-    /// 인스펙터에 미리 만든 패널/텍스트/버튼을 켜고 꺼서 표시한다.
-    /// (이전: 코드에서 UI 를 빌드 → 현재: 프리팹/씬에 디자인된 패널을 토글)
     /// GameSessionManager.OnMatchEnded 구독.
     /// </summary>
     public class ResultView : MonoBehaviour
@@ -28,13 +27,13 @@ namespace ProjectM.UI
         [SerializeField] private GameObject panelRoot;
 
         [Header("텍스트 (필요한 것만 연결)")]
-        [SerializeField] private TMP_Text titleText;        // 예: \"Game Over\" / \"Victory\"
-        [SerializeField] private TMP_Text playerText;       // 예: \"Player 1\"
-        [SerializeField] private TMP_Text waveText;         // 예: \"Wave 2 / 4\"
-        [SerializeField] private TMP_Text killsText;        // 예: \"쓰러트린 적 수: 1,000\" (카운터 연결 전엔 비워둠)
-        [SerializeField] private TMP_Text playTimeText;     // 예: \"플레이 시간: 123.4초\"
-        [SerializeField] private TMP_Text balanceText;      // 예: \"₩ 1,000\"
-        [SerializeField] private TMP_Text rewardText;       // 예: \"+250\"
+        [SerializeField] private TMP_Text titleText;
+        [SerializeField] private TMP_Text playerText;
+        [SerializeField] private TMP_Text waveText;
+        [SerializeField] private TMP_Text killsText;
+        [SerializeField] private TMP_Text playTimeText;
+        [SerializeField] private TMP_Text balanceText;
+        [SerializeField] private TMP_Text rewardText;
 
         [Header("표시 라벨")]
         [SerializeField] private string victoryLabel = "Victory";
@@ -45,20 +44,16 @@ namespace ProjectM.UI
         [SerializeField] private int    localPlayerIndex  = 1;
 
         [Header("승패 이미지 (선택)")]
-        [Tooltip("승리/패배에 따라 sprite 를 갈아끼울 이미지 (예: 헤더 장식). 비워두면 미사용.")]
         [SerializeField] private Image  resultImage;
         [SerializeField] private Sprite victorySprite;
         [SerializeField] private Sprite defeatSprite;
 
         [Header("버튼")]
-        [SerializeField] private Button retryButton;   // 다시하기
-        [SerializeField] private Button homeButton;    // 홈으로
+        [SerializeField] private Button retryButton;
+        [SerializeField] private Button homeButton;
 
         [Header("동작")]
-        [Tooltip("결과창이 뜰 때 Time.timeScale 을 0 으로 멈출지")]
         [SerializeField] private bool pauseGameOnShow = true;
-        [Tooltip("다시하기 시 로드할 씬 이름. 비우면 현재 씬 재로드.")]
-        [SerializeField] private string retrySceneName = "";
 
         private float storedTimeScale = 1f;
 
@@ -69,10 +64,8 @@ namespace ProjectM.UI
             if (reward  == null) reward  = FindAnyObjectByType<RewardCalculator>();
             if (stats   == null) stats   = FindAnyObjectByType<PlayerStatsTracker>();
 
-            // 평소엔 숨김
             if (panelRoot != null) panelRoot.SetActive(false);
 
-            // 버튼 와이어링
             if (retryButton != null)
             {
                 retryButton.onClick.RemoveAllListeners();
@@ -102,18 +95,15 @@ namespace ProjectM.UI
             if (panelRoot == null) return;
             panelRoot.SetActive(true);
 
-            // 커서 풀기 (씬은 안 바꾸므로 직접 해줘야 함)
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
 
-            // 게임 일시정지
             if (pauseGameOnShow)
             {
                 storedTimeScale = Time.timeScale;
                 Time.timeScale = 0f;
             }
 
-            // 텍스트 채우기 (연결된 것만)
             if (titleText != null)
             {
                 titleText.text  = cleared ? victoryLabel : defeatLabel;
@@ -127,25 +117,31 @@ namespace ProjectM.UI
             }
 
             if (playerText != null)
-                playerText.text = string.Format(playerLabelFormat, localPlayerIndex);
+                playerText.text = ResolveLocalDisplayName();
 
             if (waveText != null && session != null)
                 waveText.text = $"Wave {session.State.CurrentWave} / {session.State.MaxWave}";
 
             if (playTimeText != null && session != null)
             {
-                float sec = Time.unscaledTime - session.State.MatchStartTime;
+                float sec = Time.time - session.State.MatchStartTime;
                 playTimeText.text = $"플레이 시간: {sec:F1}초";
             }
 
             if (balanceText != null && wallet != null)
                 balanceText.text = $"₩ {wallet.Balance:N0}";
 
-            if (rewardText != null && reward != null)
-                rewardText.text = $"+{reward.LastReward:N0}";
+            if (rewardText != null)
+                rewardText.text = $"+{ResolveLastReward():N0}";
 
             if (killsText != null && stats != null)
-                killsText.text = $"{stats.Kills:N0}";
+                killsText.text = $"쓰러트린 적 수: {stats.Kills:N0}";
+
+            if (retryButton != null)
+            {
+                bool canRetry = !NetworkSessionHelper.IsMultiplayerSession || NetworkSessionHelper.IsServer;
+                retryButton.interactable = canRetry;
+            }
         }
 
         public void Hide()
@@ -154,27 +150,39 @@ namespace ProjectM.UI
             if (pauseGameOnShow) Time.timeScale = storedTimeScale <= 0f ? 1f : storedTimeScale;
         }
 
-        /// <summary>외부에서 처치 수를 주입할 때 사용.</summary>
-        public void SetKills(int kills)
+        private string ResolveLocalDisplayName()
         {
-            if (killsText != null) killsText.text = $"쓰러트린 적 수: {kills:N0}";
+            var netLocal = NetworkPlayerRegistry.LocalPlayer;
+            if (netLocal != null && !string.IsNullOrEmpty(netLocal.DisplayName))
+                return netLocal.DisplayName;
+
+            if (stats != null && !string.IsNullOrEmpty(stats.LocalNickname))
+                return stats.LocalNickname;
+
+            return string.Format(playerLabelFormat, localPlayerIndex);
         }
 
-        // ─── 버튼 핸들러 ────────────────────────────────────────────────
+        private int ResolveLastReward()
+        {
+            if (NetworkSessionHelper.IsMultiplayerSession && NetworkMatchStats.Instance != null)
+                return NetworkMatchStats.Instance.LastReward;
+
+            return reward != null ? reward.LastReward : 0;
+        }
+
         private void OnRetryClicked()
         {
-            // 타임스케일 복구 후 씬 재로드
-            Time.timeScale = 1f;
-            var sceneName = string.IsNullOrEmpty(retrySceneName)
-                ? SceneManager.GetActiveScene().name
-                : retrySceneName;
-            SceneManager.LoadScene(sceneName);
+            if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer)
+                return;
+
+            Hide();
+            MatchExitHelper.ExitToCharacterSelect();
         }
 
         private void OnHomeClicked()
         {
-            Time.timeScale = 1f;
-            if (session != null) session.ReturnToLobby();
+            Hide();
+            MatchExitHelper.ExitToCharacterSelect();
         }
     }
 }

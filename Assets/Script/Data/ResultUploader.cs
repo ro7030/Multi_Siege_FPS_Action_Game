@@ -12,13 +12,12 @@ namespace ProjectM.Data
 {
     /// <summary>
     /// 매치 종료 시 결과 DTO를 빌드하여 서버에 전송.
-    /// 실패 시 PersistentDataPath/pending_results.json에 큐로 저장하고 다음 매치 종료 시 재시도.
+    /// NGO 세션에서는 Host만 업로드. 실패 시 로컬 큐에 저장.
     /// </summary>
     public class ResultUploader : MonoBehaviour
     {
         [SerializeField] private GameSessionManager session;
         [SerializeField] private CurrencyWallet wallet;
-        [SerializeField] private RoomManager room;
         [SerializeField] private PlayerStatsTracker stats;
         [SerializeField] private DbApiClient apiClient;
 
@@ -35,7 +34,6 @@ namespace ProjectM.Data
         {
             if (session == null) session = FindAnyObjectByType<GameSessionManager>();
             if (wallet == null) wallet = LocalPlayerUtility.FindLocalCurrencyWallet();
-            if (room == null) room = FindAnyObjectByType<RoomManager>();
             if (stats == null) stats = FindAnyObjectByType<PlayerStatsTracker>();
             if (apiClient == null) apiClient = FindAnyObjectByType<DbApiClient>();
         }
@@ -52,39 +50,75 @@ namespace ProjectM.Data
 
         private void HandleMatchEnded(bool cleared)
         {
+            if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer)
+                return;
+
             var dto = BuildSessionResultDto(cleared);
             StartCoroutine(UploadAsync(dto));
-            StartCoroutine(RetryPendingAsync()); // 큐에 쌓인 이전 결과도 재시도
+            StartCoroutine(RetryPendingAsync());
         }
 
         public SessionResultDto BuildSessionResultDto(bool cleared)
         {
-            var dto = new SessionResultDto
+            string endedAtUtc = DateTime.UtcNow.ToString("o");
+            string lobbyId = LobbyRelayService.Instance != null
+                ? LobbyRelayService.Instance.CurrentLobbyId
+                : string.Empty;
+
+            return new SessionResultDto
             {
-                sessionId = Guid.NewGuid().ToString("N"),
-                roomId = "",
-                roomCode = room != null ? room.RoomCode : "",
+                sessionId = BuildSessionId(lobbyId, endedAtUtc),
+                roomId = lobbyId,
+                roomCode = lobbyId,
                 cleared = cleared,
                 finalWave = session != null ? session.State.CurrentWave : 0,
                 maxWave = session != null ? session.State.MaxWave : 10,
                 finalScore = stats != null ? stats.FinalScore : 0,
                 finalBalance = wallet != null ? wallet.Balance : 0,
                 playSeconds = session != null ? (Time.time - session.State.MatchStartTime) : 0f,
-                endedAtUtc = DateTime.UtcNow.ToString("o"),
+                endedAtUtc = endedAtUtc,
                 players = BuildPlayerStats(),
             };
-            return dto;
+        }
+
+        private static string BuildSessionId(string lobbyId, string endedAtUtc)
+        {
+            if (string.IsNullOrEmpty(lobbyId))
+                return Guid.NewGuid().ToString("N");
+
+            return $"{lobbyId}_{endedAtUtc}";
         }
 
         private PlayerStatDto[] BuildPlayerStats()
         {
-            // MVP: 로컬 플레이어 1명만 기록. 멀티 시점에서는 Host가 모든 클라이언트의 통계를 수집해야 함.
             var list = new List<PlayerStatDto>();
+
+            if (NetworkSessionHelper.IsMultiplayerSession && NetworkMatchStats.Instance != null)
+            {
+                for (int i = 0; i < NetworkMatchStats.Instance.Count; i++)
+                {
+                    var entry = NetworkMatchStats.Instance.GetEntryAt(i);
+                    list.Add(new PlayerStatDto
+                    {
+                        clientId = (int)entry.ClientId,
+                        nickname = entry.Nickname.IsEmpty ? $"Player{entry.ClientId}" : entry.Nickname.ToString(),
+                        kills = entry.Kills,
+                        harvestCount = entry.HarvestCount,
+                        repairCount = 0,
+                        reviveCount = entry.ReviveCount,
+                        damageDealt = entry.DamageDealt,
+                        finalScore = entry.Score,
+                    });
+                }
+
+                return list.ToArray();
+            }
+
             if (stats != null)
             {
                 list.Add(new PlayerStatDto
                 {
-                    clientId = room != null ? room.LocalClientId : 0,
+                    clientId = 0,
                     nickname = stats.LocalNickname,
                     kills = stats.Kills,
                     harvestCount = stats.HarvestCount,
@@ -94,6 +128,7 @@ namespace ProjectM.Data
                     finalScore = stats.FinalScore,
                 });
             }
+
             return list.ToArray();
         }
 
@@ -128,7 +163,7 @@ namespace ProjectM.Data
         {
             var queue = LoadPendingQueue();
             queue.Add(dto);
-            if (queue.Count > maxRetryQueueSize) queue.RemoveAt(0); // 오래된 것 폐기
+            if (queue.Count > maxRetryQueueSize) queue.RemoveAt(0);
 
             var wrapper = new PendingResultsWrapper { items = queue.ToArray() };
             try
@@ -177,7 +212,6 @@ namespace ProjectM.Data
                 if (!ok) remaining.Add(dto);
             }
 
-            // 남은 것만 다시 저장 (전부 성공이면 파일 삭제)
             if (remaining.Count == 0)
             {
                 try { if (File.Exists(PendingFilePath)) File.Delete(PendingFilePath); } catch { }

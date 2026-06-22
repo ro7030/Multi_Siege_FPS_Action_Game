@@ -178,7 +178,7 @@ namespace ProjectM.Economy
         // ─────────────────────────────────────────────────────────────
 
         /// <summary>플레이어가 F 키로 수확 시도. FarmPlot 의 누적분을 팀 전원 지갑에 균등 분배.</summary>
-        public void HarvestFarm(FarmPlot plot)
+        public void HarvestFarm(FarmPlot plot, ulong harvesterClientId = ulong.MaxValue)
         {
             if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer)
                 return;
@@ -190,6 +190,9 @@ namespace ProjectM.Economy
 
             var wallets = PlayerWalletUtility.FindAllPlayerWallets();
             PlayerWalletUtility.ServerAddToAllPlayers(yieldPerPlayer, $"Farm harvest +{yieldPerPlayer}");
+
+            if (harvesterClientId != ulong.MaxValue)
+                NetworkMatchStats.Instance?.RecordHarvest(harvesterClientId);
 
             OnFarmHarvested?.Invoke(plot, yieldPerPlayer);
             Debug.Log($"[FarmManager] 수확! +{yieldPerPlayer} × {wallets.Count}명");

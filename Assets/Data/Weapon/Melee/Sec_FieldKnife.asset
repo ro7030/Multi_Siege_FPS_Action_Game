@@ -16,7 +16,7 @@ MonoBehaviour:
   slot: 1
   kind: 1
   price: 0
-  damage: 100
+  damage: 18
   icon: {fileID: 21300000, guid: 40802069c708c9a43a5b6105dd831776, type: 3}
   viewModelPrefab: {fileID: 8972777865294516069, guid: 181b55f9c40e5431ea7722ec76d64448, type: 3}
   fireRate: 5
@@ -25,5 +25,5 @@ MonoBehaviour:
   range: 200
   isAutomatic: 1
   attackInterval: 1
-  meleeRange: 4
-  meleeAngle: 100
+  meleeRange: 3.5
+  meleeAngle: 110

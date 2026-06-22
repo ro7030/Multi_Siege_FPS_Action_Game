@@ -25,5 +25,5 @@ MonoBehaviour:
   range: 200
   isAutomatic: 1
   attackInterval: 2.5
-  meleeRange: 2.5
-  meleeAngle: 100
+  meleeRange: 3.75
+  meleeAngle: 115

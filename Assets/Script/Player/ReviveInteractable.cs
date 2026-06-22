@@ -62,7 +62,7 @@ namespace ProjectM.Player
 
             if (target.TryGetComponent<NetworkDamageBridge>(out var bridge))
             {
-                bridge.RequestReviveHold(deltaTime);
+                bridge.RequestReviveHold(deltaTime, interactor);
                 return;
             }
 
