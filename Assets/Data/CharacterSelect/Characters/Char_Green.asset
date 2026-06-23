@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Char_Green
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.CharacterSelect.CharacterData
   displayName: Green
-  previewPrefab: {fileID: 6140646021388264035, guid: 31b17cbe4d355824bbcbd1237b1379eb, type: 3}
-  gameplayPrefab: {fileID: 6140646021388264035, guid: 31b17cbe4d355824bbcbd1237b1379eb, type: 3}
+  previewPrefab: {fileID: 6558351570595821722, guid: ef862cd3624c70f48ba2e3e54f0d7f21, type: 3}
+  gameplayPrefab: {fileID: 6558351570595821722, guid: ef862cd3624c70f48ba2e3e54f0d7f21, type: 3}

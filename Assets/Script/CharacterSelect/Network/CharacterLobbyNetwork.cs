@@ -143,6 +143,13 @@ namespace ProjectM.CharacterSelect
             return slots[slot].Nickname.ToString();
         }
 
+        public int GetCharacterIndexForClient(ulong clientId)
+        {
+            int slot = FindSlotByClientId(clientId);
+            if (slot < 0) return 0;
+            return slots[slot].CharacterIndex;
+        }
+
         public bool CanStartGame()
         {
             if (NetworkManager == null || slots == null) return false;

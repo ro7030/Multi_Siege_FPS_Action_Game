@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Char_Red
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.CharacterSelect.CharacterData
   displayName: Red
-  previewPrefab: {fileID: 6325612980646036171, guid: 6602d6fad6f54d84980fdc5b16b71728, type: 3}
-  gameplayPrefab: {fileID: 6325612980646036171, guid: 6602d6fad6f54d84980fdc5b16b71728, type: 3}
+  previewPrefab: {fileID: 5058119200980185944, guid: 37e6c48943f389d4bb7264be0344ee77, type: 3}
+  gameplayPrefab: {fileID: 5058119200980185944, guid: 37e6c48943f389d4bb7264be0344ee77, type: 3}
