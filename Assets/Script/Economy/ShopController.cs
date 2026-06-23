@@ -72,7 +72,7 @@ namespace ProjectM.Economy
 
         public bool TryUpgradeWeapon(WeaponSlot slot)
         {
-            if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer)
+            if (NetworkSessionHelper.IsMultiplayerSession)
             {
                 var local = NetworkPlayerRegistry.LocalPlayer;
                 if (local == null) { Fail(null, "플레이어 없음"); return false; }
@@ -90,7 +90,7 @@ namespace ProjectM.Economy
         /// <summary>원하는 무기 티어를 바로 구매(순서 무관, 미보유 티어만).</summary>
         public bool TryPurchaseWeaponTier(WeaponSlot slot, int tierIndex)
         {
-            if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer)
+            if (NetworkSessionHelper.IsMultiplayerSession)
             {
                 var local = NetworkPlayerRegistry.LocalPlayer;
                 if (local == null) { Fail(null, "플레이어 없음"); return false; }
@@ -124,7 +124,7 @@ namespace ProjectM.Economy
         {
             if (item == null) { Fail(null, "아이템 없음"); return false; }
 
-            if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer)
+            if (NetworkSessionHelper.IsMultiplayerSession)
             {
                 var local = NetworkPlayerRegistry.LocalPlayer;
                 if (local == null) { Fail(item, "플레이어 없음"); return false; }
@@ -153,8 +153,74 @@ namespace ProjectM.Economy
 
             ApplyEffectForBuyer(buyer, item);
             OnPurchased?.Invoke(item);
-            Debug.Log($"[Shop] 구매 성공: {item.displayName} (-{item.price}, 잔액 {buyerWallet.Balance})");
+
+            ulong clientId = 0;
+            if (buyer != null && buyer.TryGetComponent(out NetworkPlayer netPlayer))
+                clientId = netPlayer.OwnerClientId;
+
+            Debug.Log(
+                $"[Shop] 구매 성공: {item.displayName} (-{item.price}, 잔액 {buyerWallet.Balance}) " +
+                $"buyer={buyer?.name} clientId={clientId}");
             return true;
+        }
+
+        /// <summary>서버 구매 후 Owner 클라이언트에만 적용 — NGO 미동기화 즉시 효과(탄약 등).</summary>
+        public void ApplyPurchasedEffectOnOwner(GameObject buyer, string itemId)
+        {
+            if (catalog == null || buyer == null || string.IsNullOrEmpty(itemId)) return;
+
+            var item = catalog.GetById(itemId);
+            if (item == null || !RequiresOwnerLocalApply(item.type)) return;
+
+            ApplyOwnerLocalEffectForBuyer(buyer, item);
+        }
+
+        public bool RequiresOwnerLocalApply(ItemType type) => type == ItemType.AmmoRefill;
+
+        public bool RequiresOwnerLocalApplyForItem(string itemId)
+        {
+            if (catalog == null || string.IsNullOrEmpty(itemId)) return false;
+            var item = catalog.GetById(itemId);
+            return item != null && RequiresOwnerLocalApply(item.type);
+        }
+
+        private void ApplyOwnerLocalEffectForBuyer(GameObject buyer, ItemData item)
+        {
+            if (buyer == null || item == null) return;
+
+            switch (item.type)
+            {
+                case ItemType.AmmoRefill:
+                    var buyerWeapon = ResolveBuyerWeaponController(buyer);
+                    if (buyerWeapon == null)
+                    {
+                        ulong clientId = buyer.TryGetComponent(out NetworkPlayer np) ? np.OwnerClientId : 0;
+                        Debug.LogWarning(
+                            $"[Shop][Owner] WeaponController not found — buyer={buyer.name} clientId={clientId} item={item.id}");
+                        break;
+                    }
+
+                    int amount = Mathf.RoundToInt(item.value);
+                    int before = buyerWeapon.ReserveAmmo;
+                    buyerWeapon.AddReserveAmmo(amount);
+                    Debug.Log(
+                        $"[Shop][Owner] AmmoRefill +{amount} reserve {before}→{buyerWeapon.ReserveAmmo} " +
+                        $"buyer={buyer.name} item={item.id}");
+                    break;
+            }
+        }
+
+        private static WeaponController ResolveBuyerWeaponController(GameObject buyer)
+        {
+            if (buyer == null) return null;
+
+            var weapon = buyer.GetComponentInChildren<WeaponController>();
+            if (weapon != null) return weapon;
+
+            if (buyer.TryGetComponent(out NetworkPlayer netPlayer) && netPlayer.IsOwner)
+                return LocalPlayerUtility.FindLocalWeaponController();
+
+            return null;
         }
 
         public bool TryPurchaseWeaponTierForPlayer(GameObject buyer, WeaponSlot slot, int tierIndex)
@@ -207,6 +273,8 @@ namespace ProjectM.Economy
                     if (buyerHealth != null) buyerHealth.Heal(item.value);
                     break;
                 case ItemType.AmmoRefill:
+                    // MP: Owner ClientRpc가 ReserveAmmo를 적용한다. 서버 쪽 WeaponController는 HUD에 반영되지 않는다.
+                    if (NetworkSessionHelper.IsMultiplayerSession) break;
                     if (buyerWeapon != null) buyerWeapon.AddReserveAmmo(Mathf.RoundToInt(item.value));
                     break;
                 case ItemType.WeaponUpgrade:

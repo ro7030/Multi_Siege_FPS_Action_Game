@@ -52,6 +52,7 @@ namespace ProjectM.Player
         public event Action OnFired;
         public event Action OnReloadStart;
         public event Action OnReloadEnd;
+        public event Action OnReserveAmmoChanged;
         public event Action<GameObject, float> OnHit; // 맞춘 대상, 데미지
 
         private float nextFireTime;
@@ -150,6 +151,7 @@ namespace ProjectM.Player
         {
             if (amount <= 0) return;
             reserveAmmo += amount;
+            OnReserveAmmoChanged?.Invoke();
         }
 
         /// <summary>무기 정의(단계)를 적용한다. PlayerArsenal 이 장착/업그레이드 시 호출.</summary>

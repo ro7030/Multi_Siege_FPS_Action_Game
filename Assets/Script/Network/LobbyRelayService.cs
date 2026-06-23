@@ -24,6 +24,7 @@ namespace ProjectM.Network
         public const string DataRoomName = "roomName";
         public const string DataRelayJoinCode = "relayJoinCode";
         public const string DataHasPassword = "hasPassword";
+        public const string DataRematchGroup = "rematchGroup";
         public const int LobbyPasswordLength = 8;
 
         public static LobbyRelayService Instance { get; private set; }
@@ -52,6 +53,9 @@ namespace ProjectM.Network
             Instance = this;
             DontDestroyOnLoad(gameObject);
             ResolveNetworkComponents();
+
+            if (GetComponent<MatchRematchCoordinator>() == null)
+                gameObject.AddComponent<MatchRematchCoordinator>();
         }
 
         private void ResolveNetworkComponents()
@@ -138,6 +142,83 @@ namespace ProjectM.Network
 
             Debug.Log($"[LobbyRelay] Room created: {displayName} lobbyId={lobby.Id} relay={joinCode}");
         }
+
+        /// <summary>호스트 퇴장 후 rematch — rematchGroupId(S1)로 검색 가능한 공개 방 생성.</summary>
+        public async Task CreateRematchRoomAsync(string rematchGroupId, string roomName)
+        {
+            await EnsureServicesReadyAsync();
+
+            if (IsInSession)
+                await LeaveSessionAsync();
+
+            ShutdownNetworkIfListening();
+            await CleanupRemoteLobbyMembershipAsync();
+
+            int connectionCount = Mathf.Max(1, maxPlayers - 1);
+            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(connectionCount);
+            string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+
+            string displayName = string.IsNullOrWhiteSpace(roomName)
+                ? $"{AuthSessionManager.ResolveNickname("Host")} Rematch"
+                : roomName.Trim();
+
+            var lobbyOptions = new CreateLobbyOptions
+            {
+                IsPrivate = false,
+                Data = BuildLobbyData(displayName, joinCode, hasPassword: false, rematchGroupId)
+            };
+
+            var lobby = await LobbyService.Instance.CreateLobbyAsync(displayName, maxPlayers, lobbyOptions);
+
+            ApplyRelayServerData(allocation);
+            NetworkPlayerSessionGuard.ApplyManagerSettings(networkManager);
+            if (!networkManager.StartHost())
+                throw new InvalidOperationException("Failed to start NGO Host for rematch.");
+
+            NetworkPlayerSessionGuard.EnforceGameplayOnlySpawn(networkManager);
+
+            IsInSession = true;
+            IsHost = true;
+            CurrentLobbyId = lobby.Id;
+            RelayJoinCode = joinCode;
+            RoomName = displayName;
+
+            await SendHeartbeatAsync();
+            StartHostHeartbeat();
+
+            Debug.Log($"[LobbyRelay] Rematch room created: {displayName} group={rematchGroupId} lobbyId={lobby.Id}");
+        }
+
+        /// <summary>rematchGroupId(S1)로 열린 rematch 로비 검색.</summary>
+        public async Task<string> TryFindRematchLobbyAsync(string rematchGroupId)
+        {
+            if (string.IsNullOrEmpty(rematchGroupId))
+                return string.Empty;
+
+            await EnsureServicesReadyAsync();
+
+            var options = new QueryLobbiesOptions
+            {
+                Count = 5,
+                Filters = new List<QueryFilter>
+                {
+                    new(QueryFilter.FieldOptions.S1, rematchGroupId, QueryFilter.OpOptions.EQ),
+                    new(QueryFilter.FieldOptions.AvailableSlots, "0", QueryFilter.OpOptions.GT)
+                },
+                Order = new List<QueryOrder>
+                {
+                    new QueryOrder(false, QueryOrder.FieldOptions.Created)
+                }
+            };
+
+            QueryResponse response = await LobbyService.Instance.QueryLobbiesAsync(options);
+            if (response.Results.Count == 0)
+                return string.Empty;
+
+            return response.Results[0].Id;
+        }
+
+        public Task LeaveSessionForHomeAsync() => LeaveSessionAsync();
 
         public async Task<List<RoomListEntry>> QueryLobbiesAsync()
         {
@@ -396,14 +477,28 @@ namespace ProjectM.Network
             transport.SetRelayServerData(relayData);
         }
 
-        private static Dictionary<string, DataObject> BuildLobbyData(string roomName, string relayJoinCode, bool hasPassword)
+        private static Dictionary<string, DataObject> BuildLobbyData(
+            string roomName,
+            string relayJoinCode,
+            bool hasPassword,
+            string rematchGroupId = null)
         {
-            return new Dictionary<string, DataObject>
+            var data = new Dictionary<string, DataObject>
             {
                 { DataRoomName, new DataObject(DataObject.VisibilityOptions.Public, roomName) },
                 { DataRelayJoinCode, new DataObject(DataObject.VisibilityOptions.Member, relayJoinCode) },
                 { DataHasPassword, new DataObject(DataObject.VisibilityOptions.Public, hasPassword ? "1" : "0") }
             };
+
+            if (!string.IsNullOrEmpty(rematchGroupId))
+            {
+                data[DataRematchGroup] = new DataObject(
+                    DataObject.VisibilityOptions.Public,
+                    rematchGroupId,
+                    DataObject.IndexOptions.S1);
+            }
+
+            return data;
         }
 
         private void StartHostHeartbeat()

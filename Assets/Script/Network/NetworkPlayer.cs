@@ -20,7 +20,13 @@ namespace ProjectM.Network
             NetworkVariableReadPermission.Everyone,
             NetworkVariableWritePermission.Server);
 
+        private NetworkVariable<FixedString64Bytes> networkAuthPlayerId = new(
+            default,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server);
+
         public string DisplayName => networkNickname.Value.ToString();
+        public string AuthPlayerId => networkAuthPlayerId.Value.ToString();
 
         public override void OnNetworkSpawn()
         {
@@ -30,7 +36,14 @@ namespace ProjectM.Network
                 networkNickname.Value = ResolveNickname(OwnerClientId);
 
             if (IsOwner)
+            {
                 SubmitNicknameServerRpc(new FixedString64Bytes(AuthSessionManager.ResolveNickname("Player")));
+                string authId = AuthSessionManager.Instance != null
+                    ? AuthSessionManager.Instance.PlayerId
+                    : string.Empty;
+                if (!string.IsNullOrEmpty(authId))
+                    SubmitAuthPlayerIdServerRpc(new FixedString64Bytes(authId));
+            }
 
             ConfigureOwnership();
         }
@@ -79,6 +92,13 @@ namespace ProjectM.Network
         }
 
         [ServerRpc]
+        private void SubmitAuthPlayerIdServerRpc(FixedString64Bytes authPlayerId)
+        {
+            if (!authPlayerId.IsEmpty)
+                networkAuthPlayerId.Value = authPlayerId;
+        }
+
+        [ServerRpc]
         private void SubmitNicknameServerRpc(FixedString64Bytes nickname)
         {
             if (!nickname.IsEmpty)
@@ -102,9 +122,34 @@ namespace ProjectM.Network
         [ServerRpc]
         public void RequestShopPurchaseServerRpc(FixedString64Bytes itemId)
         {
+            string id = itemId.ToString();
             var shop = Object.FindAnyObjectByType<ShopController>();
-            bool success = shop != null && shop.TryPurchaseForPlayer(gameObject, itemId.ToString());
+            bool success = shop != null && shop.TryPurchaseForPlayer(gameObject, id);
+
+            int balanceAfter = TryGetComponent(out CurrencyWallet wallet) ? wallet.Balance : -1;
+            Debug.Log(
+                $"[Shop][Server] purchase client={OwnerClientId} buyer={DisplayName} item={id} " +
+                $"success={success} balanceAfter={balanceAfter}");
+
+            if (success && shop != null && shop.RequiresOwnerLocalApplyForItem(id))
+                ApplyShopEffectOwnerClientRpc(itemId);
+
             NotifyShopResultClientRpc(success, itemId);
+        }
+
+        [ClientRpc]
+        private void ApplyShopEffectOwnerClientRpc(FixedString64Bytes itemId)
+        {
+            if (!IsOwner) return;
+
+            var shop = Object.FindAnyObjectByType<ShopController>();
+            if (shop == null)
+            {
+                Debug.LogWarning($"[Shop][Owner] ShopController missing — item={itemId}");
+                return;
+            }
+
+            shop.ApplyPurchasedEffectOnOwner(gameObject, itemId.ToString());
         }
 
         [ClientRpc]

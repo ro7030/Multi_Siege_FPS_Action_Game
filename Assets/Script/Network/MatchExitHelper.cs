@@ -1,52 +1,48 @@
-using System.Collections;
 using ProjectM.Core;
-using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace ProjectM.Network
 {
     /// <summary>
-    /// 매치 종료 후 NGO 세션·로비 정리 및 캐릭터 선택 씬 복귀.
+    /// ResultView Retry/Home → MatchRematchCoordinator 위임.
     /// </summary>
     public static class MatchExitHelper
     {
-        public const string CharacterSelectScene = "CharacterSelect";
-
-        private static bool exitInProgress;
+        public const string CharacterSelectScene = MatchRematchCoordinator.CharacterSelectScene;
+        public const string MainMenuScene = MatchRematchCoordinator.MainMenuScene;
 
         public static void ExitToCharacterSelect()
         {
-            if (exitInProgress) return;
-            exitInProgress = true;
-            Time.timeScale = 1f;
+            if (NetworkSessionHelper.IsMultiplayerSession)
+            {
+                var director = Object.FindAnyObjectByType<NetworkMatchDirector>();
+                if (director != null && director.IsSpawned)
+                {
+                    director.RegisterRematchIntent();
+                    return;
+                }
+            }
 
-            if (GameSessionManager.Instance != null)
-                GameSessionManager.Instance.ReturnToLobby();
+            ResolveCoordinator()?.RequestRematchOffline();
+        }
+
+        public static void ExitToMainMenu()
+        {
+            ResolveCoordinator()?.RequestHome();
+        }
+
+        private static MatchRematchCoordinator ResolveCoordinator()
+        {
+            if (MatchRematchCoordinator.Instance != null)
+                return MatchRematchCoordinator.Instance;
 
             var relay = LobbyRelayService.Instance;
             if (relay != null)
-                relay.StartCoroutine(ExitRoutine(relay));
-            else
-                FinishExit();
-        }
+                return relay.GetComponent<MatchRematchCoordinator>()
+                       ?? relay.gameObject.AddComponent<MatchRematchCoordinator>();
 
-        private static IEnumerator ExitRoutine(LobbyRelayService relay)
-        {
-            var leaveTask = relay.LeaveSessionAsync();
-            while (!leaveTask.IsCompleted)
-                yield return null;
-
-            FinishExit();
-        }
-
-        private static void FinishExit()
-        {
-            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
-                NetworkManager.Singleton.Shutdown();
-
-            exitInProgress = false;
-            SceneManager.LoadScene(CharacterSelectScene);
+            var go = new UnityEngine.GameObject(nameof(MatchRematchCoordinator));
+            return go.AddComponent<MatchRematchCoordinator>();
         }
     }
 }

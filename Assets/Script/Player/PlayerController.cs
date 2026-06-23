@@ -112,6 +112,7 @@ namespace ProjectM.Player
 
         private void HandleCursorInput()
         {
+            if (UIInputModal.IsBlockingGameplayInput) return;
             if (!lockCursor) return;
 
             var kb = Keyboard.current;

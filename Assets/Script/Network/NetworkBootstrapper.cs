@@ -52,11 +52,22 @@ namespace ProjectM.Network
             if (!createLobbyRelayService) return LobbyRelayService.Instance;
 
             if (LobbyRelayService.Instance != null)
+            {
+                EnsureRematchCoordinator(LobbyRelayService.Instance.gameObject);
                 return LobbyRelayService.Instance;
+            }
 
             var go = new GameObject(nameof(LobbyRelayService));
             DontDestroyOnLoad(go);
-            return go.AddComponent<LobbyRelayService>();
+            var service = go.AddComponent<LobbyRelayService>();
+            EnsureRematchCoordinator(go);
+            return service;
+        }
+
+        private static void EnsureRematchCoordinator(GameObject go)
+        {
+            if (go.GetComponent<MatchRematchCoordinator>() == null)
+                go.AddComponent<MatchRematchCoordinator>();
         }
     }
 }

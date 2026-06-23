@@ -1,5 +1,6 @@
-using System;
+using System.Collections.Generic;
 using ProjectM.Auth;
+using ProjectM.Network;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -7,9 +8,10 @@ using UnityEngine.SceneManagement;
 
 namespace ProjectM.CharacterSelect
 {
-    public struct LobbySlotState : INetworkSerializable, IEquatable<LobbySlotState>
+    public struct LobbySlotState : INetworkSerializable, System.IEquatable<LobbySlotState>
     {
         public FixedString64Bytes Nickname;
+        public FixedString64Bytes AuthPlayerId;
         public int CharacterIndex;
         public bool IsReady;
         public bool IsOccupied;
@@ -18,6 +20,7 @@ namespace ProjectM.CharacterSelect
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             serializer.SerializeValue(ref Nickname);
+            serializer.SerializeValue(ref AuthPlayerId);
             serializer.SerializeValue(ref CharacterIndex);
             serializer.SerializeValue(ref IsReady);
             serializer.SerializeValue(ref IsOccupied);
@@ -27,6 +30,7 @@ namespace ProjectM.CharacterSelect
         public bool Equals(LobbySlotState other)
         {
             return Nickname.Equals(other.Nickname)
+                   && AuthPlayerId.Equals(other.AuthPlayerId)
                    && CharacterIndex == other.CharacterIndex
                    && IsReady == other.IsReady
                    && IsOccupied == other.IsOccupied
@@ -36,6 +40,7 @@ namespace ProjectM.CharacterSelect
 
     /// <summary>
     /// NGO 캐릭터 선택 로비 상태 — 4슬롯, Ready, Start → GamePlay.
+    /// rematch 시 OriginalHostAuthPlayerId 기준 슬롯 0 복원.
     /// </summary>
     public class CharacterLobbyNetwork : NetworkBehaviour
     {
@@ -48,8 +53,8 @@ namespace ProjectM.CharacterSelect
 
         private NetworkList<LobbySlotState> slots;
 
-        public event Action<int> OnPlayerChanged;
-        public event Action OnGameStarting;
+        public event System.Action<int> OnPlayerChanged;
+        public event System.Action OnGameStarting;
 
         private void Awake()
         {
@@ -80,19 +85,7 @@ namespace ProjectM.CharacterSelect
                 NetworkManager.OnClientDisconnectCallback += HandleClientDisconnected;
             }
 
-            if (IsClient && !IsServer)
-            {
-                RegisterLocalPlayerServerRpc(
-                    AuthSessionManager.ResolveNickname("Player"),
-                    NetworkManager.LocalClientId);
-            }
-            else if (IsServer)
-            {
-                RegisterLocalPlayerServerRpc(
-                    AuthSessionManager.ResolveNickname("Player"),
-                    NetworkManager.ServerClientId);
-            }
-
+            RegisterLocalPlayer();
             BroadcastAllSlots();
         }
 
@@ -107,6 +100,18 @@ namespace ProjectM.CharacterSelect
             }
 
             if (Instance == this) Instance = null;
+        }
+
+        private void RegisterLocalPlayer()
+        {
+            string authId = AuthSessionManager.Instance != null
+                ? AuthSessionManager.Instance.PlayerId ?? string.Empty
+                : string.Empty;
+
+            RegisterLocalPlayerServerRpc(
+                AuthSessionManager.ResolveNickname("Player"),
+                NetworkManager.LocalClientId,
+                new FixedString64Bytes(authId));
         }
 
         public int GetLocalSlotIndex()
@@ -174,19 +179,26 @@ namespace ProjectM.CharacterSelect
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void RegisterLocalPlayerServerRpc(FixedString64Bytes nickname, ulong clientId)
+        private void RegisterLocalPlayerServerRpc(
+            FixedString64Bytes nickname,
+            ulong clientId,
+            FixedString64Bytes authPlayerId)
         {
             int slot = FindSlotByClientId(clientId);
-            if (slot < 0) slot = AssignClientToSlot(clientId);
+            if (slot < 0) slot = AssignClientToSlot(clientId, authPlayerId);
             if (slot < 0) return;
 
             var state = slots[slot];
             state.IsOccupied = true;
             state.OwnerClientId = clientId;
             state.Nickname = nickname;
+            if (!authPlayerId.IsEmpty)
+                state.AuthPlayerId = authPlayerId;
             if (state.CharacterIndex < 0) state.CharacterIndex = 0;
             if (clientId == NetworkManager.ServerClientId) state.IsReady = false;
             slots[slot] = state;
+
+            RebalanceHostSlot();
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -236,6 +248,7 @@ namespace ProjectM.CharacterSelect
                 slots.Add(new LobbySlotState
                 {
                     Nickname = default,
+                    AuthPlayerId = default,
                     CharacterIndex = 0,
                     IsReady = false,
                     IsOccupied = false,
@@ -248,7 +261,8 @@ namespace ProjectM.CharacterSelect
         {
             if (clientId == NetworkManager.ServerClientId) return;
             if (FindSlotByClientId(clientId) >= 0) return;
-            AssignClientToSlot(clientId);
+            AssignClientToSlot(clientId, default);
+            RebalanceHostSlot();
         }
 
         private void EnsureAllConnectedClientsRegistered()
@@ -256,8 +270,10 @@ namespace ProjectM.CharacterSelect
             foreach (ulong clientId in NetworkManager.ConnectedClientsIds)
             {
                 if (FindSlotByClientId(clientId) >= 0) continue;
-                AssignClientToSlot(clientId);
+                AssignClientToSlot(clientId, default);
             }
+
+            RebalanceHostSlot();
         }
 
         private void HandleClientDisconnected(ulong clientId)
@@ -265,35 +281,133 @@ namespace ProjectM.CharacterSelect
             int slot = FindSlotByClientId(clientId);
             if (slot < 0) return;
 
-            var empty = new LobbySlotState
-            {
-                Nickname = default,
-                CharacterIndex = 0,
-                IsReady = false,
-                IsOccupied = false,
-                OwnerClientId = 0
-            };
-            slots[slot] = empty;
+            slots[slot] = EmptySlot();
+            RebalanceHostSlot();
         }
 
-        private int AssignClientToSlot(ulong clientId)
+        private int AssignClientToSlot(ulong clientId, FixedString64Bytes authPlayerId)
         {
             int existing = FindSlotByClientId(clientId);
             if (existing >= 0) return existing;
 
-            int slot = clientId == NetworkManager.ServerClientId
-                ? HostSlotIndex
-                : FindFirstFreeGuestSlot();
+            int slot = ResolvePreferredSlot(clientId, authPlayerId);
+            if (slot < 0) return -1;
+
+            if (slots[slot].IsOccupied && slots[slot].OwnerClientId != clientId)
+                slot = FindFirstFreeGuestSlot();
+
             if (slot < 0) return -1;
 
             var state = slots[slot];
             state.IsOccupied = true;
             state.OwnerClientId = clientId;
-            state.Nickname = default;
+            if (state.Nickname.IsEmpty) state.Nickname = default;
+            if (!authPlayerId.IsEmpty) state.AuthPlayerId = authPlayerId;
             state.CharacterIndex = 0;
             state.IsReady = false;
             slots[slot] = state;
             return slot;
+        }
+
+        private int ResolvePreferredSlot(ulong clientId, FixedString64Bytes authPlayerId)
+        {
+            string originalHost = MatchPartyContext.OriginalHostAuthPlayerId;
+            if (!string.IsNullOrEmpty(originalHost)
+                && !authPlayerId.IsEmpty
+                && authPlayerId.ToString() == originalHost
+                && !IsOriginalHostExcluded())
+            {
+                return HostSlotIndex;
+            }
+
+            if (string.IsNullOrEmpty(originalHost) && clientId == NetworkManager.ServerClientId)
+                return HostSlotIndex;
+
+            return FindFirstFreeGuestSlot();
+        }
+
+        private static bool IsOriginalHostExcluded()
+        {
+            string originalHost = MatchPartyContext.OriginalHostAuthPlayerId;
+            if (string.IsNullOrEmpty(originalHost)) return false;
+
+            var payload = MatchPartyContext.LastStatusPayload;
+            for (int i = 0; i < payload.PlayerCount; i++)
+            {
+                var entry = payload.GetPlayer(i);
+                if (entry.AuthPlayerId.ToString() != originalHost) continue;
+                return entry.PlayerState == RematchPlayerState.LeftHome;
+            }
+
+            return false;
+        }
+
+        private void RebalanceHostSlot()
+        {
+            string originalHost = MatchPartyContext.OriginalHostAuthPlayerId;
+            if (string.IsNullOrEmpty(originalHost) || IsOriginalHostExcluded()) return;
+
+            ulong hostClientId = FindClientIdByAuth(originalHost);
+            if (hostClientId == ulong.MaxValue) return;
+
+            int currentHostSlot = FindSlotByClientId(hostClientId);
+            if (currentHostSlot == HostSlotIndex) return;
+
+            if (slots[HostSlotIndex].IsOccupied && slots[HostSlotIndex].OwnerClientId != hostClientId)
+            {
+                ulong displaced = slots[HostSlotIndex].OwnerClientId;
+                MoveClientToGuestSlot(displaced);
+            }
+
+            MoveClientToSlot(hostClientId, HostSlotIndex);
+        }
+
+        private ulong FindClientIdByAuth(string authPlayerId)
+        {
+            for (int i = 0; i < slots.Count; i++)
+            {
+                if (!slots[i].IsOccupied) continue;
+                if (slots[i].AuthPlayerId.ToString() == authPlayerId)
+                    return slots[i].OwnerClientId;
+            }
+
+            return ulong.MaxValue;
+        }
+
+        private void MoveClientToGuestSlot(ulong clientId)
+        {
+            int guestSlot = FindFirstFreeGuestSlot();
+            if (guestSlot < 0) return;
+            MoveClientToSlot(clientId, guestSlot);
+        }
+
+        private void MoveClientToSlot(ulong clientId, int targetSlot)
+        {
+            int sourceSlot = FindSlotByClientId(clientId);
+            if (sourceSlot < 0 || targetSlot < 0 || sourceSlot == targetSlot) return;
+
+            var moving = slots[sourceSlot];
+            if (!moving.IsOccupied || moving.OwnerClientId != clientId) return;
+
+            if (slots[targetSlot].IsOccupied && slots[targetSlot].OwnerClientId != clientId)
+                return;
+
+            slots[sourceSlot] = EmptySlot();
+            moving.IsReady = targetSlot == HostSlotIndex ? false : moving.IsReady;
+            slots[targetSlot] = moving;
+        }
+
+        private static LobbySlotState EmptySlot()
+        {
+            return new LobbySlotState
+            {
+                Nickname = default,
+                AuthPlayerId = default,
+                CharacterIndex = 0,
+                IsReady = false,
+                IsOccupied = false,
+                OwnerClientId = 0
+            };
         }
 
         private int FindFirstFreeGuestSlot()

@@ -180,6 +180,7 @@ namespace ProjectM.UI
                 playerWeapon.OnFired += RefreshAmmo;
                 playerWeapon.OnReloadStart += RefreshReload;
                 playerWeapon.OnReloadEnd += RefreshReload;
+                playerWeapon.OnReserveAmmoChanged += RefreshAmmo;
             }
             if (session != null) session.OnWaveStarted += HandleWaveStarted;
             if (kitInventory != null) kitInventory.OnCountChanged += HandleKitChanged;
@@ -239,6 +240,7 @@ namespace ProjectM.UI
                 playerWeapon.OnFired -= RefreshAmmo;
                 playerWeapon.OnReloadStart -= RefreshReload;
                 playerWeapon.OnReloadEnd -= RefreshReload;
+                playerWeapon.OnReserveAmmoChanged -= RefreshAmmo;
             }
             if (session != null) session.OnWaveStarted -= HandleWaveStarted;
             if (kitInventory != null) kitInventory.OnCountChanged -= HandleKitChanged;
