@@ -39,6 +39,13 @@ namespace ProjectM.Player
 
         public bool IsLocalPlayer { get => isLocalPlayer; set => isLocalPlayer = value; }
         public bool CanControl { get => canControl; set => canControl = value; }
+        public Transform CameraPivot => cameraPivot;
+
+        public void AlignCameraPivotTo(Transform anchor)
+        {
+            if (cameraPivot == null || anchor == null) return;
+            cameraPivot.position = anchor.position;
+        }
 
         private void Awake()
         {

@@ -25,15 +25,33 @@ namespace ProjectM.Network
             NetworkVariableReadPermission.Everyone,
             NetworkVariableWritePermission.Server);
 
+        private NetworkVariable<int> networkCharacterIndex = new(
+            0,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server);
+
+        private CharacterVisualBinder cachedBinder;
+
         public string DisplayName => networkNickname.Value.ToString();
         public string AuthPlayerId => networkAuthPlayerId.Value.ToString();
+        public int CharacterIndex => networkCharacterIndex.Value;
 
         public override void OnNetworkSpawn()
         {
             NetworkPlayerRegistry.Register(this);
 
+            cachedBinder = GetComponentInChildren<CharacterVisualBinder>(true);
+            if (cachedBinder != null)
+                cachedBinder.OnVisualApplied += HandleVisualApplied;
+
             if (IsServer)
+            {
                 networkNickname.Value = ResolveNickname(OwnerClientId);
+                networkCharacterIndex.Value = ResolveCharacterIndex(OwnerClientId);
+            }
+
+            networkCharacterIndex.OnValueChanged += HandleCharacterIndexChanged;
+            ApplyCharacterVisual(networkCharacterIndex.Value);
 
             if (IsOwner)
             {
@@ -50,7 +68,35 @@ namespace ProjectM.Network
 
         public override void OnNetworkDespawn()
         {
+            networkCharacterIndex.OnValueChanged -= HandleCharacterIndexChanged;
+            if (cachedBinder != null)
+                cachedBinder.OnVisualApplied -= HandleVisualApplied;
             NetworkPlayerRegistry.Unregister(this);
+        }
+
+        private void HandleCharacterIndexChanged(int previous, int current)
+        {
+            ApplyCharacterVisual(current);
+        }
+
+        private void ApplyCharacterVisual(int index)
+        {
+            if (cachedBinder == null) return;
+            cachedBinder.ApplyCharacter(index);
+        }
+
+        private void HandleVisualApplied(GameObject visual, Transform eyeAnchor)
+        {
+            if (eyeAnchor == null) return;
+            foreach (var pc in GetComponentsInChildren<PlayerController>(true))
+                pc.AlignCameraPivotTo(eyeAnchor);
+        }
+
+        private static int ResolveCharacterIndex(ulong clientId)
+        {
+            if (CharacterLobbyNetwork.Instance != null)
+                return CharacterLobbyNetwork.Instance.GetCharacterIndexForClient(clientId);
+            return 0;
         }
 
         private void ConfigureOwnership()
