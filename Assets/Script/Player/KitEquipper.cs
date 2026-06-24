@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 using ProjectM.Defense;
 using ProjectM.Economy;
 using ProjectM.Network;
+using ProjectM.UI;
 
 namespace ProjectM.Player
 {
@@ -358,7 +359,9 @@ namespace ProjectM.Player
             if (FarmManager.Instance == null) { Debug.LogWarning("[Kit] FarmKit: FarmManager 없음"); return false; }
             if (!FarmManager.Instance.IsPlacementAllowed())
             {
-                Debug.LogWarning("[Kit] FarmKit: 정비 시간이 아니거나 최대 개수 도달");
+                string msg = FarmManager.Instance.GetPlacementBlockMessage();
+                Debug.LogWarning($"[Kit] FarmKit: {msg}");
+                NotificationBanner.Instance?.Show(msg, 2.5f);
                 return false;
             }
             if (!TryRaycastFromView(out RaycastHit hit)) return false;

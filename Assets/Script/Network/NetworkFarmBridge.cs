@@ -51,7 +51,10 @@ namespace ProjectM.Network
             }
 
             if (plot != null && plot.State == FarmPlot.FarmState.Destroyed)
+            {
                 plot.ApplyDestroyedPresentation();
+                FarmManager.Instance?.NotifyFarmDestroyedFromMirror(plot);
+            }
         }
 
         public void RequestHarvest()

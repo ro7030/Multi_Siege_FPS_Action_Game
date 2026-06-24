@@ -150,12 +150,17 @@ namespace ProjectM.Defense
             if (NetworkSessionHelper.IsGameplayAuthority)
                 return;
 
+            bool wasActive = State == FarmState.Active;
             AccumulatedYield = accumulatedYield;
             State = state;
             ApplyVisual();
 
             if (state == FarmState.Destroyed)
+            {
                 ApplyDestroyedPresentation();
+                if (wasActive)
+                    Economy.FarmManager.Instance?.NotifyFarmDestroyedFromMirror(this);
+            }
         }
 
         /// <summary>파괴 시 비주얼·콜라이더 비활성화 (서버/클라이언트 공통).</summary>

@@ -88,7 +88,7 @@ namespace ProjectM.Economy
 
             if (!IsPlacementAllowed())
             {
-                Debug.LogWarning("[FarmManager] 설치 불가: 정비 시간이 아니거나 최대 개수 도달");
+                Debug.LogWarning($"[FarmManager] 설치 불가: {GetPlacementBlockMessage()}");
                 return false;
             }
 
@@ -137,18 +137,38 @@ namespace ProjectM.Economy
             return session.State.CurrentPhase == GamePhase.Preparation;
         }
 
+        /// <summary>설치 불가 시 플레이어에게 보여줄 메시지.</summary>
+        public string GetPlacementBlockMessage()
+        {
+            if (!CanPlaceMore)
+                return $"밭은 최대 {MaxFarms}개까지 설치할 수 있습니다. ({ActiveCount}/{MaxFarms})";
+            if (session != null && session.State.CurrentPhase != GamePhase.Preparation)
+                return "정비 시간에만 밭을 설치할 수 있습니다.";
+            return "밭을 설치할 수 없습니다.";
+        }
+
         // ─────────────────────────────────────────────────────────────
         // 파괴
         // ─────────────────────────────────────────────────────────────
 
         private void HandleFarmDestroyed(FarmPlot plot)
         {
-            if (plot == null) return;
+            if (plot == null || !activeFarms.Contains(plot)) return;
+
             plot.OnDestroyedByEnemy -= HandleFarmDestroyed;
             activeFarms.Remove(plot);
             OnFarmDestroyed?.Invoke(plot);
 
             Debug.Log($"[FarmManager] 밭 파괴됨 — 누적 수익 손실 ({ActiveCount}/{MaxFarms})");
+        }
+
+        /// <summary>클라이언트 NGO 미러: 서버에서 파괴된 밭을 로컬 목록에서 제거.</summary>
+        public void NotifyFarmDestroyedFromMirror(FarmPlot plot)
+        {
+            if (NetworkSessionHelper.IsGameplayAuthority)
+                return;
+
+            HandleFarmDestroyed(plot);
         }
 
         // ─────────────────────────────────────────────────────────────

@@ -3,6 +3,7 @@ using Unity.Netcode;
 using UnityEngine;
 using ProjectM.Economy;
 using ProjectM.Player;
+using ProjectM.UI;
 
 namespace ProjectM.Network
 {
@@ -11,6 +12,8 @@ namespace ProjectM.Network
     /// </summary>
     public class NetworkFarmManagerBridge : NetworkBehaviour
     {
+        private const float FailureBannerDuration = 2.5f;
+
         [ServerRpc(RequireOwnership = false)]
         public void RequestPlaceFarmServerRpc(Vector3 position, float rotationY, ServerRpcParams rpcParams = default)
         {
@@ -20,6 +23,13 @@ namespace ProjectM.Network
             if (manager == null)
             {
                 NotifyPlaceFarmResult(clientId, false, "no_manager");
+                return;
+            }
+
+            if (!manager.IsPlacementAllowed())
+            {
+                string reason = !manager.CanPlaceMore ? "max_farms" : "wrong_phase";
+                NotifyPlaceFarmResult(clientId, false, reason);
                 return;
             }
 
@@ -55,9 +65,14 @@ namespace ProjectM.Network
             ClientRpcParams clientRpcParams = default)
         {
             if (success)
+            {
                 Debug.Log("[NetworkFarmManagerBridge] 밭 설치 성공");
-            else
-                Debug.LogWarning($"[NetworkFarmManagerBridge] 밭 설치 실패: {reason}");
+                return;
+            }
+
+            string msg = ResolveFailureMessage(reason.ToString());
+            Debug.LogWarning($"[NetworkFarmManagerBridge] 밭 설치 실패: {msg}");
+            NotificationBanner.Instance?.Show(msg, FailureBannerDuration);
         }
 
         private void NotifyPlaceFarmResult(ulong clientId, bool success, string reason)
@@ -71,6 +86,27 @@ namespace ProjectM.Network
             };
 
             NotifyPlaceFarmResultClientRpc(success, reason, clientRpcParams);
+        }
+
+        private static string ResolveFailureMessage(string reasonCode)
+        {
+            var manager = FarmManager.Instance;
+            return reasonCode switch
+            {
+                "max_farms" => manager != null
+                    ? manager.GetPlacementBlockMessage()
+                    : "밭은 최대 4개까지 설치할 수 있습니다.",
+                "wrong_phase" => "정비 시간에만 밭을 설치할 수 있습니다.",
+                "consume_failed" => "밭 설치 키트가 없습니다.",
+                "place_failed" => manager != null
+                    ? manager.GetPlacementBlockMessage()
+                    : "밭을 설치할 수 없습니다.",
+                "no_manager" => "밭 시스템을 사용할 수 없습니다.",
+                "player_missing" => "플레이어 정보를 찾을 수 없습니다.",
+                _ => manager != null
+                    ? manager.GetPlacementBlockMessage()
+                    : "밭을 설치할 수 없습니다."
+            };
         }
 
         private static GameObject ResolvePlayer(ulong clientId)
