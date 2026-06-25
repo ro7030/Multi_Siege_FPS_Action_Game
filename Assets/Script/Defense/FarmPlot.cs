@@ -64,9 +64,14 @@ namespace ProjectM.Defense
         private void Start()
         {
             // 씬에 미리 놓인 밭(인스펙터 배치)도 FarmManager 에 자동 등록.
-            // TryPlaceFarm 으로 설치된 밭은 RegisterExistingFarm 이 중복 호출돼도 List.Contains 체크로 안전.
+            // MP 서버는 PlaceFarmInternal/RegisterExistingFarm 으로 이미 등록됨.
             if (State == FarmState.Active && Economy.FarmManager.Instance != null)
+            {
+                if (NetworkSessionHelper.IsMultiplayerSession && NetworkSessionHelper.IsServer)
+                    return;
+
                 Economy.FarmManager.Instance.RegisterExistingFarm(this);
+            }
         }
 
         private void OnDisable()

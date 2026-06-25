@@ -33,7 +33,20 @@ namespace ProjectM.Economy
 
         private readonly List<FarmPlot> activeFarms = new();
 
-        public int ActiveCount => activeFarms.Count;
+        public int ActiveCount
+        {
+            get
+            {
+                if (NetworkSessionHelper.IsGameplayAuthority)
+                    return activeFarms.Count;
+
+                if (NetworkFarmManagerBridge.Instance != null)
+                    return NetworkFarmManagerBridge.Instance.SyncedActiveCount;
+
+                return activeFarms.Count;
+            }
+        }
+
         public int MaxFarms => settings != null ? settings.maxActiveFarms : 4;
         public bool CanPlaceMore => ActiveCount < MaxFarms;
         public FarmSettings Settings => settings;
@@ -53,18 +66,29 @@ namespace ProjectM.Economy
 
         private void OnEnable()
         {
-            if (session != null) session.OnWaveEnded += HandleWaveEnded;
+            if (session != null)
+            {
+                session.OnWaveEnded += HandleWaveEnded;
+                session.OnMatchStarted += ResetForMatch;
+            }
         }
 
         private void OnDisable()
         {
-            if (session != null) session.OnWaveEnded -= HandleWaveEnded;
+            if (session != null)
+            {
+                session.OnWaveEnded -= HandleWaveEnded;
+                session.OnMatchStarted -= ResetForMatch;
+            }
             if (Instance == this) Instance = null;
         }
 
         private void Update()
         {
-            activeFarmCount = activeFarms.Count;
+            if (!NetworkSessionHelper.IsGameplayAuthority)
+                activeFarms.RemoveAll(f => f == null);
+
+            activeFarmCount = ActiveCount;
         }
 
         // ─────────────────────────────────────────────────────────────
@@ -125,6 +149,7 @@ namespace ProjectM.Economy
             plot.InstalledOnWave = session != null ? session.State.CurrentWave : 0;
             plot.OnDestroyedByEnemy += HandleFarmDestroyed;
             activeFarms.Add(plot);
+            PushActiveFarmCountToNetwork();
             OnFarmPlaced?.Invoke(plot);
 
             Debug.Log($"[FarmManager] 밭 설치됨 ({ActiveCount}/{MaxFarms})");
@@ -147,6 +172,15 @@ namespace ProjectM.Economy
             return "밭을 설치할 수 없습니다.";
         }
 
+        /// <summary>Guest 클라이언트: Despawn 후 fake-null 항목 정리.</summary>
+        public void CleanupStaleFarmEntries()
+        {
+            if (NetworkSessionHelper.IsGameplayAuthority)
+                return;
+
+            activeFarms.RemoveAll(f => f == null);
+        }
+
         // ─────────────────────────────────────────────────────────────
         // 파괴
         // ─────────────────────────────────────────────────────────────
@@ -157,6 +191,7 @@ namespace ProjectM.Economy
 
             plot.OnDestroyedByEnemy -= HandleFarmDestroyed;
             activeFarms.Remove(plot);
+            PushActiveFarmCountToNetwork();
             OnFarmDestroyed?.Invoke(plot);
 
             Debug.Log($"[FarmManager] 밭 파괴됨 — 누적 수익 손실 ({ActiveCount}/{MaxFarms})");
@@ -169,6 +204,28 @@ namespace ProjectM.Economy
                 return;
 
             HandleFarmDestroyed(plot);
+        }
+
+        /// <summary>매치 시작 시 활성 밭 목록·네트워크 카운트 초기화.</summary>
+        public void ResetForMatch()
+        {
+            foreach (var plot in activeFarms)
+            {
+                if (plot != null)
+                    plot.OnDestroyedByEnemy -= HandleFarmDestroyed;
+            }
+
+            activeFarms.Clear();
+            PushActiveFarmCountToNetwork();
+            activeFarmCount = ActiveCount;
+        }
+
+        private void PushActiveFarmCountToNetwork()
+        {
+            if (!NetworkSessionHelper.IsServer)
+                return;
+
+            NetworkFarmManagerBridge.Instance?.ServerSyncActiveFarmCount(activeFarms.Count);
         }
 
         // ─────────────────────────────────────────────────────────────

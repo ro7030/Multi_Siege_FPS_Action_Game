@@ -1,6 +1,7 @@
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using ProjectM.Core;
 using ProjectM.Economy;
 using ProjectM.Player;
 using ProjectM.UI;
@@ -8,11 +9,52 @@ using ProjectM.UI;
 namespace ProjectM.Network
 {
     /// <summary>
-    /// 클라이언트 밭 설치 요청을 서버 FarmManager 로 전달한다.
+    /// 클라이언트 밭 설치 요청을 서버 FarmManager 로 전달하고,
+    /// 팀 활성 밭 개수를 NetworkVariable 로 복제한다.
     /// </summary>
     public class NetworkFarmManagerBridge : NetworkBehaviour
     {
+        public static NetworkFarmManagerBridge Instance { get; private set; }
+
         private const float FailureBannerDuration = 2.5f;
+
+        [SerializeField] private GameSessionManager session;
+
+        private readonly NetworkVariable<int> netActiveFarmCount = new(
+            0,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server);
+
+        public int SyncedActiveCount => netActiveFarmCount.Value;
+
+        private void Awake()
+        {
+            if (session == null)
+                session = FindAnyObjectByType<GameSessionManager>();
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            if (Instance != null && Instance != this)
+                Debug.LogWarning("[NetworkFarmManagerBridge] Duplicate instance detected.");
+            else
+                Instance = this;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            if (Instance == this)
+                Instance = null;
+        }
+
+        /// <summary>서버 FarmManager 가 활성 밭 수 변경 시 호출.</summary>
+        public void ServerSyncActiveFarmCount(int count)
+        {
+            if (!IsServer)
+                return;
+
+            netActiveFarmCount.Value = count;
+        }
 
         [ServerRpc(RequireOwnership = false)]
         public void RequestPlaceFarmServerRpc(Vector3 position, float rotationY, ServerRpcParams rpcParams = default)
@@ -66,6 +108,7 @@ namespace ProjectM.Network
         {
             if (success)
             {
+                FarmManager.Instance?.CleanupStaleFarmEntries();
                 Debug.Log("[NetworkFarmManagerBridge] 밭 설치 성공");
                 return;
             }

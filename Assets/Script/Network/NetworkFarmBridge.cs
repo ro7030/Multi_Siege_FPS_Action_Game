@@ -48,12 +48,13 @@ namespace ProjectM.Network
             {
                 netAccumulatedYield.OnValueChanged -= HandleYieldChanged;
                 netState.OnValueChanged -= HandleStateChanged;
-            }
 
-            if (plot != null && plot.State == FarmPlot.FarmState.Destroyed)
-            {
-                plot.ApplyDestroyedPresentation();
-                FarmManager.Instance?.NotifyFarmDestroyedFromMirror(plot);
+                // destroyOnDeath Despawn이 netState=Destroyed보다 먼저 올 수 있어 State 무관 unregister.
+                if (plot != null)
+                {
+                    plot.ApplyDestroyedPresentation();
+                    FarmManager.Instance?.NotifyFarmDestroyedFromMirror(plot);
+                }
             }
         }
 
