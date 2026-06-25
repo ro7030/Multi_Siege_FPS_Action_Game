@@ -18,6 +18,7 @@ namespace ProjectM.UI
         [SerializeField] private TMP_InputField nicknameInput;
         [SerializeField] private Button loginButton;
         [SerializeField] private Button guestButton;
+        [SerializeField] private Button quitButton;
         [SerializeField] private TMP_Text statusText;
         [SerializeField] private GameObject loadingOverlay;
 
@@ -46,8 +47,19 @@ namespace ProjectM.UI
         {
             if (loginButton != null) loginButton.onClick.AddListener(OnLoginClicked);
             if (guestButton != null) guestButton.onClick.AddListener(OnGuestClicked);
+            if (quitButton != null) quitButton.onClick.AddListener(OnQuitClicked);
             SetStatus(string.Empty);
             SetBusy(false);
+        }
+
+        private void OnQuitClicked()
+        {
+            if (isBusy) return;
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
         }
 
         private void ApplyFontToUi()
@@ -59,6 +71,7 @@ namespace ProjectM.UI
 
             if (loginButton != null) ApplyFontToText(loginButton.GetComponentInChildren<TMP_Text>());
             if (guestButton != null) ApplyFontToText(guestButton.GetComponentInChildren<TMP_Text>());
+            if (quitButton != null) ApplyFontToText(quitButton.GetComponentInChildren<TMP_Text>());
 
             foreach (var text in GetComponentsInChildren<TMP_Text>(true))
                 ApplyFontToText(text);
