@@ -87,9 +87,13 @@ namespace ProjectM.Network
 
         private void HandleVisualApplied(GameObject visual, Transform eyeAnchor)
         {
-            if (eyeAnchor == null) return;
-            foreach (var pc in GetComponentsInChildren<PlayerController>(true))
-                pc.AlignCameraPivotTo(eyeAnchor);
+            LocalFirstPersonVisual.ApplyOwnerVisual(visual, IsOwner);
+
+            if (IsOwner)
+            {
+                foreach (var cam in GetComponentsInChildren<Camera>(true))
+                    LocalFirstPersonVisual.ConfigureLocalCamera(cam, true);
+            }
         }
 
         private static int ResolveCharacterIndex(ulong clientId)
@@ -125,7 +129,10 @@ namespace ProjectM.Network
                 pi.IsLocalPlayer = local;
 
             foreach (var cam in GetComponentsInChildren<Camera>(true))
+            {
                 cam.enabled = local;
+                LocalFirstPersonVisual.ConfigureLocalCamera(cam, local);
+            }
 
             foreach (var listener in GetComponentsInChildren<AudioListener>(true))
                 listener.enabled = local;

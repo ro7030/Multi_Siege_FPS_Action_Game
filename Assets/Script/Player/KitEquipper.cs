@@ -399,7 +399,7 @@ namespace ProjectM.Player
             hit = default;
             if (viewCamera == null) return false;
             var ray = new Ray(viewCamera.transform.position, viewCamera.transform.forward);
-            return Physics.Raycast(ray, out hit, useRange, hitMask, QueryTriggerInteraction.Ignore);
+            return PlayerRaycastUtility.TryRaycastFromView(transform, ray, out hit, useRange, hitMask);
         }
     }
 }

@@ -13,15 +13,13 @@ namespace ProjectM.Network
     {
         [SerializeField] private CharacterDatabase database;
         [SerializeField] private Transform visualRoot;
-        [SerializeField] private string eyeAnchorName = "EyeAnchor";
+        [SerializeField] private float visualScale = 1.5f;
 
         private int currentIndex = int.MinValue;
         private GameObject currentVisual;
-        private Transform currentEyeAnchor;
 
         public Transform VisualRoot => visualRoot;
         public GameObject CurrentVisual => currentVisual;
-        public Transform CurrentEyeAnchor => currentEyeAnchor;
 
         public event Action<GameObject, Transform> OnVisualApplied;
 
@@ -52,24 +50,14 @@ namespace ProjectM.Network
             currentVisual = Instantiate(data.gameplayPrefab, visualRoot);
             currentVisual.transform.localPosition = Vector3.zero;
             currentVisual.transform.localRotation = Quaternion.identity;
-            currentVisual.transform.localScale = Vector3.one;
-            currentEyeAnchor = FindEyeAnchor(currentVisual.transform);
+            currentVisual.transform.localScale = Vector3.one * visualScale;
             currentIndex = wrapped;
 
-            OnVisualApplied?.Invoke(currentVisual, currentEyeAnchor);
-        }
-
-        private Transform FindEyeAnchor(Transform root)
-        {
-            if (string.IsNullOrEmpty(eyeAnchorName)) return null;
-            foreach (var t in root.GetComponentsInChildren<Transform>(true))
-                if (t.name == eyeAnchorName) return t;
-            return null;
+            OnVisualApplied?.Invoke(currentVisual, null);
         }
 
         private void ClearVisual()
         {
-            currentEyeAnchor = null;
             if (currentVisual != null)
             {
                 Destroy(currentVisual);

@@ -105,7 +105,7 @@ namespace ProjectM.Player
 
             if (viewCamera == null) return;
             var ray = new Ray(viewCamera.transform.position, viewCamera.transform.forward);
-            if (Physics.Raycast(ray, out RaycastHit hit, range, hitMask, QueryTriggerInteraction.Ignore))
+            if (PlayerRaycastUtility.TryRaycastFromView(transform, ray, out RaycastHit hit, range, hitMask))
             {
                 // 방어 오브젝트(성문/베이스/밭)는 플레이어 공격으로 파괴 불가 — 데미지 적용 안 함
                 bool isDefense = hit.collider.GetComponentInParent<DefenseObject>() != null;

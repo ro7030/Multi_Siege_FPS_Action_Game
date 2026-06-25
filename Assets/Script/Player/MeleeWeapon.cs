@@ -168,10 +168,9 @@ namespace ProjectM.Player
         private void TryRayAssistHit(Vector3 origin, Vector3 fwd, HashSet<IDamageable> hitTargets)
         {
             var ray = new Ray(viewCamera.transform.position, viewCamera.transform.forward);
-            if (!Physics.Raycast(ray, out RaycastHit hit, meleeRange, hitMask, QueryTriggerInteraction.Ignore))
+            if (!PlayerRaycastUtility.TryRaycastFromView(transform, ray, out RaycastHit hit, meleeRange, hitMask))
                 return;
 
-            if (hit.collider.transform.IsChildOf(transform)) return;
             if (hit.collider.GetComponentInParent<DefenseObject>() != null) return;
 
             var dmg = hit.collider.GetComponentInParent<IDamageable>();
