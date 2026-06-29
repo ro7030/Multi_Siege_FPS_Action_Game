@@ -14440,6 +14440,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Network.NetworkFarmManagerBridge
   ShowTopMostFoldoutHeaderGroup: 1
+  session: {fileID: 0}
 --- !u!114 &2088100003
 MonoBehaviour:
   m_ObjectHideFlags: 0

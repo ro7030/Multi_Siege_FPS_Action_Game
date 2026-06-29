@@ -1,5 +1,6 @@
 using System;
 using ProjectM.Auth;
+using ProjectM.Network;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -77,11 +78,15 @@ namespace ProjectM.CharacterSelect
         public void TryStartGame()
         {
             if (!CanStartGame) return;
+
+            var data = _slots[LocalSlotIndex];
+            MatchLoadoutContext.CaptureOffline(data.CharacterIndex);
             OnAllPlayersReady?.Invoke();
         }
 
         public void LeaveRoom()
         {
+            MatchLoadoutContext.Clear();
             if (!string.IsNullOrEmpty(mainMenuSceneName))
             {
                 SceneManager.LoadScene(mainMenuSceneName);

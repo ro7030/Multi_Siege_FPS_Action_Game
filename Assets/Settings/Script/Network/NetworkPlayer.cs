@@ -98,8 +98,12 @@ namespace ProjectM.Network
 
         private static int ResolveCharacterIndex(ulong clientId)
         {
+            if (MatchLoadoutContext.TryGetCharacterIndex(clientId, out int loadoutIndex))
+                return loadoutIndex;
+
             if (CharacterLobbyNetwork.Instance != null)
                 return CharacterLobbyNetwork.Instance.GetCharacterIndexForClient(clientId);
+
             return 0;
         }
 

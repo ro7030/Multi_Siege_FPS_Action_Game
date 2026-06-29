@@ -103,6 +103,25 @@ namespace ProjectM.Network
             }
 
             offlineScenePlayer.SetActive(true);
+            ApplyOfflineCharacterVisual(offlineScenePlayer);
+        }
+
+        private static void ApplyOfflineCharacterVisual(GameObject player)
+        {
+            if (player == null) return;
+
+            var binder = player.GetComponentInChildren<CharacterVisualBinder>(true);
+            if (binder == null) return;
+
+            int index = MatchLoadoutContext.GetOfflineCharacterIndex();
+            binder.ApplyCharacter(index);
+
+            if (binder.CurrentVisual != null)
+            {
+                LocalFirstPersonVisual.ApplyOwnerVisual(binder.CurrentVisual, true);
+                foreach (var cam in player.GetComponentsInChildren<Camera>(true))
+                    LocalFirstPersonVisual.ConfigureLocalCamera(cam, true);
+            }
         }
 
         private bool IsGameplayScene()

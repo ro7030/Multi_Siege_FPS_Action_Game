@@ -62,6 +62,7 @@ namespace ProjectM.Network
             HostLeftViaHome = false;
             LastStatusPayload = default;
             ResetRematchSession();
+            MatchLoadoutContext.Clear();
         }
 
         public static string FormatStatusText()

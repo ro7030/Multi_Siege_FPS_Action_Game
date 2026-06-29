@@ -97,6 +97,7 @@ namespace ProjectM.CharacterSelect
         public async void LeaveRoom()
         {
             UnsubscribeLobby();
+            MatchLoadoutContext.Clear();
 
             if (LobbyRelayService.Instance != null)
                 await LobbyRelayService.Instance.LeaveSessionAsync();

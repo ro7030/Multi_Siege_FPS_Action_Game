@@ -106,6 +106,7 @@ namespace ProjectM.Core
 
         public void ReturnToLobby()
         {
+            MatchLoadoutContext.Clear();
             Phase.ChangePhase(GamePhase.Lobby);
             State.Reset();
         }

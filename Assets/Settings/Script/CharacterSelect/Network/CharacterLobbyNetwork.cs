@@ -244,11 +244,14 @@ namespace ProjectM.CharacterSelect
 
             OnGameStarting?.Invoke();
             if (string.IsNullOrEmpty(gameplaySceneName)) return;
+
+            MatchLoadoutContext.CaptureFromLobby(this);
             NetworkManager.SceneManager.LoadScene(gameplaySceneName, LoadSceneMode.Single);
         }
 
         private void InitializeServerSlots()
         {
+            MatchLoadoutContext.Clear();
             slots.Clear();
             for (int i = 0; i < MaxSlots; i++)
             {
