@@ -3636,10 +3636,12 @@ GameObject:
   - component: {fileID: 487639004}
   - component: {fileID: 487639003}
   - component: {fileID: 487639000}
-  - component: {fileID: 487639006}
   - component: {fileID: 487639007}
   - component: {fileID: 487639008}
   - component: {fileID: 487639009}
+  - component: {fileID: 487639012}
+  - component: {fileID: 487639011}
+  - component: {fileID: 487639010}
   m_Layer: 0
   m_Name: GameManagers
   m_TagString: Untagged
@@ -3796,24 +3798,6 @@ MonoBehaviour:
   session: {fileID: 0}
   farmPrefab: {fileID: 1140569608176417595, guid: eb467faf93422ae4fb26f44b6940daf4, type: 3}
   activeFarmCount: 0
---- !u!114 &487639006
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 487638994}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d1280ba8793112144ade75ab860b67ed, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Data.ResultUploader
-  session: {fileID: 0}
-  wallet: {fileID: 0}
-  stats: {fileID: 0}
-  apiClient: {fileID: 0}
-  resultEndpoint: /sessions/result
-  maxRetryQueueSize: 32
 --- !u!114 &487639007
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3861,6 +3845,57 @@ MonoBehaviour:
   baseUrl: 
   timeoutSeconds: 5
   authToken: 
+--- !u!114 &487639010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 487638994}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1280ba8793112144ade75ab860b67ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Data.ResultUploader
+  session: {fileID: 487638998}
+  wallet: {fileID: 0}
+  stats: {fileID: 487639008}
+  apiClient: {fileID: 0}
+  mysqlSettings: {fileID: 487639012}
+  mysqlRepository: {fileID: 487639011}
+  resultEndpoint: /sessions/result
+  maxRetryQueueSize: 32
+--- !u!114 &487639011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 487638994}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 301c1746abab143d9b2c67f9f607ab8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Data.MySqlSessionRepository
+  settings: {fileID: 487639012}
+  testSaveOnStart: 0
+--- !u!114 &487639012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 487638994}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: edd52deaa31a3443a99bc120715444de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Data.MySqlConnectionSettings
+  server: 127.0.0.1
+  port: 3306
+  userId: game_dev
+  password: game_dev
+  database: multi_siege_fps
 --- !u!1 &501924248
 GameObject:
   m_ObjectHideFlags: 0
