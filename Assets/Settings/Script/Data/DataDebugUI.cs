@@ -4,13 +4,15 @@ using UnityEngine;
 namespace ProjectM.Data
 {
     /// <summary>
-    /// Phase 8 임시 디버그 UI. 누적 통계, API 구성 여부, 로컬 대기 큐 정보를 표시한다.
+    /// Phase 8 임시 디버그 UI. 누적 통계, MySQL/API 구성 여부, 로컬 대기 큐 정보를 표시한다.
     /// </summary>
     public class DataDebugUI : MonoBehaviour
     {
         [SerializeField] private PlayerStatsTracker stats;
         [SerializeField] private ResultUploader uploader;
         [SerializeField] private DbApiClient api;
+        [SerializeField] private MySqlConnectionSettings mysqlSettings;
+        [SerializeField] private MySqlSessionRepository mysqlRepository;
 
         private string apiUrl = "";
 
@@ -19,6 +21,8 @@ namespace ProjectM.Data
             if (stats == null) stats = FindAnyObjectByType<PlayerStatsTracker>();
             if (uploader == null) uploader = FindAnyObjectByType<ResultUploader>();
             if (api == null) api = FindAnyObjectByType<DbApiClient>();
+            if (mysqlSettings == null) mysqlSettings = FindAnyObjectByType<MySqlConnectionSettings>();
+            if (mysqlRepository == null) mysqlRepository = FindAnyObjectByType<MySqlSessionRepository>();
             if (api != null) apiUrl = api.BaseUrl;
         }
 
@@ -28,7 +32,7 @@ namespace ProjectM.Data
             GUI.skin.button.fontSize = 12;
             GUI.skin.textField.fontSize = 12;
 
-            GUILayout.BeginArea(new Rect(380, 320, 380, 300), GUI.skin.box);
+            GUILayout.BeginArea(new Rect(380, 320, 400, 360), GUI.skin.box);
             GUILayout.Label("=== Phase 8 Data Debug ===");
 
             if (stats != null)
@@ -41,6 +45,15 @@ namespace ProjectM.Data
                 GUILayout.Label($"Score    : {stats.FinalScore}");
                 if (GUILayout.Button("Reset Stats")) stats.ResetAll();
             }
+
+            GUILayout.Space(6);
+            GUILayout.Label("-- MySQL --");
+            bool mysqlReady = mysqlSettings != null && mysqlSettings.IsConfigured;
+            GUILayout.Label($"Configured: {mysqlReady}");
+            if (mysqlRepository != null)
+                GUILayout.Label($"Last DB  : {mysqlRepository.LastStatus}");
+            if (uploader != null && uploader.LastSavedSessionResultId > 0)
+                GUILayout.Label($"Saved id : {uploader.LastSavedSessionResultId}");
 
             GUILayout.Space(6);
             GUILayout.Label("-- API --");
@@ -57,15 +70,13 @@ namespace ProjectM.Data
                 GUILayout.Label($"Pending  : {pending}");
                 GUILayout.Label($"File     : {Path.GetFileName(uploader.PendingFilePath)}");
                 GUILayout.BeginHorizontal();
-                if (GUILayout.Button("Test Upload (Cleared)"))
+                if (GUILayout.Button("Test DB Save"))
                     StartCoroutine(uploader.UploadAsync(uploader.BuildSessionResultDto(true)));
                 if (GUILayout.Button("Retry Pending"))
                     StartCoroutine(uploader.RetryPendingAsync());
                 GUILayout.EndHorizontal();
                 if (GUILayout.Button("Open Persistent Folder"))
-                {
                     Application.OpenURL("file://" + Application.persistentDataPath);
-                }
             }
 
             GUILayout.EndArea();

@@ -11,8 +11,8 @@ using ProjectM.Player;
 namespace ProjectM.Data
 {
     /// <summary>
-    /// 매치 종료 시 결과 DTO를 빌드하여 서버에 전송.
-    /// NGO 세션에서는 Host만 업로드. 실패 시 로컬 큐에 저장.
+    /// 매치 종료 시 결과 DTO를 MySQL(1차) 또는 REST API로 저장.
+    /// NGO 세션에서는 Host만 업로드. 실패 시 로컬 JSON 큐에 저장.
     /// </summary>
     public class ResultUploader : MonoBehaviour
     {
@@ -20,15 +20,19 @@ namespace ProjectM.Data
         [SerializeField] private CurrencyWallet wallet;
         [SerializeField] private PlayerStatsTracker stats;
         [SerializeField] private DbApiClient apiClient;
+        [SerializeField] private MySqlConnectionSettings mysqlSettings;
+        [SerializeField] private MySqlSessionRepository mysqlRepository;
 
         [SerializeField] private string resultEndpoint = "/sessions/result";
         [SerializeField] private int maxRetryQueueSize = 32;
 
         public string PendingFilePath => Path.Combine(Application.persistentDataPath, "pending_results.json");
+        public long LastSavedSessionResultId { get; private set; }
 
         public event Action<SessionResultDto> OnUploadSuccess;
         public event Action<SessionResultDto, string> OnUploadFailed;
         public event Action<SessionResultDto> OnSavedLocally;
+        public event Action<SessionResultDto, long> OnSavedToDatabase;
 
         private void Awake()
         {
@@ -36,6 +40,8 @@ namespace ProjectM.Data
             if (wallet == null) wallet = LocalPlayerUtility.FindLocalCurrencyWallet();
             if (stats == null) stats = FindAnyObjectByType<PlayerStatsTracker>();
             if (apiClient == null) apiClient = FindAnyObjectByType<DbApiClient>();
+            if (mysqlSettings == null) mysqlSettings = FindAnyObjectByType<MySqlConnectionSettings>();
+            if (mysqlRepository == null) mysqlRepository = FindAnyObjectByType<MySqlSessionRepository>();
         }
 
         private void OnEnable()
@@ -47,6 +53,9 @@ namespace ProjectM.Data
         {
             if (session != null) session.OnMatchEnded -= HandleMatchEnded;
         }
+
+        public bool IsMySqlConfigured =>
+            mysqlRepository != null && mysqlRepository.IsReady;
 
         private void HandleMatchEnded(bool cleared)
         {
@@ -86,7 +95,11 @@ namespace ProjectM.Data
             if (string.IsNullOrEmpty(lobbyId))
                 return Guid.NewGuid().ToString("N");
 
-            return $"{lobbyId}_{endedAtUtc}";
+            string sessionId = $"{lobbyId}_{endedAtUtc}";
+            if (sessionId.Length <= 64)
+                return sessionId;
+
+            return Guid.NewGuid().ToString("N");
         }
 
         private PlayerStatDto[] BuildPlayerStats()
@@ -134,29 +147,59 @@ namespace ProjectM.Data
 
         public IEnumerator UploadAsync(SessionResultDto dto)
         {
-            if (apiClient == null || !apiClient.IsConfigured)
+            if (IsMySqlConfigured)
             {
-                Debug.LogWarning("[Upload] API 미구성 — 로컬 폴백 저장");
+                bool mysqlDone = false;
+                string mysqlErr = null;
+                long sessionResultId = 0;
+
+                yield return mysqlRepository.SaveSessionResultCoroutine(
+                    dto,
+                    onSuccess: id =>
+                    {
+                        mysqlDone = true;
+                        sessionResultId = id;
+                    },
+                    onError: e => mysqlErr = e);
+
+                if (mysqlDone)
+                {
+                    LastSavedSessionResultId = sessionResultId;
+                    OnSavedToDatabase?.Invoke(dto, sessionResultId);
+                    OnUploadSuccess?.Invoke(dto);
+                    Debug.Log($"[Upload] MySQL 저장 성공 sessionId={dto.sessionId} id={sessionResultId}");
+                    yield break;
+                }
+
+                OnUploadFailed?.Invoke(dto, mysqlErr);
+                Debug.LogWarning($"[Upload] MySQL 저장 실패: {mysqlErr} → 로컬 폴백");
                 SaveLocalFallback(dto);
                 yield break;
             }
 
-            bool done = false; string err = null;
-            yield return apiClient.PostJson(resultEndpoint, dto,
-                onSuccess: _ => { done = true; },
-                onError: e => { err = e; });
+            if (apiClient != null && apiClient.IsConfigured)
+            {
+                bool done = false;
+                string err = null;
+                yield return apiClient.PostJson(resultEndpoint, dto,
+                    onSuccess: _ => { done = true; },
+                    onError: e => { err = e; });
 
-            if (done)
-            {
-                OnUploadSuccess?.Invoke(dto);
-                Debug.Log($"[Upload] 결과 전송 성공 sessionId={dto.sessionId}");
-            }
-            else
-            {
+                if (done)
+                {
+                    OnUploadSuccess?.Invoke(dto);
+                    Debug.Log($"[Upload] API 전송 성공 sessionId={dto.sessionId}");
+                    yield break;
+                }
+
                 OnUploadFailed?.Invoke(dto, err);
-                Debug.LogWarning($"[Upload] 결과 전송 실패: {err} → 로컬 폴백");
+                Debug.LogWarning($"[Upload] API 전송 실패: {err} → 로컬 폴백");
                 SaveLocalFallback(dto);
+                yield break;
             }
+
+            Debug.LogWarning("[Upload] MySQL/API 미구성 — 로컬 폴백 저장");
+            SaveLocalFallback(dto);
         }
 
         public void SaveLocalFallback(SessionResultDto dto)
@@ -197,18 +240,33 @@ namespace ProjectM.Data
 
         public IEnumerator RetryPendingAsync()
         {
-            if (apiClient == null || !apiClient.IsConfigured) yield break;
             var queue = LoadPendingQueue();
             if (queue.Count == 0) yield break;
 
+            if (!IsMySqlConfigured && (apiClient == null || !apiClient.IsConfigured))
+                yield break;
+
             Debug.Log($"[Upload] 대기 중인 {queue.Count}건 재전송 시도");
             var remaining = new List<SessionResultDto>();
+
             foreach (var dto in queue)
             {
                 bool ok = false;
-                yield return apiClient.PostJson(resultEndpoint, dto,
-                    onSuccess: _ => ok = true,
-                    onError: _ => { });
+
+                if (IsMySqlConfigured)
+                {
+                    yield return mysqlRepository.SaveSessionResultCoroutine(
+                        dto,
+                        onSuccess: _ => ok = true,
+                        onError: _ => { });
+                }
+                else
+                {
+                    yield return apiClient.PostJson(resultEndpoint, dto,
+                        onSuccess: _ => ok = true,
+                        onError: _ => { });
+                }
+
                 if (!ok) remaining.Add(dto);
             }
 
