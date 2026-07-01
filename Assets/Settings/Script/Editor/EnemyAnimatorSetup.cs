@@ -1,0 +1,51 @@
+#if UNITY_EDITOR
+using ProjectM.Enemy;
+using UnityEditor;
+using UnityEngine;
+
+namespace ProjectM.EditorTools
+{
+    public static class EnemyAnimatorSetup
+    {
+        private static readonly (string prefabPath, string controllerPath)[] EnemyPrefabs =
+        {
+            ("Assets/Prefab/Enemy/Enemy_Normal.prefab", "Assets/StylizedCharacterPack/Animations/Controllers/MediumController.controller"),
+            ("Assets/Prefab/Enemy/Enemy_Runner.prefab", "Assets/StylizedCharacterPack/Animations/Controllers/MediumController.controller"),
+            ("Assets/Prefab/Enemy/Enemy_Tank.prefab", "Assets/StylizedCharacterPack/Animations/Controllers/MediumController.controller"),
+            ("Assets/Prefab/Enemy/Enemy_DPS.prefab", "Assets/StylizedCharacterPack/Animations/Controllers/SmallController.controller"),
+            ("Assets/Prefab/Enemy/Enemy_Boss.prefab", "Assets/StylizedCharacterPack/Animations/Controllers/BigController.controller"),
+        };
+
+        [MenuItem("Tools/ProjectM/Setup Enemy Animators")]
+        public static void Setup()
+        {
+            foreach (var (prefabPath, controllerPath) in EnemyPrefabs)
+            {
+                var controller = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(controllerPath);
+                if (controller == null)
+                {
+                    Debug.LogWarning($"[EnemyAnimatorSetup] Controller missing: {controllerPath}");
+                    continue;
+                }
+
+                var root = PrefabUtility.LoadPrefabContents(prefabPath);
+                var animator = root.GetComponentInChildren<Animator>(true);
+                if (animator != null)
+                {
+                    animator.runtimeAnimatorController = controller;
+                    animator.applyRootMotion = false;
+                }
+
+                if (root.GetComponent<EnemyAnimator>() == null)
+                    root.AddComponent<EnemyAnimator>();
+
+                PrefabUtility.SaveAsPrefabAsset(root, prefabPath);
+                PrefabUtility.UnloadPrefabContents(root);
+            }
+
+            AssetDatabase.SaveAssets();
+            Debug.Log("[EnemyAnimatorSetup] Enemy animator components configured.");
+        }
+    }
+}
+#endif

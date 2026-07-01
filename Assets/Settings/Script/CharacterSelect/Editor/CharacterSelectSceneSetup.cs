@@ -15,6 +15,7 @@ namespace ProjectM.CharacterSelect.Editor
         private const string ScenePath = "Assets/Scenes/CharacterSelect.unity";
         private const string FontPath = "Assets/Resources/Fonts/Jalnan2/Jalnan2TTF SDF.asset";
         private const string DatabasePath = "Assets/CharacterSelect/CharacterDatabase.asset";
+        private const string PreviewAnimatorControllerPath = "Assets/Animations/Player/PlayerGunAnimator.controller";
 
         private const string ResLeftArrow = "캐릭터 선택/캐릭터선택 좌";
         private const string ResRightArrow = "캐릭터 선택/캐릭터선택 우";
@@ -298,12 +299,15 @@ namespace ProjectM.CharacterSelect.Editor
             for (int i = 0; i < slotViews.Length; i++)
                 anchors[i] = slotViews[i].PreviewAnchor;
 
+            var fallbackController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(PreviewAnimatorControllerPath);
+
             var spawnerSo = new SerializedObject(spawner);
             spawnerSo.FindProperty("database").objectReferenceValue = database;
             spawnerSo.FindProperty("roomServiceBootstrapper").objectReferenceValue = bootstrapper;
             spawnerSo.FindProperty("slotAnchors").arraySize = anchors.Length;
             for (int i = 0; i < anchors.Length; i++)
                 spawnerSo.FindProperty("slotAnchors").GetArrayElementAtIndex(i).objectReferenceValue = anchors[i];
+            spawnerSo.FindProperty("fallbackAnimatorController").objectReferenceValue = fallbackController;
             spawnerSo.ApplyModifiedPropertiesWithoutUndo();
 
             var bootstrapSo = new SerializedObject(bootstrapper);

@@ -43,6 +43,8 @@ namespace ProjectM.Player
         public int CurrentMagazine { get; private set; }
         public int ReserveAmmo => reserveAmmo;
         public bool IsReloading { get; private set; }
+        /// <summary>좌클릭 견착 유지(연발 중 fireRate 쿨다운 제외, 탄창·재장전 조건).</summary>
+        public bool IsAimHeld { get; private set; }
         public bool IsLocalPlayer { get => isLocalPlayer; set => isLocalPlayer = value; }
 
         /// <summary>주무기 슬롯이 활성일 때만 true. PlayerArsenal 이 토글.</summary>
@@ -70,26 +72,27 @@ namespace ProjectM.Player
 
         private void Update()
         {
+            IsAimHeld = false;
             if (!isLocalPlayer) return;
-            if (revive != null && (revive.IsDown || revive.IsDead)) return;
 
             // 재장전 완료는 슬롯이 비활성(보조무기 사용 중)이어도 진행
             if (IsReloading && Time.time >= reloadEndTime) FinishReload();
 
-            if (!IsActive) return; // 보조무기 활성 중이면 주무기 입력 무시
+            if (revive != null && (revive.IsDown || revive.IsDead)) return;
+            if (!IsActive) return;
 
             var mouse = Mouse.current;
             var kb = Keyboard.current;
             if (mouse == null) return;
-
-            // 커서가 잠겨 있을 때만 입력 수신 (디버그 UI 클릭과 충돌 방지)
             if (Cursor.lockState != CursorLockMode.Locked) return;
 
-            // 키트/투척 휠 선택 중이거나 장착 중이면 좌클릭은 그쪽 용도 — 사격 억제
             if (kitEquipper != null && (kitEquipper.IsSelecting || kitEquipper.IsKitEquipped)) return;
             if (throwableEquipper != null && (throwableEquipper.IsSelecting || throwableEquipper.IsThrowableEquipped)) return;
 
-            bool wantsFire = isAutomatic ? mouse.leftButton.isPressed : mouse.leftButton.wasPressedThisFrame;
+            bool wantsAim = mouse.leftButton.isPressed;
+            IsAimHeld = wantsAim && !IsReloading && CurrentMagazine > 0;
+
+            bool wantsFire = isAutomatic ? wantsAim : mouse.leftButton.wasPressedThisFrame;
             if (wantsFire && CanFire()) Fire();
 
             if (kb != null && kb.rKey.wasPressedThisFrame) StartReload();

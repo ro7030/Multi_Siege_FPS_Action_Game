@@ -87,6 +87,10 @@ namespace ProjectM.Network.Editor
                 player.AddComponent<OwnerNetworkTransform>();
             if (player.GetComponent<NetworkPlayer>() == null)
                 player.AddComponent<NetworkPlayer>();
+            if (player.GetComponent<ProjectM.Player.PlayerAnimationController>() == null)
+                player.AddComponent<ProjectM.Player.PlayerAnimationController>();
+            if (player.GetComponent<NetworkPlayerAnimationBridge>() == null)
+                player.AddComponent<NetworkPlayerAnimationBridge>();
         }
 
         private static GameObject SavePlayerPrefab(GameObject player)

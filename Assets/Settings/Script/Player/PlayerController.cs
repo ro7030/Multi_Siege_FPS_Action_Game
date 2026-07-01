@@ -28,6 +28,15 @@ namespace ProjectM.Player
         [Header("로컬 권한")]
         [SerializeField] private bool isLocalPlayer = true; // 원격 플레이어는 입력 무시
 
+        [Header("사격 반동")]
+        [SerializeField] private WeaponController weaponController;
+        [Tooltip("발당 반동으로 카메라가 위로 튀는 각도(도).")]
+        [SerializeField] private float recoilKick = 1.2f;
+        [Tooltip("발당 좌우로 살짝 흔들리는 최대 각도(도).")]
+        [SerializeField] private float recoilRandomYaw = 0.3f;
+        [Tooltip("반동 오프셋이 원래 시점으로 복귀하는 속도(도/초).")]
+        [SerializeField] private float recoilRecoverySpeed = 8f;
+
         private CharacterController cc;
         private HealthSystem health;
         private ReviveSystem revive;
@@ -35,6 +44,8 @@ namespace ProjectM.Player
         private ThrowableEquipper throwableEquipper;
         private Vector3 velocity;
         private float pitch;
+        private float recoilPitchOffset;
+        private float recoilYawOffset;
         private bool canControl = true;
 
         public bool IsLocalPlayer { get => isLocalPlayer; set => isLocalPlayer = value; }
@@ -54,6 +65,8 @@ namespace ProjectM.Player
             revive = GetComponent<ReviveSystem>();
             kitEquipper = GetComponent<KitEquipper>();
             throwableEquipper = GetComponent<ThrowableEquipper>();
+            if (weaponController == null)
+                weaponController = GetComponent<WeaponController>();
             if (cameraPivot == null)
             {
                 var cam = GetComponentInChildren<Camera>();
@@ -71,6 +84,7 @@ namespace ProjectM.Player
                 revive.OnFullDeath += HandleFullDeath;
                 SyncControlFromRevive();
             }
+            if (weaponController != null) weaponController.OnFired += HandleFired;
             if (isLocalPlayer && lockCursor) SetCursorLocked(true);
         }
 
@@ -83,6 +97,7 @@ namespace ProjectM.Player
                 revive.OnRevived -= HandleRevived;
                 revive.OnFullDeath -= HandleFullDeath;
             }
+            if (weaponController != null) weaponController.OnFired -= HandleFired;
             if (isLocalPlayer) SetCursorLocked(false);
         }
 
@@ -101,6 +116,13 @@ namespace ProjectM.Player
         private void HandleFullDeath() => canControl = false;
         private void HandleRevived() => canControl = true;
 
+        private void HandleFired()
+        {
+            if (!isLocalPlayer) return;
+            recoilPitchOffset -= recoilKick;
+            recoilYawOffset += UnityEngine.Random.Range(-recoilRandomYaw, recoilRandomYaw);
+        }
+
         private void SyncControlFromRevive()
         {
             if (revive == null) return;
@@ -113,8 +135,16 @@ namespace ProjectM.Player
             if (UIInputModal.IsBlockingGameplayInput) return;
 
             HandleCursorInput();
+            HandleRecoilRecovery();
             HandleLook();
             HandleMove();
+        }
+
+        private void HandleRecoilRecovery()
+        {
+            float recovery = recoilRecoverySpeed * Time.deltaTime;
+            recoilPitchOffset = Mathf.MoveTowards(recoilPitchOffset, 0f, recovery);
+            recoilYawOffset = Mathf.MoveTowards(recoilYawOffset, 0f, recovery);
         }
 
         private void HandleCursorInput()
@@ -149,7 +179,9 @@ namespace ProjectM.Player
             transform.Rotate(0f, delta.x, 0f, Space.Self);
 
             pitch = Mathf.Clamp(pitch - delta.y, minPitch, maxPitch);
-            cameraPivot.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+
+            float appliedPitch = Mathf.Clamp(pitch + recoilPitchOffset, minPitch, maxPitch);
+            cameraPivot.localRotation = Quaternion.Euler(appliedPitch, recoilYawOffset, 0f);
         }
 
         private void HandleMove()
