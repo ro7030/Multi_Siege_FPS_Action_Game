@@ -43,6 +43,7 @@ namespace ProjectM.Player
 
         private float nextAttackTime;
         private ReviveSystem revive;
+        private PlayerAttachedWeaponVisual attachedVisual;
 
         private void Awake()
         {
@@ -50,6 +51,7 @@ namespace ProjectM.Player
             if (kitEquipper == null) kitEquipper = GetComponent<KitEquipper>();
             if (throwableEquipper == null) throwableEquipper = GetComponent<ThrowableEquipper>();
             revive = GetComponent<ReviveSystem>();
+            attachedVisual = GetComponent<PlayerAttachedWeaponVisual>();
         }
 
         private void ResolveViewCamera()
@@ -79,6 +81,14 @@ namespace ProjectM.Player
 
         private void SwapViewModel(GameObject prefab)
         {
+            if (attachedVisual != null && attachedVisual.UseAttachedWeapons)
+            {
+                if (viewModelInstance != null) Destroy(viewModelInstance);
+                viewModelInstance = null;
+                attachedVisual.RefreshPresentation();
+                return;
+            }
+
             if (viewModelInstance != null) Destroy(viewModelInstance);
             viewModelInstance = null;
 
@@ -87,10 +97,17 @@ namespace ProjectM.Player
             viewModelInstance = Instantiate(prefab, viewModelSocket);
             viewModelInstance.transform.localPosition = Vector3.zero;
             viewModelInstance.transform.localRotation = Quaternion.identity;
+            viewModelInstance.SetActive(IsActive);
         }
 
         public void SetViewModelVisible(bool visible)
         {
+            if (attachedVisual != null && attachedVisual.UseAttachedWeapons)
+            {
+                attachedVisual.RefreshPresentation();
+                return;
+            }
+
             if (viewModelInstance != null) viewModelInstance.SetActive(visible);
         }
 

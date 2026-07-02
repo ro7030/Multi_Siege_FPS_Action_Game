@@ -11,6 +11,8 @@ namespace ProjectM.Network
     /// </summary>
     public class CharacterVisualBinder : MonoBehaviour
     {
+        public const string HandEquipmentSocketName = "Hand_r_equipment";
+
         [SerializeField] private CharacterDatabase database;
         [SerializeField] private Transform visualRoot;
         [SerializeField] private float visualScale = 1.5f;
@@ -20,6 +22,7 @@ namespace ProjectM.Network
 
         public Transform VisualRoot => visualRoot;
         public GameObject CurrentVisual => currentVisual;
+        public Transform HandEquipmentSocket { get; private set; }
 
         public event Action<GameObject, Transform> OnVisualApplied;
 
@@ -53,11 +56,29 @@ namespace ProjectM.Network
             currentVisual.transform.localScale = Vector3.one * visualScale;
             currentIndex = wrapped;
 
-            OnVisualApplied?.Invoke(currentVisual, null);
+            CacheHandEquipmentSocket(currentVisual);
+            OnVisualApplied?.Invoke(currentVisual, HandEquipmentSocket);
+        }
+
+        private void CacheHandEquipmentSocket(GameObject visual)
+        {
+            HandEquipmentSocket = null;
+            if (visual == null) return;
+
+            foreach (var t in visual.GetComponentsInChildren<Transform>(true))
+            {
+                if (t.name != HandEquipmentSocketName) continue;
+                HandEquipmentSocket = t;
+                return;
+            }
+
+            Debug.LogWarning($"[{nameof(CharacterVisualBinder)}] '{HandEquipmentSocketName}' 소켓 없음 — visual={visual.name}", this);
         }
 
         private void ClearVisual()
         {
+            HandEquipmentSocket = null;
+
             if (currentVisual != null)
             {
                 Destroy(currentVisual);

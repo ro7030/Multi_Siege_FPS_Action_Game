@@ -40,6 +40,7 @@ namespace ProjectM.Player
         [SerializeField] private Transform viewModelSocket;
         private GameObject viewModelInstance;
         private ThrowableType viewModelType = ThrowableType.None;
+        private PlayerAttachedWeaponVisual attachedVisual;
 
         [Header("입력")]
         [SerializeField] private bool isLocalPlayer = true;
@@ -79,6 +80,7 @@ namespace ProjectM.Player
             if (inventory == null) inventory = GetComponent<ThrowableInventory>();
             if (viewCamera == null) viewCamera = GetComponentInChildren<Camera>();
             if (kitEquipper == null) kitEquipper = GetComponent<KitEquipper>();
+            attachedVisual = GetComponent<PlayerAttachedWeaponVisual>();
         }
 
         private void OnEnable()
@@ -164,6 +166,15 @@ namespace ProjectM.Player
 
         private void SwapHeldViewModel(ThrowableType type)
         {
+            if (attachedVisual != null && attachedVisual.UseAttachedWeapons)
+            {
+                if (viewModelInstance != null) Destroy(viewModelInstance);
+                viewModelInstance = null;
+                viewModelType = type;
+                attachedVisual.RefreshPresentation();
+                return;
+            }
+
             if (viewModelType == type && viewModelInstance != null) return;
 
             if (viewModelInstance != null) Destroy(viewModelInstance);

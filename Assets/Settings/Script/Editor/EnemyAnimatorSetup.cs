@@ -7,9 +7,10 @@ namespace ProjectM.EditorTools
 {
     public static class EnemyAnimatorSetup
     {
+        // Enemy_Normal(고블린)은 GoblinAnimatorBuilder.cs 가 전담한다 (Tools/ProjectM/Build Goblin Animator).
+        // 이 목록에 다시 포함시키면 MediumController(Rabbit 리그)로 덮어써져 고블린 걸음 애니가 깨진다.
         private static readonly (string prefabPath, string controllerPath)[] EnemyPrefabs =
         {
-            ("Assets/Prefab/Enemy/Enemy_Normal.prefab", "Assets/StylizedCharacterPack/Animations/Controllers/MediumController.controller"),
             ("Assets/Prefab/Enemy/Enemy_Runner.prefab", "Assets/StylizedCharacterPack/Animations/Controllers/MediumController.controller"),
             ("Assets/Prefab/Enemy/Enemy_Tank.prefab", "Assets/StylizedCharacterPack/Animations/Controllers/MediumController.controller"),
             ("Assets/Prefab/Enemy/Enemy_DPS.prefab", "Assets/StylizedCharacterPack/Animations/Controllers/SmallController.controller"),

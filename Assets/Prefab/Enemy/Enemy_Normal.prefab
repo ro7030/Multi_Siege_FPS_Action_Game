@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 9100000000000000003}
   - component: {fileID: 9100000000000000004}
   - component: {fileID: 9100000000000000005}
+  - component: {fileID: 7622116242284705613}
   m_Layer: 0
   m_Name: Enemy_Normal
   m_TagString: Untagged
@@ -233,6 +234,20 @@ MonoBehaviour:
   ai: {fileID: 6241858638892478513}
   agent: {fileID: 4135788597337990346}
   animator: {fileID: 0}
+  animBridge: {fileID: 0}
+--- !u!114 &7622116242284705613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9125259333789829230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f05ecf4206c9542a1b815254c8b1bbbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Network.NetworkEnemyAnimationBridge
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1001 &1708713748386148731
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -284,10 +299,42 @@ PrefabInstance:
     - target: {fileID: 1549704670063745121, guid: 044a6c749f52fff4fa7f6eee255d74f6, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: e17d7f68d6344554193eaddbd513d5ee, type: 2}
+      objectReference: {fileID: 9100000, guid: c0fd2fcd7faeb412b9ba725fce7cecbf, type: 2}
     - target: {fileID: 1902838328966055547, guid: 044a6c749f52fff4fa7f6eee255d74f6, type: 3}
       propertyPath: m_Name
       value: PFB_Basic_Goblin
+      objectReference: {fileID: 0}
+    - target: {fileID: 2276534852518530001, guid: 044a6c749f52fff4fa7f6eee255d74f6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5103362
+      objectReference: {fileID: 0}
+    - target: {fileID: 2276534852518530001, guid: 044a6c749f52fff4fa7f6eee255d74f6, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.60221153
+      objectReference: {fileID: 0}
+    - target: {fileID: 2276534852518530001, guid: 044a6c749f52fff4fa7f6eee255d74f6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.38456932
+      objectReference: {fileID: 0}
+    - target: {fileID: 2276534852518530001, guid: 044a6c749f52fff4fa7f6eee255d74f6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.47854424
+      objectReference: {fileID: 0}
+    - target: {fileID: 5255362396085891314, guid: 044a6c749f52fff4fa7f6eee255d74f6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5103362
+      objectReference: {fileID: 0}
+    - target: {fileID: 5255362396085891314, guid: 044a6c749f52fff4fa7f6eee255d74f6, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.60221153
+      objectReference: {fileID: 0}
+    - target: {fileID: 5255362396085891314, guid: 044a6c749f52fff4fa7f6eee255d74f6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.38456932
+      objectReference: {fileID: 0}
+    - target: {fileID: 5255362396085891314, guid: 044a6c749f52fff4fa7f6eee255d74f6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.47854424
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 4213232506160068849, guid: 044a6c749f52fff4fa7f6eee255d74f6, type: 3}

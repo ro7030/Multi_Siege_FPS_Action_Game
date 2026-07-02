@@ -48,6 +48,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8557203427919007493, guid: 0619b4f784b9fca4b997798c15670c42, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5103362
+      objectReference: {fileID: 0}
+    - target: {fileID: -8557203427919007493, guid: 0619b4f784b9fca4b997798c15670c42, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.60221153
+      objectReference: {fileID: 0}
+    - target: {fileID: -8557203427919007493, guid: 0619b4f784b9fca4b997798c15670c42, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.38456932
+      objectReference: {fileID: 0}
+    - target: {fileID: -8557203427919007493, guid: 0619b4f784b9fca4b997798c15670c42, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.47854424
+      objectReference: {fileID: 0}
     - target: {fileID: -3324899161423266846, guid: 0619b4f784b9fca4b997798c15670c42, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -64,6 +80,22 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: d69524f8bf6810c4c9420f88a71ac598, type: 2}
+    - target: {fileID: 6793566720875105240, guid: 0619b4f784b9fca4b997798c15670c42, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5103362
+      objectReference: {fileID: 0}
+    - target: {fileID: 6793566720875105240, guid: 0619b4f784b9fca4b997798c15670c42, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.60221153
+      objectReference: {fileID: 0}
+    - target: {fileID: 6793566720875105240, guid: 0619b4f784b9fca4b997798c15670c42, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.38456932
+      objectReference: {fileID: 0}
+    - target: {fileID: 6793566720875105240, guid: 0619b4f784b9fca4b997798c15670c42, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.47854424
+      objectReference: {fileID: 0}
     - target: {fileID: 6860641434701783778, guid: 0619b4f784b9fca4b997798c15670c42, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -94,7 +126,7 @@ Animator:
   m_GameObject: {fileID: 1902838328966055547}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 99ba10d9babc3c44bb73c379035ab563, type: 2}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: c0fd2fcd7faeb412b9ba725fce7cecbf, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

@@ -24,6 +24,11 @@ namespace ProjectM.Player
         public Sprite icon;   // UI 표시용 (상점 상세 등)
         [Tooltip("1인칭 카메라 자식 소켓에 인스턴스화되는 3D 모델 프리팹.")]
         public GameObject viewModelPrefab;
+        [Tooltip("3인칭 몽키 손에 붙일 모델. 비어있으면 viewModelPrefab을 사용한다.")]
+        public GameObject worldModelPrefab;
+
+        public GameObject ResolveWorldModelPrefab() =>
+            worldModelPrefab != null ? worldModelPrefab : viewModelPrefab;
 
         [Header("원거리 (Ranged 전용)")]
         public float fireRate = 5f;       // 초당 발사

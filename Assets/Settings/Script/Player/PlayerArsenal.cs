@@ -105,17 +105,21 @@ namespace ProjectM.Player
         // ── 슬롯 전환 ─────────────────────────────────────────────
         public void SetActiveSlot(WeaponSlot slot)
         {
-            ActiveSlot = slot;
+            ApplyActiveSlotLocal(slot, holsterItems: true);
 
-            // 무기로 전환하면 키트/투척은 내려놓음
-            if (kitEquipper != null) kitEquipper.Holster();
-            if (throwableEquipper != null) throwableEquipper.Holster();
+            if (isLocalPlayer
+                && TryGetComponent<NetworkPlayerArsenal>(out var netArsenal)
+                && NetworkSessionHelper.IsMultiplayerSession
+                && netArsenal.IsSpawned)
+            {
+                netArsenal.OwnerPublishActiveSlot(slot);
+            }
+        }
 
-            SyncWeaponInputState();
-            SyncWeaponViewModels();
-
-            OnSlotChanged?.Invoke(slot);
-            Debug.Log($"[Arsenal] 슬롯 전환: {slot}");
+        /// <summary>네트워크 미러용. NGO 재전파 없이 ActiveSlot·표시만 갱신.</summary>
+        public void MirrorActiveSlot(WeaponSlot slot)
+        {
+            ApplyActiveSlotLocal(slot, holsterItems: false);
         }
 
         // ── 업그레이드 조회/실행 ──────────────────────────────────
@@ -177,8 +181,15 @@ namespace ProjectM.Player
             return true;
         }
 
-        /// <summary>ActiveSlot 기준 IsActive만 재동기화(Holster·뷰모델 없음).</summary>
-        private void ResyncWeaponActivation() => SyncWeaponInputState();
+        /// <summary>ActiveSlot 기준 IsActive·1인칭 뷰모델 재동기화.</summary>
+        private void ResyncWeaponActivation()
+        {
+            SyncWeaponInputState();
+            SyncWeaponViewModels();
+        }
+
+        /// <summary>네트워크 스폰·티어 변경 후 외부에서 표시 상태를 재동기화.</summary>
+        public void ResyncWeaponPresentation() => ResyncWeaponActivation();
 
         public int GetTierPrice(WeaponSlot slot, int tierIndex)
         {
@@ -211,6 +222,26 @@ namespace ProjectM.Player
             bool kitOn       = kitEquipper       != null && kitEquipper.IsKitEquipped;
             bool throwableOn = throwableEquipper != null && throwableEquipper.IsThrowableEquipped;
             return !kitOn && !throwableOn;
+        }
+
+        public bool AreWeaponsVisible() => AreWeaponsInputAllowed();
+
+        private void ApplyActiveSlotLocal(WeaponSlot slot, bool holsterItems)
+        {
+            ActiveSlot = slot;
+
+            if (holsterItems)
+            {
+                if (kitEquipper != null) kitEquipper.Holster();
+                if (throwableEquipper != null) throwableEquipper.Holster();
+            }
+
+            SyncWeaponInputState();
+            SyncWeaponViewModels();
+            OnSlotChanged?.Invoke(slot);
+
+            if (holsterItems)
+                Debug.Log($"[Arsenal] 슬롯 전환: {slot}");
         }
 
         /// <summary>ActiveSlot + 키트/투척 상태 기준으로 IsActive만 갱신(유일한 진입점).</summary>

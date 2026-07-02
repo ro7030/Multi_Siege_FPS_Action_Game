@@ -14,6 +14,9 @@ namespace ProjectM.EditorTools
         private const string ChibiAvatarPath = "Assets/Suriyun/Pspsps/FBX/Characters/Chibi_Monkey.fbx";
         private const string ControllerPath = "Assets/Animations/Player/PlayerGunAnimator.controller";
 
+        /// <summary>Idle/Walk ↔ Run 전환 기준 속도(m/s). walkSpeed 5 / sprintSpeed 8의 중간값.</summary>
+        private const float SwordSprintSpeedThreshold = 6.5f;
+
         private static readonly (string assetPath, string clipName, bool loop)[] ClipSources =
         {
             ("Assets/Resources/Monkey Gun Ani/X Bot@Rifle Idle.fbx", "Idle", true),
@@ -22,6 +25,11 @@ namespace ProjectM.EditorTools
             ("Assets/Resources/Monkey Gun Ani/X Bot@Gunplay.fbx", "GunPlay", false),
             ("Assets/Resources/Monkey Gun Ani/X Bot@Reloading.fbx", "Reloading", false),
             ("Assets/Resources/Monkey Gun Ani/X Bot@Throw.fbx", "Throw", false),
+            ("Assets/Resources/Monkey Sword Ani/X Bot@Great Sword Idle.fbx", "SwordIdle", true),
+            ("Assets/Resources/Monkey Sword Ani/X Bot@Sword And Shield Walk.fbx", "SwordWalk", true),
+            ("Assets/Resources/Monkey Sword Ani/X Bot@Sword And Shield Run.fbx", "SwordRun", true),
+            ("Assets/Resources/Monkey Sword Ani/X Bot@Great Sword Jump.fbx", "SwordJump", false),
+            ("Assets/Resources/Monkey Sword Ani/X Bot@Great Sword Slash.fbx", "SwordAttack", false),
         };
 
         private static readonly string[] ChibiPrefabPaths =
@@ -136,6 +144,8 @@ namespace ProjectM.EditorTools
             AddParameter(controller, "Reload", AnimatorControllerParameterType.Trigger);
             AddParameter(controller, "IsReloading", AnimatorControllerParameterType.Bool);
             AddParameter(controller, "Throw", AnimatorControllerParameterType.Trigger);
+            AddParameter(controller, "IsMelee", AnimatorControllerParameterType.Bool);
+            AddParameter(controller, "Attack", AnimatorControllerParameterType.Trigger);
 
             var root = controller.layers[0].stateMachine;
             var idle = AddMotionState(root, "Idle", clips["Idle"], new Vector3(300, 0, 0));
@@ -144,6 +154,12 @@ namespace ProjectM.EditorTools
             var gunPlay = AddMotionState(root, "GunPlay", clips["GunPlay"], new Vector3(550, 180, 0));
             var reloading = AddMotionState(root, "Reloading", clips["Reloading"], new Vector3(550, 300, 0));
             var throwing = AddMotionState(root, "Throw", clips["Throw"], new Vector3(300, 420, 0));
+
+            var swordIdle = AddMotionState(root, "SwordIdle", clips["SwordIdle"], new Vector3(900, 0, 0));
+            var swordWalk = AddMotionState(root, "SwordWalk", clips["SwordWalk"], new Vector3(900, 120, 0));
+            var swordRun = AddMotionState(root, "SwordRun", clips["SwordRun"], new Vector3(900, 240, 0));
+            var swordJump = AddMotionState(root, "SwordJump", clips["SwordJump"], new Vector3(1150, 60, 0));
+            var swordAttack = AddMotionState(root, "SwordAttack", clips["SwordAttack"], new Vector3(1150, 180, 0));
 
             root.defaultState = idle;
 
@@ -167,7 +183,40 @@ namespace ProjectM.EditorTools
             AddTriggerTransition(idle, throwing, "Throw");
             AddTriggerTransition(run, throwing, "Throw");
             AddTriggerTransition(gunPlay, throwing, "Throw");
-            AddExitTransition(throwing, idle, 0.9f);
+            AddTriggerTransition(swordIdle, throwing, "Throw");
+            AddTriggerTransition(swordWalk, throwing, "Throw");
+            AddTriggerTransition(swordRun, throwing, "Throw");
+            AddExitTransitionWithBoolCondition(throwing, idle, 0.9f, "IsMelee", false);
+            AddExitTransitionWithBoolCondition(throwing, swordIdle, 0.9f, "IsMelee", true);
+
+            // ── 총 ↔ 검 브랜치 전환 (IsMelee 게이팅) ──
+            AddBoolTransition(idle, swordIdle, "IsMelee", true);
+            AddBoolTransition(swordIdle, idle, "IsMelee", false);
+
+            AddMultiConditionTransition(run, swordWalk,
+                (AnimatorConditionMode.If, 0f, "IsMelee"),
+                (AnimatorConditionMode.Less, SwordSprintSpeedThreshold, "Speed"));
+            AddMultiConditionTransition(run, swordRun,
+                (AnimatorConditionMode.If, 0f, "IsMelee"),
+                (AnimatorConditionMode.Greater, SwordSprintSpeedThreshold - 0.001f, "Speed"));
+            AddBoolTransition(swordWalk, run, "IsMelee", false);
+            AddBoolTransition(swordRun, run, "IsMelee", false);
+
+            // ── 검 자체 로코모션 (Idle → Walk → Run 3단) ──
+            AddTransition(swordIdle, swordWalk, AnimatorConditionMode.Greater, "Speed", 0.1f);
+            AddTransition(swordWalk, swordIdle, AnimatorConditionMode.Less, "Speed", 0.1f);
+            AddTransition(swordWalk, swordRun, AnimatorConditionMode.Greater, "Speed", SwordSprintSpeedThreshold);
+            AddTransition(swordRun, swordWalk, AnimatorConditionMode.Less, "Speed", SwordSprintSpeedThreshold);
+
+            AddBoolTransition(swordIdle, swordJump, "Grounded", false);
+            AddBoolTransition(swordWalk, swordJump, "Grounded", false);
+            AddBoolTransition(swordRun, swordJump, "Grounded", false);
+            AddBoolTransition(swordJump, swordIdle, "Grounded", true);
+
+            AddTriggerTransition(swordIdle, swordAttack, "Attack");
+            AddTriggerTransition(swordWalk, swordAttack, "Attack");
+            AddTriggerTransition(swordRun, swordAttack, "Attack");
+            AddExitTransition(swordAttack, swordIdle, 0.85f);
         }
 
         private static void AssignControllerToChibiPrefabs()
@@ -285,6 +334,33 @@ namespace ProjectM.EditorTools
             transition.hasExitTime = true;
             transition.exitTime = exitTime;
             transition.duration = 0.1f;
+        }
+
+        private static void AddExitTransitionWithBoolCondition(
+            AnimatorState from,
+            AnimatorState to,
+            float exitTime,
+            string param,
+            bool value)
+        {
+            var transition = from.AddTransition(to);
+            transition.hasExitTime = true;
+            transition.exitTime = exitTime;
+            transition.duration = 0.1f;
+            transition.AddCondition(value ? AnimatorConditionMode.If : AnimatorConditionMode.IfNot, 0f, param);
+        }
+
+        /// <summary>여러 조건을 모두 만족해야(AND) 전이되는 전환을 추가한다.</summary>
+        private static void AddMultiConditionTransition(
+            AnimatorState from,
+            AnimatorState to,
+            params (AnimatorConditionMode mode, float threshold, string param)[] conditions)
+        {
+            var transition = from.AddTransition(to);
+            transition.hasExitTime = false;
+            transition.duration = 0.1f;
+            foreach (var (mode, threshold, param) in conditions)
+                transition.AddCondition(mode, threshold, param);
         }
 
         private static void EnsureFolder(string path)

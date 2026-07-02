@@ -72,6 +72,7 @@ namespace ProjectM.Player
         [SerializeField] private KitHeldVisual[] heldViewModels;
         private GameObject viewModelInstance;
         private KitType viewModelType = KitType.None;
+        private PlayerAttachedWeaponVisual attachedVisual;
 
         [Serializable]
         public struct KitHeldVisual
@@ -102,6 +103,7 @@ namespace ProjectM.Player
             if (viewCamera == null) viewCamera = GetComponentInChildren<Camera>();
             if (playerHealth == null) playerHealth = GetComponent<HealthSystem>();
             if (throwableEquipper == null) throwableEquipper = GetComponent<ThrowableEquipper>();
+            attachedVisual = GetComponent<PlayerAttachedWeaponVisual>();
         }
 
         private void OnEnable()
@@ -206,6 +208,15 @@ namespace ProjectM.Player
 
         private void SwapHeldViewModel(KitType type)
         {
+            if (attachedVisual != null && attachedVisual.UseAttachedWeapons)
+            {
+                if (viewModelInstance != null) Destroy(viewModelInstance);
+                viewModelInstance = null;
+                viewModelType = type;
+                attachedVisual.RefreshPresentation();
+                return;
+            }
+
             if (viewModelType == type && viewModelInstance != null) return;
 
             if (viewModelInstance != null) Destroy(viewModelInstance);
@@ -222,6 +233,8 @@ namespace ProjectM.Player
             viewModelInstance.transform.localRotation = Quaternion.identity;
             viewModelType = type;
         }
+
+        public GameObject GetHeldViewModelPrefab(KitType type) => GetHeldPrefab(type);
 
         private GameObject GetHeldPrefab(KitType type)
         {

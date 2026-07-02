@@ -34,6 +34,7 @@ Transform:
   m_Children:
   - {fileID: 5424259374410102990}
   - {fileID: 8724971255838169413}
+  - {fileID: 5424259374410102992}
   m_Father: {fileID: 5975870485403521752}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &5686380502176844567
@@ -201,6 +202,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5074678034640525258}
   m_LocalEulerAnglesHint: {x: -39.7, y: -111.42, z: -5.2}
+--- !u!1 &3747066551491500362
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5424259374410102992}
+  m_Layer: 0
+  m_Name: ThrowableSocket
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5424259374410102992
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3747066551491500362}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -0.043619405, z: 0, w: 0.9990483}
+  m_LocalPosition: {x: 0.15, y: -0.28, z: 0.86}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5074678034640525258}
+  m_LocalEulerAnglesHint: {x: 0, y: -5, z: 0}
 --- !u!1 &7205131818524043760
 GameObject:
   m_ObjectHideFlags: 0
@@ -283,6 +315,8 @@ GameObject:
   - component: {fileID: 9200000000000000009}
   - component: {fileID: 9200000000000000010}
   - component: {fileID: 9200000000000000011}
+  - component: {fileID: 9200000000000000012}
+  - component: {fileID: 9200000000000000013}
   m_Layer: 0
   m_Name: NetworkPlayer
   m_TagString: Player
@@ -806,6 +840,7 @@ MonoBehaviour:
   characterController: {fileID: 2638820265281733691}
   weaponController: {fileID: 6331050007943407383}
   throwableEquipper: {fileID: 0}
+  meleeWeapon: {fileID: 0}
   visualBinder: {fileID: 8269778327862469331}
   animBridge: {fileID: 9200000000000000011}
   fallbackAnimatorController: {fileID: 9100000, guid: 69f9a31efffd43b6a3eead1bebe594e4, type: 2}
@@ -822,3 +857,48 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Network.NetworkPlayerAnimationBridge
   ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &9200000000000000012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8514623158254487877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b03e890a032416baa16263b1d7a87ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.PlayerAttachedWeaponVisual
+  useAttachedWeapons: 1
+  arsenal: {fileID: 4579525695095911832}
+  visualBinder: {fileID: 8269778327862469331}
+  kitEquipper: {fileID: 8841444830580655268}
+  throwableEquipper: {fileID: 1250960470891422125}
+  rangedLocalPosition: {x: 0.02, y: 0.04, z: 0.08}
+  rangedLocalEuler: {x: -10, y: 90, z: 0}
+  rangedLocalScale: {x: 0.6, y: 0.6, z: 0.6}
+  meleeLocalPosition: {x: 0.04, y: 0.02, z: 0.06}
+  meleeLocalEuler: {x: 0, y: 90, z: 0}
+  meleeLocalScale: {x: 0.7, y: 0.7, z: 0.7}
+  heldLocalPosition: {x: 0.03, y: 0.03, z: 0.07}
+  heldLocalEuler: {x: -5, y: 90, z: 0}
+  heldLocalScale: {x: 0.55, y: 0.55, z: 0.55}
+--- !u!114 &9200000000000000013
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8514623158254487877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cafd14702a144b1957e1c7626e0dc64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.PlayerFirstPersonWeaponAligner
+  attachedVisual: {fileID: 9200000000000000012}
+  primarySocket: {fileID: 5424259374410102990}
+  meleeSocket: {fileID: 8724971255838169413}
+  kitSocket: {fileID: 0}
+  throwableSocket: {fileID: 5424259374410102992}
+  throwableEquipper: {fileID: 1250960470891422125}
+  throwableFirstPersonLocalOffset: {x: 0, y: 0.18, z: 0.03}

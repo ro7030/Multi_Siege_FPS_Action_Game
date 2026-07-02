@@ -75,6 +75,9 @@ namespace ProjectM.Network.Editor
 
             if (go.GetComponent<NetworkDamageBridge>() == null)
                 go.AddComponent<NetworkDamageBridge>();
+
+            if (go.GetComponent<NetworkEnemyAnimationBridge>() == null)
+                go.AddComponent<NetworkEnemyAnimationBridge>();
         }
 
         private static void RegisterDefaultNetworkPrefab(GameObject prefab)

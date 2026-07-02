@@ -17,10 +17,13 @@ namespace ProjectM.Player
         private static readonly int ReloadHash = Animator.StringToHash("Reload");
         private static readonly int IsReloadingHash = Animator.StringToHash("IsReloading");
         private static readonly int ThrowHash = Animator.StringToHash("Throw");
+        private static readonly int IsMeleeHash = Animator.StringToHash("IsMelee");
+        private static readonly int AttackHash = Animator.StringToHash("Attack");
 
         [SerializeField] private CharacterController characterController;
         [SerializeField] private WeaponController weaponController;
         [SerializeField] private ThrowableEquipper throwableEquipper;
+        [SerializeField] private MeleeWeapon meleeWeapon;
         [SerializeField] private CharacterVisualBinder visualBinder;
         [SerializeField] private NetworkPlayerAnimationBridge animBridge;
         [Tooltip("visual 프리팹의 Animator에 Controller가 비어있을 때 강제로 채워 넣을 안전망.")]
@@ -49,6 +52,8 @@ namespace ProjectM.Player
                 weaponController = GetComponent<WeaponController>();
             if (throwableEquipper == null)
                 throwableEquipper = GetComponent<ThrowableEquipper>();
+            if (meleeWeapon == null)
+                meleeWeapon = GetComponent<MeleeWeapon>();
             if (visualBinder == null)
                 visualBinder = GetComponentInChildren<CharacterVisualBinder>(true);
             if (animBridge == null)
@@ -69,10 +74,14 @@ namespace ProjectM.Player
             if (throwableEquipper != null)
                 throwableEquipper.OnThrown += HandleThrown;
 
+            if (meleeWeapon != null)
+                meleeWeapon.OnAttack += HandleMeleeAttack;
+
             if (animBridge != null)
             {
                 animBridge.OnSyncedStateChanged += HandleSyncedStateChanged;
                 animBridge.OnThrowRequested += HandleThrowSynced;
+                animBridge.OnAttackRequested += HandleAttackSynced;
             }
 
             TryBindExistingVisual();
@@ -92,10 +101,14 @@ namespace ProjectM.Player
             if (throwableEquipper != null)
                 throwableEquipper.OnThrown -= HandleThrown;
 
+            if (meleeWeapon != null)
+                meleeWeapon.OnAttack -= HandleMeleeAttack;
+
             if (animBridge != null)
             {
                 animBridge.OnSyncedStateChanged -= HandleSyncedStateChanged;
                 animBridge.OnThrowRequested -= HandleThrowSynced;
+                animBridge.OnAttackRequested -= HandleAttackSynced;
             }
 
             hasForcedInitialPublish = false;
@@ -119,7 +132,8 @@ namespace ProjectM.Player
                             state.Grounded,
                             state.VerticalSpeed,
                             state.IsAiming,
-                            state.IsReloading);
+                            state.IsReloading,
+                            state.IsMelee);
                         hasForcedInitialPublish = true;
                     }
                     else
@@ -129,7 +143,8 @@ namespace ProjectM.Player
                             state.Grounded,
                             state.VerticalSpeed,
                             state.IsAiming,
-                            state.IsReloading);
+                            state.IsReloading,
+                            state.IsMelee);
                     }
                 }
             }
@@ -167,6 +182,21 @@ namespace ProjectM.Player
         {
             if (UseRemoteDriver)
                 animator?.SetTrigger(ThrowHash);
+        }
+
+        private void HandleMeleeAttack()
+        {
+            if (!UseLocalDriver) return;
+
+            animator?.SetTrigger(AttackHash);
+            if (animBridge != null && animBridge.IsSpawned && animBridge.IsOwner)
+                animBridge.PublishAttack();
+        }
+
+        private void HandleAttackSynced()
+        {
+            if (UseRemoteDriver)
+                animator?.SetTrigger(AttackHash);
         }
 
         private void TryBindExistingVisual()
@@ -217,8 +247,9 @@ namespace ProjectM.Player
             float verticalSpeed = ResolveVerticalSpeed();
             bool isAiming = weaponController != null && weaponController.IsAimHeld;
             bool isReloading = weaponController != null && weaponController.IsReloading;
+            bool isMelee = meleeWeapon != null && meleeWeapon.IsActive;
 
-            return new AnimState(speed, grounded, verticalSpeed, isAiming, isReloading);
+            return new AnimState(speed, grounded, verticalSpeed, isAiming, isReloading, isMelee);
         }
 
         private void ApplyRemoteState(bool forceReloadTrigger = false)
@@ -235,7 +266,8 @@ namespace ProjectM.Player
                     animBridge.SyncedGrounded,
                     animBridge.SyncedVerticalSpeed,
                     animBridge.SyncedIsAiming,
-                    isReloading),
+                    isReloading,
+                    animBridge.SyncedIsMelee),
                 triggerReloadOnStart: triggerReload);
         }
 
@@ -253,6 +285,7 @@ namespace ProjectM.Player
             animator.SetFloat(VerticalSpeedHash, state.VerticalSpeed);
             animator.SetBool(IsAimingHash, state.IsAiming);
             animator.SetBool(IsReloadingHash, state.IsReloading);
+            animator.SetBool(IsMeleeHash, state.IsMelee);
 
             if (triggerReloadOnStart)
                 animator.SetTrigger(ReloadHash);
@@ -308,14 +341,16 @@ namespace ProjectM.Player
             public readonly float VerticalSpeed;
             public readonly bool IsAiming;
             public readonly bool IsReloading;
+            public readonly bool IsMelee;
 
-            public AnimState(float speed, bool grounded, float verticalSpeed, bool isAiming, bool isReloading)
+            public AnimState(float speed, bool grounded, float verticalSpeed, bool isAiming, bool isReloading, bool isMelee)
             {
                 Speed = speed;
                 Grounded = grounded;
                 VerticalSpeed = verticalSpeed;
                 IsAiming = isAiming;
                 IsReloading = isReloading;
+                IsMelee = isMelee;
             }
         }
     }

@@ -42,6 +42,16 @@ namespace ProjectM.Network
             NetworkVariableReadPermission.Everyone,
             NetworkVariableWritePermission.Owner);
 
+        private readonly NetworkVariable<bool> netIsMelee = new(
+            false,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Owner);
+
+        private readonly NetworkVariable<int> netAttackToken = new(
+            0,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Owner);
+
         private float lastSentSpeed;
         private float lastSentVerticalSpeed;
 
@@ -50,12 +60,15 @@ namespace ProjectM.Network
         public float SyncedVerticalSpeed => netVerticalSpeed.Value;
         public bool SyncedIsAiming => netIsAiming.Value;
         public bool SyncedIsReloading => netIsReloading.Value;
+        public bool SyncedIsMelee => netIsMelee.Value;
 
         public event Action OnSyncedStateChanged;
         /// <summary>Owner가 투척을 실행한 순간마다 정확히 1회 발생 (Remote 애니메이션 트리거용).</summary>
         public event Action OnThrowRequested;
+        /// <summary>Owner가 근접 공격을 실행한 순간마다 정확히 1회 발생 (Remote 애니메이션 트리거용).</summary>
+        public event Action OnAttackRequested;
 
-        public void Publish(float speed, bool grounded, float verticalSpeed, bool isAiming, bool isReloading)
+        public void Publish(float speed, bool grounded, float verticalSpeed, bool isAiming, bool isReloading, bool isMelee)
         {
             if (!IsSpawned || !IsOwner) return;
 
@@ -79,9 +92,12 @@ namespace ProjectM.Network
 
             if (netIsReloading.Value != isReloading)
                 netIsReloading.Value = isReloading;
+
+            if (netIsMelee.Value != isMelee)
+                netIsMelee.Value = isMelee;
         }
 
-        public void ForcePublish(float speed, bool grounded, float verticalSpeed, bool isAiming, bool isReloading)
+        public void ForcePublish(float speed, bool grounded, float verticalSpeed, bool isAiming, bool isReloading, bool isMelee)
         {
             if (!IsSpawned || !IsOwner) return;
 
@@ -90,6 +106,7 @@ namespace ProjectM.Network
             netVerticalSpeed.Value = verticalSpeed;
             netIsAiming.Value = isAiming;
             netIsReloading.Value = isReloading;
+            netIsMelee.Value = isMelee;
 
             lastSentSpeed = speed;
             lastSentVerticalSpeed = verticalSpeed;
@@ -106,6 +123,17 @@ namespace ProjectM.Network
             }
         }
 
+        /// <summary>근접 공격 1회 이벤트를 Remote에 전파한다 (netThrowToken과 동일한 edge-보존 방식).</summary>
+        public void PublishAttack()
+        {
+            if (!IsSpawned || !IsOwner) return;
+
+            unchecked
+            {
+                netAttackToken.Value = netAttackToken.Value + 1;
+            }
+        }
+
         public override void OnNetworkSpawn()
         {
             netSpeed.OnValueChanged += HandleAnyChanged;
@@ -114,6 +142,8 @@ namespace ProjectM.Network
             netIsAiming.OnValueChanged += HandleBoolChanged;
             netIsReloading.OnValueChanged += HandleBoolChanged;
             netThrowToken.OnValueChanged += HandleThrowTokenChanged;
+            netIsMelee.OnValueChanged += HandleBoolChanged;
+            netAttackToken.OnValueChanged += HandleAttackTokenChanged;
 
             OnSyncedStateChanged?.Invoke();
         }
@@ -126,10 +156,13 @@ namespace ProjectM.Network
             netIsAiming.OnValueChanged -= HandleBoolChanged;
             netIsReloading.OnValueChanged -= HandleBoolChanged;
             netThrowToken.OnValueChanged -= HandleThrowTokenChanged;
+            netIsMelee.OnValueChanged -= HandleBoolChanged;
+            netAttackToken.OnValueChanged -= HandleAttackTokenChanged;
         }
 
         private void HandleAnyChanged(float _, float __) => OnSyncedStateChanged?.Invoke();
         private void HandleBoolChanged(bool _, bool __) => OnSyncedStateChanged?.Invoke();
         private void HandleThrowTokenChanged(int _, int __) => OnThrowRequested?.Invoke();
+        private void HandleAttackTokenChanged(int _, int __) => OnAttackRequested?.Invoke();
     }
 }

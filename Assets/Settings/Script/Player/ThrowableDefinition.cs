@@ -28,6 +28,8 @@ namespace ProjectM.Player
         public GameObject projectilePrefab;
         [Tooltip("들고 있을 때 1인칭 카메라 자식 소켓에 인스턴스화되는 모델 프리팹.")]
         public GameObject heldViewModelPrefab;
+        [Tooltip("부착 무기 모드에서 Owner 1인칭 카메라 스냅 시 추가 로컬 오프셋(하단 UI 가림 보정).")]
+        public Vector3 attachedFpAlignOffset;
         public Sprite icon;
         public int price = 35;
     }
