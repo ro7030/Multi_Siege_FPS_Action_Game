@@ -52,7 +52,7 @@ namespace ProjectM.Network.Editor
 
         private static void RemoveLegacyRepairZones()
         {
-            var zones = Object.FindObjectsByType<Transform>(FindObjectsSortMode.None);
+            var zones = Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             int removed = 0;
             foreach (var t in zones)
             {

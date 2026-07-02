@@ -428,7 +428,7 @@ MonoBehaviour:
   isAutomatic: 1
   hitMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4294966783
   magazineSize: 30
   reserveAmmo: 90
   reloadDuration: 1.5
@@ -515,7 +515,7 @@ MonoBehaviour:
   useRange: 8
   hitMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4294966783
   healAmount: 50
   repairAmount: 50
   healProgression: {fileID: 0}
@@ -567,7 +567,7 @@ MonoBehaviour:
   meleeAngle: 100
   hitMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4294966783
   isLocalPlayer: 1
   kitEquipper: {fileID: 0}
   throwableEquipper: {fileID: 0}

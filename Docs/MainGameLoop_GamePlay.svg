@@ -1,0 +1,165 @@
+<svg viewBox="0 0 1280 820" xmlns="http://www.w3.org/2000/svg" font-family="Malgun Gothic, 맑은 고딕, AppleSDGothicNeo, sans-serif">
+  <defs>
+    <marker id="arrR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#D92B2B"/>
+    </marker>
+    <marker id="arrG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2E9E3E"/>
+    </marker>
+  </defs>
+
+  <!-- 배경 -->
+  <rect x="0" y="0" width="1280" height="820" fill="#F0C75F"/>
+
+  <!-- 제목 -->
+  <text x="40" y="96" font-size="48" font-weight="800" fill="#B01111">메인 게임 루프</text>
+  <text x="44" y="130" font-size="17" fill="#6B5410">GamePlay 씬 · 웨이브 디펜스 시스템 흐름</text>
+
+  <!-- ───────── 범례 ───────── -->
+  <g>
+    <rect x="1030" y="36" width="220" height="212" rx="8" fill="#FFFFFF" stroke="#BBBBBB"/>
+    <text x="1140" y="60" font-size="14" font-weight="700" text-anchor="middle" fill="#333">범례</text>
+    <rect x="1046" y="74" width="26" height="16" fill="#D5E8D4" stroke="#82B366"/>
+    <text x="1082" y="87" font-size="12" fill="#333">주요 흐름 / 페이즈</text>
+    <polygon points="1059,100 1074,108 1059,116 1044,108" fill="#FFF2CC" stroke="#D6B656"/>
+    <text x="1082" y="113" font-size="12" fill="#333">분기 / 결정</text>
+    <rect x="1046" y="126" width="26" height="16" fill="#E1D5E7" stroke="#9673A6"/>
+    <text x="1082" y="139" font-size="12" fill="#333">정비 · 경제 요소</text>
+    <rect x="1046" y="152" width="26" height="16" fill="#F8CECC" stroke="#B85450"/>
+    <text x="1082" y="165" font-size="12" fill="#333">패배 / 종료</text>
+    <rect x="1046" y="178" width="26" height="16" fill="#DAE8FC" stroke="#6C8EBF"/>
+    <text x="1082" y="191" font-size="12" fill="#333">승리</text>
+    <rect x="1046" y="204" width="26" height="16" fill="#FFFFFF" stroke="#999999"/>
+    <text x="1082" y="217" font-size="12" fill="#333">결과 처리 / 서브</text>
+  </g>
+
+  <!-- ───────── 메인 세로 플로우 ───────── -->
+  <!-- 1. 게임 시작 -->
+  <rect x="340" y="44" width="250" height="62" rx="6" fill="#D5E8D4" stroke="#82B366" stroke-width="1.5"/>
+  <text x="465" y="64" font-size="15" font-weight="700" text-anchor="middle" fill="#1A1A1A">게임 시작</text>
+  <text x="465" y="81" font-size="11" text-anchor="middle" fill="#333">GamePlay 씬 로드</text>
+  <text x="465" y="96" font-size="11" text-anchor="middle" fill="#333">GameSessionManager → GamePhase.Lobby</text>
+
+  <line x1="465" y1="106" x2="465" y2="130" stroke="#D92B2B" stroke-width="2" marker-end="url(#arrR)"/>
+
+  <!-- 2. 매치 시작 -->
+  <rect x="340" y="132" width="250" height="62" rx="6" fill="#D5E8D4" stroke="#82B366" stroke-width="1.5"/>
+  <text x="465" y="152" font-size="15" font-weight="700" text-anchor="middle" fill="#1A1A1A">매치 시작 (자동)</text>
+  <text x="465" y="169" font-size="11" text-anchor="middle" fill="#333">CountdownPresenter 카운트다운 완료 시</text>
+  <text x="465" y="184" font-size="11" text-anchor="middle" fill="#333">MatchBootstrapper → StartMatch()</text>
+
+  <line x1="465" y1="194" x2="465" y2="218" stroke="#D92B2B" stroke-width="2" marker-end="url(#arrR)"/>
+
+  <!-- 3. 정비 페이즈 -->
+  <rect x="340" y="220" width="250" height="62" rx="6" fill="#D5E8D4" stroke="#82B366" stroke-width="1.5"/>
+  <text x="465" y="240" font-size="15" font-weight="700" text-anchor="middle" fill="#1A1A1A">정비 페이즈</text>
+  <text x="465" y="257" font-size="11" text-anchor="middle" fill="#333">GamePhase.Preparation</text>
+  <text x="465" y="272" font-size="11" text-anchor="middle" fill="#333">첫 웨이브 5초 · 이후 15초</text>
+
+  <line x1="465" y1="282" x2="465" y2="306" stroke="#D92B2B" stroke-width="2" marker-end="url(#arrR)"/>
+
+  <!-- 4. 웨이브 시작 -->
+  <rect x="340" y="308" width="250" height="62" rx="6" fill="#D5E8D4" stroke="#82B366" stroke-width="1.5"/>
+  <text x="465" y="328" font-size="15" font-weight="700" text-anchor="middle" fill="#1A1A1A">웨이브 시작</text>
+  <text x="465" y="345" font-size="11" text-anchor="middle" fill="#333">GamePhase.Wave · CurrentWave++</text>
+  <text x="465" y="360" font-size="11" text-anchor="middle" fill="#333">StartWave() → OnWaveStarted</text>
+
+  <line x1="465" y1="370" x2="465" y2="394" stroke="#D92B2B" stroke-width="2" marker-end="url(#arrR)"/>
+
+  <!-- 5. 적 스폰 · 전투 -->
+  <rect x="340" y="396" width="250" height="62" rx="6" fill="#D5E8D4" stroke="#82B366" stroke-width="1.5"/>
+  <text x="465" y="416" font-size="15" font-weight="700" text-anchor="middle" fill="#1A1A1A">적 스폰 · 전투</text>
+  <text x="465" y="433" font-size="11" text-anchor="middle" fill="#333">WaveManager.SpawnRoutine()</text>
+  <text x="465" y="448" font-size="11" text-anchor="middle" fill="#333">WaveConfig 순서로 EnemySpawner.Spawn()</text>
+
+  <line x1="465" y1="458" x2="465" y2="470" stroke="#D92B2B" stroke-width="2" marker-end="url(#arrR)"/>
+
+  <!-- 분기 1: 모든 적 처치? -->
+  <polygon points="465,472 580,520 465,568 350,520" fill="#FFF2CC" stroke="#D6B656" stroke-width="1.5"/>
+  <text x="465" y="517" font-size="15" font-weight="700" text-anchor="middle" fill="#1A1A1A">모든 적 처치?</text>
+  <text x="465" y="537" font-size="11" text-anchor="middle" fill="#333">spawner.AliveCount == 0</text>
+
+  <!-- 잔존 적 루프 (좌측 소형 박스) -->
+  <line x1="350" y1="520" x2="327" y2="520" stroke="#D92B2B" stroke-width="2" marker-end="url(#arrR)"/>
+  <text x="337" y="490" font-size="10.5" text-anchor="middle" fill="#B01111">잔존 적 있음</text>
+  <rect x="185" y="495" width="140" height="50" rx="6" fill="#D5E8D4" stroke="#82B366" stroke-width="1.5"/>
+  <text x="255" y="515" font-size="12" font-weight="700" text-anchor="middle" fill="#1A1A1A">잔존 적 처치 대기</text>
+  <text x="255" y="531" font-size="10.5" text-anchor="middle" fill="#333">(0.5초 간격 확인)</text>
+  <path d="M 255 495 L 255 427 L 338 427" fill="none" stroke="#D92B2B" stroke-width="2" marker-end="url(#arrR)"/>
+
+  <line x1="465" y1="568" x2="465" y2="592" stroke="#D92B2B" stroke-width="2" marker-end="url(#arrR)"/>
+  <text x="478" y="586" font-size="11" fill="#B01111">전멸</text>
+
+  <!-- 7. 웨이브 종료 -->
+  <rect x="340" y="594" width="250" height="62" rx="6" fill="#D5E8D4" stroke="#82B366" stroke-width="1.5"/>
+  <text x="465" y="614" font-size="15" font-weight="700" text-anchor="middle" fill="#1A1A1A">웨이브 종료</text>
+  <text x="465" y="631" font-size="11" text-anchor="middle" fill="#333">GameSessionManager.EndWave()</text>
+  <text x="465" y="646" font-size="11" text-anchor="middle" fill="#333">OnWaveEnded → 보상 · 수확 누적</text>
+
+  <line x1="465" y1="656" x2="465" y2="670" stroke="#D92B2B" stroke-width="2" marker-end="url(#arrR)"/>
+
+  <!-- 분기 2: 마지막 웨이브? -->
+  <polygon points="465,672 585,722 465,772 345,722" fill="#FFF2CC" stroke="#D6B656" stroke-width="1.5"/>
+  <text x="465" y="719" font-size="15" font-weight="700" text-anchor="middle" fill="#1A1A1A">마지막 웨이브?</text>
+  <text x="465" y="739" font-size="11" text-anchor="middle" fill="#333">CurrentWave ≥ MaxWave(10)</text>
+
+  <!-- 아니오 → 정비 루프 (녹색) -->
+  <path d="M 345 722 L 170 722 L 170 251 L 332 251" fill="none" stroke="#2E9E3E" stroke-width="2.5" marker-end="url(#arrG)"/>
+  <text x="257" y="710" font-size="12" font-weight="700" fill="#1E7A2C">아니오</text>
+  <text x="178" y="744" font-size="10.5" fill="#1E7A2C">WaveCleared → Preparation</text>
+
+  <!-- ───────── 우측: 정비 페이즈 행동 ───────── -->
+  <line x1="590" y1="251" x2="648" y2="251" stroke="#9673A6" stroke-width="1.5" stroke-dasharray="5,4"/>
+  <rect x="650" y="200" width="350" height="104" rx="6" fill="#E1D5E7" stroke="#9673A6" stroke-width="1.5"/>
+  <text x="825" y="221" font-size="13.5" font-weight="700" text-anchor="middle" fill="#1A1A1A">정비 페이즈 행동 (Preparation 한정)</text>
+  <text x="666" y="243" font-size="12" fill="#333">· 밭 설치 : FarmManager.TryPlaceFarm()</text>
+  <text x="666" y="261" font-size="12" fill="#333">· 상점 구매 : ShopController (웨이브 시작 시 닫힘)</text>
+  <text x="666" y="279" font-size="12" fill="#333">· 수확(F키) : HarvestSystem → 팀 지갑 균등 분배</text>
+
+  <!-- ───────── 우측: 패배 조건 (상시 감시) ───────── -->
+  <line x1="590" y1="427" x2="644" y2="427" stroke="#D92B2B" stroke-width="1.5" stroke-dasharray="5,4"/>
+  <text x="650" y="387" font-size="12.5" font-weight="700" fill="#8A1B1B">베이스 캠프 파괴 (HP = 0)</text>
+  <text x="650" y="406" font-size="11.5" fill="#5A3010">→ BaseCampController.HandleDestroyed()</text>
+  <text x="650" y="423" font-size="11.5" fill="#5A3010">→ GameSessionManager.EndMatch(false)</text>
+
+  <text x="650" y="454" font-size="12.5" font-weight="700" fill="#8A1B1B">전원 행동 불능 (다운 / 사망)</text>
+  <text x="650" y="473" font-size="11.5" fill="#5A3010">→ PlayerWipeoutDetector.CheckWipeout()</text>
+  <text x="650" y="490" font-size="11.5" fill="#5A3010">→ EndMatch(false) · 솔로: 다운 = 즉시 패배</text>
+
+  <line x1="990" y1="440" x2="1036" y2="440" stroke="#D92B2B" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrR)"/>
+
+  <!-- 패배 박스 -->
+  <rect x="1040" y="395" width="210" height="90" rx="6" fill="#F8CECC" stroke="#B85450" stroke-width="1.5"/>
+  <text x="1145" y="424" font-size="15" font-weight="700" text-anchor="middle" fill="#7A1F1F">패배 (Game Over)</text>
+  <text x="1145" y="444" font-size="11.5" text-anchor="middle" fill="#333">GamePhase.Result 전환</text>
+  <text x="1145" y="461" font-size="11" text-anchor="middle" fill="#333">Result → Lobby 만 허용</text>
+
+  <!-- ───────── 우측: 웨이브 클리어 보상 ───────── -->
+  <line x1="590" y1="625" x2="644" y2="625" stroke="#9673A6" stroke-width="1.5" stroke-dasharray="5,4"/>
+  <text x="650" y="607" font-size="12.5" font-weight="700" fill="#4A3B75">웨이브 클리어 보상 (매 웨이브 종료 시)</text>
+  <text x="650" y="626" font-size="11.5" fill="#5A3010">→ RewardCalculator : 30 + 10 × 웨이브 (보스 +100)</text>
+  <text x="650" y="643" font-size="11.5" fill="#5A3010">→ FarmPlot.OnWavePassed : 밭 수확량 누적</text>
+
+  <!-- 예 → 승리 -->
+  <line x1="585" y1="722" x2="676" y2="722" stroke="#D92B2B" stroke-width="2" marker-end="url(#arrR)"/>
+  <text x="605" y="712" font-size="12" font-weight="700" fill="#B01111">예</text>
+
+  <rect x="680" y="684" width="200" height="76" rx="6" fill="#DAE8FC" stroke="#6C8EBF" stroke-width="1.5"/>
+  <text x="780" y="710" font-size="14" font-weight="700" text-anchor="middle" fill="#1F3F6E">승리 (Clear)</text>
+  <text x="780" y="728" font-size="11.5" text-anchor="middle" fill="#333">EndMatch(true)</text>
+  <text x="780" y="744" font-size="11" text-anchor="middle" fill="#333">클리어 보너스 +300</text>
+
+  <line x1="880" y1="722" x2="1036" y2="722" stroke="#D92B2B" stroke-width="2" marker-end="url(#arrR)"/>
+  <line x1="1145" y1="485" x2="1145" y2="616" stroke="#D92B2B" stroke-width="2" marker-end="url(#arrR)"/>
+
+  <!-- 결과 처리 박스 -->
+  <rect x="1040" y="620" width="210" height="112" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1.5"/>
+  <text x="1145" y="644" font-size="13.5" font-weight="700" text-anchor="middle" fill="#1A1A1A">결과 처리 · Result</text>
+  <text x="1145" y="664" font-size="11" text-anchor="middle" fill="#333">ResultUploader → DB 저장</text>
+  <text x="1145" y="680" font-size="10.5" text-anchor="middle" fill="#666">(MySQL / REST · 실패 시 로컬 JSON 큐)</text>
+  <text x="1145" y="697" font-size="11" text-anchor="middle" fill="#333">ResultView 결과 표시</text>
+  <text x="1145" y="713" font-size="11" text-anchor="middle" fill="#333">ReturnToLobby() → 로비 복귀</text>
+
+  <!-- 하단 주석 -->
+  <text x="40" y="802" font-size="11.5" fill="#5A4A10">※ NGO 멀티플레이 : Host(서버) 권한으로 루프 진행 · NetworkMatchDirector 가 페이즈 / 웨이브 상태를 클라이언트에 미러링 (GameSessionManager.Mirror*)</text>
+</svg>
