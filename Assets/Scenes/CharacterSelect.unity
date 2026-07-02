@@ -1012,6 +1012,7 @@ MonoBehaviour:
   - {fileID: 879569669}
   roomServiceBootstrapper: {fileID: 604632660}
   roomServiceObject: {fileID: 0}
+  fallbackAnimatorController: {fileID: 9100000, guid: 69f9a31efffd43b6a3eead1bebe594e4, type: 2}
 --- !u!1 &638452786
 GameObject:
   m_ObjectHideFlags: 0

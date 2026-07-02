@@ -71,6 +71,8 @@ namespace ProjectM.Player
         public float SelectionMaxRadius => 1f;
 
         public event Action<ThrowableType> OnEquippedChanged;
+        /// <summary>투척이 실제로 실행(소모 확정 또는 서버 요청 전송)된 순간마다 발생 — 애니메이션 트리거용.</summary>
+        public event Action OnThrown;
 
         private void Awake()
         {
@@ -200,6 +202,7 @@ namespace ProjectM.Player
                 && !NetworkSessionHelper.IsServer)
             {
                 netThrow.RequestThrowFromOwner(type, origin, velocity);
+                OnThrown?.Invoke();
                 Debug.Log($"[Throw] {def.displayName} 투척 요청");
                 return;
             }
@@ -207,6 +210,7 @@ namespace ProjectM.Player
             if (!inventory.TryConsume(type)) return;
 
             ThrowableSpawner.SpawnProjectile(def, gameObject, origin, velocity);
+            OnThrown?.Invoke();
             Debug.Log($"[Throw] {def.displayName} 투척");
         }
 

@@ -281,6 +281,8 @@ GameObject:
   - component: {fileID: 9200000000000000007}
   - component: {fileID: 9200000000000000008}
   - component: {fileID: 9200000000000000009}
+  - component: {fileID: 9200000000000000010}
+  - component: {fileID: 9200000000000000011}
   m_Layer: 0
   m_Name: NetworkPlayer
   m_TagString: Player
@@ -352,6 +354,10 @@ MonoBehaviour:
   maxPitch: 85
   lockCursor: 1
   isLocalPlayer: 1
+  weaponController: {fileID: 0}
+  recoilKick: 1.2
+  recoilRandomYaw: 0.3
+  recoilRecoverySpeed: 8
 --- !u!114 &1377090955519065897
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -784,4 +790,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71cdb385b6955472893051165134f97a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Network.NetworkPlayerArsenal
+  ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &9200000000000000010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8514623158254487877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a84a790637694edda86c7914eac372b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.PlayerAnimationController
+  characterController: {fileID: 2638820265281733691}
+  weaponController: {fileID: 6331050007943407383}
+  throwableEquipper: {fileID: 0}
+  visualBinder: {fileID: 8269778327862469331}
+  animBridge: {fileID: 9200000000000000011}
+  fallbackAnimatorController: {fileID: 9100000, guid: 69f9a31efffd43b6a3eead1bebe594e4, type: 2}
+--- !u!114 &9200000000000000011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8514623158254487877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eae377e74a7348d3b91ed1a6f34d2258, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Network.NetworkPlayerAnimationBridge
   ShowTopMostFoldoutHeaderGroup: 1

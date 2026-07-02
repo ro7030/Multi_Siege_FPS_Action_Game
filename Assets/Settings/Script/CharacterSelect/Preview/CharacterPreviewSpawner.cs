@@ -8,6 +8,7 @@ namespace ProjectM.CharacterSelect
         [SerializeField] private Transform[] slotAnchors;
         [SerializeField] private RoomServiceBootstrapper roomServiceBootstrapper;
         [SerializeField] private MonoBehaviour roomServiceObject;
+        [SerializeField] private RuntimeAnimatorController fallbackAnimatorController;
 
         private IRoomService _room;
         private GameObject[] _spawned;
@@ -96,6 +97,12 @@ namespace ProjectM.CharacterSelect
 
             var anchor = slotAnchors[slotIndex];
             _spawned[slotIndex] = Instantiate(charData.previewPrefab, anchor.position, anchor.rotation, anchor);
+
+            var idleAnimator = _spawned[slotIndex].GetComponent<CharacterPreviewIdleAnimator>();
+            if (idleAnimator == null)
+                idleAnimator = _spawned[slotIndex].AddComponent<CharacterPreviewIdleAnimator>();
+            idleAnimator.Initialize(fallbackAnimatorController);
+
             _spawnedCharIndex[slotIndex] = data.CharacterIndex;
         }
 
