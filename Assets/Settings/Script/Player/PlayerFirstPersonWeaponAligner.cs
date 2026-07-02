@@ -12,13 +12,24 @@ namespace ProjectM.Player
     public class PlayerFirstPersonWeaponAligner : MonoBehaviour
     {
         [SerializeField] private PlayerAttachedWeaponVisual attachedVisual;
+        [SerializeField] private PlayerArsenal arsenal;
+        [SerializeField] private CharacterController characterController;
         [SerializeField] private Transform primarySocket;
         [SerializeField] private Transform meleeSocket;
         [SerializeField] private Transform kitSocket;
         [SerializeField] private Transform throwableSocket;
         [SerializeField] private ThrowableEquipper throwableEquipper;
+
+        [Tooltip("검 1인칭 스냅 기본 오프셋(소켓 로컬).")]
+        [SerializeField] private Vector3 meleeFirstPersonLocalOffset = Vector3.zero;
+
         [Tooltip("투척무기 1인칭 스냅 기본 오프셋(소켓 로컬). 하단 UI 가림 방지.")]
         [SerializeField] private Vector3 throwableFirstPersonLocalOffset = new(0f, 0.18f, 0.03f);
+
+        [Header("검 걸음 bob (선택)")]
+        [SerializeField] private bool enableMeleeWalkBob;
+        [SerializeField] private float meleeWalkBobAmplitude = 0.025f;
+        [SerializeField] private float meleeWalkBobFrequency = 9f;
 
         private NetworkObject networkObject;
 
@@ -26,6 +37,10 @@ namespace ProjectM.Player
         {
             if (attachedVisual == null)
                 attachedVisual = GetComponent<PlayerAttachedWeaponVisual>();
+            if (arsenal == null)
+                arsenal = GetComponent<PlayerArsenal>();
+            if (characterController == null)
+                characterController = GetComponent<CharacterController>();
             if (throwableEquipper == null)
                 throwableEquipper = GetComponent<ThrowableEquipper>();
             networkObject = GetComponent<NetworkObject>();
@@ -44,13 +59,8 @@ namespace ProjectM.Player
             if (instance == null)
                 return;
 
-            // 근접(검)은 Hand_r_equipment 본·SwordWalk 등 손 애니를 그대로 따른다.
-            // 카메라 스냅을 쓰면 걸을 때 손만 움직이고 칼이 공중에 떠 보인다.
             if (!ShouldSnapToCameraSocket(kind))
-            {
-                attachedVisual.RestoreActiveHandOffset();
                 return;
-            }
 
             Transform target = ResolveAlignTarget(kind);
             if (target == null)
@@ -58,10 +68,24 @@ namespace ProjectM.Player
 
             Vector3 position = target.position;
             Quaternion rotation = target.rotation;
-            if (kind == AttachedWeaponDisplayKind.Throwable)
+
+            if (kind == AttachedWeaponDisplayKind.Secondary)
+            {
+                Vector3 localOffset = meleeFirstPersonLocalOffset;
+                if (arsenal != null)
+                {
+                    var def = arsenal.CurrentDefinition(WeaponSlot.Secondary);
+                    if (def != null)
+                        localOffset += def.attachedFpAlignOffset;
+                }
+
+                position = target.TransformPoint(localOffset);
+                position += ComputeMeleeWalkBob(target);
+            }
+            else if (kind == AttachedWeaponDisplayKind.Throwable)
             {
                 Vector3 localOffset = throwableFirstPersonLocalOffset;
-                if (attachedVisual != null && throwableEquipper != null)
+                if (throwableEquipper != null)
                 {
                     var def = throwableEquipper.GetDefinition(attachedVisual.ActiveThrowableType);
                     if (def != null)
@@ -74,11 +98,34 @@ namespace ProjectM.Player
             instance.transform.SetPositionAndRotation(position, rotation);
         }
 
+        private Vector3 ComputeMeleeWalkBob(Transform target)
+        {
+            if (!enableMeleeWalkBob || target == null)
+                return Vector3.zero;
+
+            float speed = 0f;
+            if (characterController != null && characterController.enabled)
+            {
+                Vector3 velocity = characterController.velocity;
+                velocity.y = 0f;
+                speed = velocity.magnitude;
+            }
+
+            if (speed < 0.05f)
+                return Vector3.zero;
+
+            float t = Time.time * meleeWalkBobFrequency;
+            float bobY = Mathf.Sin(t * Mathf.PI * 2f) * meleeWalkBobAmplitude * speed;
+            float bobX = Mathf.Sin(t * Mathf.PI) * meleeWalkBobAmplitude * 0.5f * speed;
+            return target.TransformVector(new Vector3(bobX, bobY, 0f));
+        }
+
         private static bool ShouldSnapToCameraSocket(AttachedWeaponDisplayKind kind)
         {
             return kind switch
             {
                 AttachedWeaponDisplayKind.Primary => true,
+                AttachedWeaponDisplayKind.Secondary => true,
                 AttachedWeaponDisplayKind.Kit => true,
                 AttachedWeaponDisplayKind.Throwable => true,
                 _ => false

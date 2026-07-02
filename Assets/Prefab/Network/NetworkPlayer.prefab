@@ -896,9 +896,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.PlayerFirstPersonWeaponAligner
   attachedVisual: {fileID: 9200000000000000012}
+  arsenal: {fileID: 4579525695095911832}
+  characterController: {fileID: 2638820265281733691}
   primarySocket: {fileID: 5424259374410102990}
   meleeSocket: {fileID: 8724971255838169413}
   kitSocket: {fileID: 0}
   throwableSocket: {fileID: 5424259374410102992}
   throwableEquipper: {fileID: 1250960470891422125}
   throwableFirstPersonLocalOffset: {x: 0, y: 0.18, z: 0.03}
+  meleeFirstPersonLocalOffset: {x: 0, y: 0, z: 0}
+  enableMeleeWalkBob: 0
+  meleeWalkBobAmplitude: 0.025
+  meleeWalkBobFrequency: 9

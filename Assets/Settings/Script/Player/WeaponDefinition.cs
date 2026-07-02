@@ -30,6 +30,9 @@ namespace ProjectM.Player
         public GameObject ResolveWorldModelPrefab() =>
             worldModelPrefab != null ? worldModelPrefab : viewModelPrefab;
 
+        [Tooltip("부착 무기 모드에서 Owner 1인칭 MeleeSocket 스냅 시 추가 로컬 오프셋.")]
+        public Vector3 attachedFpAlignOffset;
+
         [Header("원거리 (Ranged 전용)")]
         public float fireRate = 5f;       // 초당 발사
         public int magazineSize = 30;
