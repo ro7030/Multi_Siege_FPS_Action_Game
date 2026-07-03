@@ -16,9 +16,11 @@ MonoBehaviour:
   slot: 1
   kind: 1
   price: 0
-  damage: 18
+  damage: 25
   icon: {fileID: 21300000, guid: 40802069c708c9a43a5b6105dd831776, type: 3}
   viewModelPrefab: {fileID: 8972777865294516069, guid: 181b55f9c40e5431ea7722ec76d64448, type: 3}
+  worldModelPrefab: {fileID: 0}
+  attachedFpAlignOffset: {x: 0, y: 0, z: 0}
   fireRate: 5
   magazineSize: 30
   reloadDuration: 2.5

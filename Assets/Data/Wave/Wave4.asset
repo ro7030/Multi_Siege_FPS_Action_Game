@@ -16,9 +16,64 @@ MonoBehaviour:
   label: Wave 4
   groups:
   - enemyPrefab: {fileID: 9125259333789829230, guid: 0c9d1185a31b42c44b28a8a1e7718e85, type: 3}
-    count: 20
+    count: 13
     spawnPointIndex: 0
     spawnInterval: 0.3
     startDelay: 0
+  - enemyPrefab: {fileID: 9125259333789829230, guid: 0c9d1185a31b42c44b28a8a1e7718e85, type: 3}
+    count: 13
+    spawnPointIndex: 1
+    spawnInterval: 0.3
+    startDelay: 0
+  - enemyPrefab: {fileID: 9125259333789829230, guid: 0c9d1185a31b42c44b28a8a1e7718e85, type: 3}
+    count: 13
+    spawnPointIndex: 2
+    spawnInterval: 0.3
+    startDelay: 0
+  - enemyPrefab: {fileID: 9125259333789829230, guid: 0c9d1185a31b42c44b28a8a1e7718e85, type: 3}
+    count: 13
+    spawnPointIndex: 3
+    spawnInterval: 0.3
+    startDelay: 0
+  - enemyPrefab: {fileID: 9125259333789829230, guid: 0c9d1185a31b42c44b28a8a1e7718e85, type: 3}
+    count: 13
+    spawnPointIndex: 4
+    spawnInterval: 0.3
+    startDelay: 0
+  - enemyPrefab: {fileID: 9125259333789829230, guid: 0c9d1185a31b42c44b28a8a1e7718e85, type: 3}
+    count: 13
+    spawnPointIndex: 5
+    spawnInterval: 0.3
+    startDelay: 0
+  - enemyPrefab: {fileID: 9125259333789829230, guid: 48b7a80f14f09a6438bfa4000a847d85, type: 3}
+    count: 2
+    spawnPointIndex: 0
+    spawnInterval: 0.3
+    startDelay: 0
+  - enemyPrefab: {fileID: 9125259333789829230, guid: f285e1b0c8c69d342a912ec0d952ddc6, type: 3}
+    count: 1
+    spawnPointIndex: 1
+    spawnInterval: 0.3
+    startDelay: 0
+  - enemyPrefab: {fileID: 9125259333789829230, guid: 48b7a80f14f09a6438bfa4000a847d85, type: 3}
+    count: 2
+    spawnPointIndex: 2
+    spawnInterval: 0.3
+    startDelay: 0
+  - enemyPrefab: {fileID: 9125259333789829230, guid: f285e1b0c8c69d342a912ec0d952ddc6, type: 3}
+    count: 1
+    spawnPointIndex: 3
+    spawnInterval: 0.3
+    startDelay: 0
+  - enemyPrefab: {fileID: 9125259333789829230, guid: 48b7a80f14f09a6438bfa4000a847d85, type: 3}
+    count: 2
+    spawnPointIndex: 4
+    spawnInterval: 0.3
+    startDelay: 0
+  - enemyPrefab: {fileID: 9125259333789829230, guid: f285e1b0c8c69d342a912ec0d952ddc6, type: 3}
+    count: 1
+    spawnPointIndex: 5
+    spawnInterval: 0.3
+    startDelay: 0
   isBossWave: 0
-  postWaveBreak: 60
+  postWaveBreak: 40

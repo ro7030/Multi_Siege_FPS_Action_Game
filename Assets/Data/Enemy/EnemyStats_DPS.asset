@@ -14,12 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Enemy.EnemyStats
   displayName: Enemy
   tier: 1
-  maxHp: 70
+  maxHp: 120
   moveSpeed: 3
   attackDamage: 18
-  attackRange: 12
+  attackRange: 8
   attackInterval: 1.5
   detectRange: 12
   targetPriority: 1
+  playerAggroRange: 10
   currencyReward: 0
   scoreReward: 10
