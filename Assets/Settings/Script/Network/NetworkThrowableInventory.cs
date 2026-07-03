@@ -141,31 +141,42 @@ namespace ProjectM.Network
             RequestThrowServerRpc((int)type, origin, velocity);
         }
 
-        [ServerRpc]
-        private void RequestThrowServerRpc(int typeInt, Vector3 origin, Vector3 velocity)
+        /// <summary>서버 권한 투척 (Host 직접 호출 + ServerRpc 공용).</summary>
+        public bool ServerExecuteThrow(ThrowableType type, Vector3 origin, Vector3 velocity)
         {
-            var type = (ThrowableType)typeInt;
-            if (type == ThrowableType.None || equipper == null)
-                return;
+            if (!IsServer || type == ThrowableType.None || equipper == null)
+                return false;
 
             if (!ServerTryConsume(type))
-                return;
+                return false;
 
             var def = equipper.GetDefinition(type);
             if (def == null)
             {
                 ServerAdd(type, 1);
-                return;
+                return false;
             }
 
             if (!TryValidateThrow(origin, velocity, out var safeOrigin, out var safeVelocity))
             {
                 ServerAdd(type, 1);
-                return;
+                return false;
             }
 
-            ThrowableSpawner.SpawnProjectile(def, gameObject, safeOrigin, safeVelocity);
+            if (!ThrowableSpawner.SpawnProjectile(def, gameObject, safeOrigin, safeVelocity))
+            {
+                ServerAdd(type, 1);
+                return false;
+            }
+
             Debug.Log($"[NetworkThrowableInventory] {def.displayName} 투척 (서버)");
+            return true;
+        }
+
+        [ServerRpc]
+        private void RequestThrowServerRpc(int typeInt, Vector3 origin, Vector3 velocity)
+        {
+            ServerExecuteThrow((ThrowableType)typeInt, origin, velocity);
         }
 
         private bool TryValidateThrow(

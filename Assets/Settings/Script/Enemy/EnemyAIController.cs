@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using Unity.Netcode;
+using ProjectM.Combat;
 using ProjectM.Defense;
 using ProjectM.Player;
 using ProjectM.Network;
@@ -18,7 +19,7 @@ namespace ProjectM.Enemy
     /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
     [RequireComponent(typeof(HealthSystem))]
-    public class EnemyAIController : MonoBehaviour
+    public class EnemyAIController : MonoBehaviour, IStunnable
     {
         private enum TargetKind
         {
@@ -67,6 +68,7 @@ namespace ProjectM.Enemy
         public EnemyStateMachine FSM { get; private set; }
         public Transform Target { get; private set; }
         public bool IsAlive => health != null && health.IsAlive;
+        public bool IsStunned => Time.time < stunEndTime;
 
         public event Action<EnemyAIController> OnDeath;
 
@@ -92,6 +94,8 @@ namespace ProjectM.Enemy
 
         private NavMeshAgent agent;
         private HealthSystem health;
+        private float stunEndTime;
+        private bool wasStunned;
         private float nextTargetSearchTime;
         private float nextAttackTime;
         private Collider targetCollider;
@@ -124,11 +128,33 @@ namespace ProjectM.Enemy
 
         private void HandleDied(GameObject _) => FSM.ChangeState(EnemyState.Dead);
 
+        public void ApplyStun(float duration, GameObject source)
+        {
+            if (!IsAlive || duration <= 0f)
+                return;
+
+            stunEndTime = Mathf.Max(stunEndTime, Time.time + duration);
+            if (agent != null && agent.isOnNavMesh)
+            {
+                agent.isStopped = true;
+                agent.ResetPath();
+            }
+        }
+
         private void Update()
         {
             if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer)
                 return;
             if (!hostAuthoritative) return;
+
+            bool stunned = IsStunned;
+            if (wasStunned && !stunned && agent != null && agent.isOnNavMesh
+                && FSM.Current == EnemyState.Chase)
+            {
+                agent.isStopped = false;
+            }
+
+            wasStunned = stunned;
             FSM.Tick();
         }
 
@@ -140,6 +166,12 @@ namespace ProjectM.Enemy
 
         private void OnIdleTick()
         {
+            if (IsStunned)
+            {
+                if (agent.isOnNavMesh) agent.isStopped = true;
+                return;
+            }
+
             RefreshTargetIfNeeded();
             if (Target != null) FSM.ChangeState(EnemyState.Chase);
         }
@@ -151,6 +183,12 @@ namespace ProjectM.Enemy
 
         private void OnChaseTick()
         {
+            if (IsStunned)
+            {
+                if (agent.isOnNavMesh) agent.isStopped = true;
+                return;
+            }
+
             RefreshTargetIfNeeded();
             if (Target == null) { FSM.ChangeState(EnemyState.Idle); return; }
 
@@ -189,6 +227,12 @@ namespace ProjectM.Enemy
 
         private void OnAttackTick()
         {
+            if (IsStunned)
+            {
+                if (agent.isOnNavMesh) agent.isStopped = true;
+                return;
+            }
+
             RefreshTargetIfNeeded();
             if (Target == null) { FSM.ChangeState(EnemyState.Idle); return; }
 

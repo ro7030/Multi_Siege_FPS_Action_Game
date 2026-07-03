@@ -17,8 +17,10 @@ MonoBehaviour:
   effect: 1
   damage: 20
   radius: 3.5
-  fuseTime: 1.5
-  effectDuration: 0
+  fuseTime: 3
+  effectDuration: 3
+  fireTickDamage: 5
+  fireTickInterval: 0.5
   projectilePrefab: {fileID: 1550851596296730, guid: f479314ba9f53c04eb7b54d71c34a39d, type: 3}
   heldViewModelPrefab: {fileID: 1550851596296730, guid: f479314ba9f53c04eb7b54d71c34a39d, type: 3}
   icon: {fileID: 0}

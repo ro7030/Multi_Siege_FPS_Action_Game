@@ -20,8 +20,12 @@ namespace ProjectM.Player
         public float radius = 4f;
         [Tooltip("던진 후 폭발까지 시간(초). 0이면 충돌 시 폭발.")]
         public float fuseTime = 1.5f;
-        [Tooltip("화염/스턴 지속 시간(초). Damage 타입은 무시.")]
+        [Tooltip("Fire: 장판 지속(초) / Stun: 기절(초). Damage 타입은 무시.")]
         public float effectDuration = 0f;
+        [Tooltip("Fire: 장판 1틱당 데미지. Stun/Damage 타입은 무시.")]
+        public float fireTickDamage;
+        [Tooltip("Fire: 장판 데미지 틱 간격(초).")]
+        public float fireTickInterval = 0.5f;
 
         [Header("프리팹/표시")]
         [Tooltip("던질 프리팹 (ThrowableProjectile + Rigidbody + Collider). 비우면 기본 구체 생성.")]

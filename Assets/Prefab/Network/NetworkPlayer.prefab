@@ -171,37 +171,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5074678034640525258}
   m_LocalEulerAnglesHint: {x: 0, y: -5, z: 0}
---- !u!1 &5437216298718667541
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8724971255838169413}
-  m_Layer: 0
-  m_Name: MeleeSocket
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &8724971255838169413
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5437216298718667541}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0.15585238, y: -0.78498596, z: -0.3042918, w: 0.5166367}
-  m_LocalPosition: {x: 0, y: -0.55, z: 0.76}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5074678034640525258}
-  m_LocalEulerAnglesHint: {x: -39.7, y: -111.42, z: -5.2}
 --- !u!1 &3747066551491500362
 GameObject:
   m_ObjectHideFlags: 0
@@ -233,6 +202,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5074678034640525258}
   m_LocalEulerAnglesHint: {x: 0, y: -5, z: 0}
+--- !u!1 &5437216298718667541
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8724971255838169413}
+  m_Layer: 0
+  m_Name: MeleeSocket
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8724971255838169413
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5437216298718667541}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.15585238, y: -0.78498596, z: -0.3042918, w: 0.5166367}
+  m_LocalPosition: {x: 0, y: -0.55, z: 0.76}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5074678034640525258}
+  m_LocalEulerAnglesHint: {x: -39.7, y: -111.42, z: -5.2}
 --- !u!1 &7205131818524043760
 GameObject:
   m_ObjectHideFlags: 0
@@ -317,6 +317,8 @@ GameObject:
   - component: {fileID: 9200000000000000011}
   - component: {fileID: 9200000000000000012}
   - component: {fileID: 9200000000000000013}
+  - component: {fileID: 185991166709721278}
+  - component: {fileID: 4369407142360775183}
   m_Layer: 0
   m_Name: NetworkPlayer
   m_TagString: Player
@@ -872,7 +874,7 @@ MonoBehaviour:
   useAttachedWeapons: 1
   arsenal: {fileID: 4579525695095911832}
   visualBinder: {fileID: 8269778327862469331}
-  kitEquipper: {fileID: 8841444830580655268}
+  kitEquipper: {fileID: 0}
   throwableEquipper: {fileID: 1250960470891422125}
   rangedLocalPosition: {x: 0.02, y: 0.04, z: 0.08}
   rangedLocalEuler: {x: -10, y: 90, z: 0}
@@ -903,8 +905,38 @@ MonoBehaviour:
   kitSocket: {fileID: 0}
   throwableSocket: {fileID: 5424259374410102992}
   throwableEquipper: {fileID: 1250960470891422125}
-  throwableFirstPersonLocalOffset: {x: 0, y: 0.18, z: 0.03}
   meleeFirstPersonLocalOffset: {x: 0, y: 0, z: 0}
+  throwableFirstPersonLocalOffset: {x: 0, y: 0.18, z: 0.03}
   enableMeleeWalkBob: 0
   meleeWalkBobAmplitude: 0.025
   meleeWalkBobFrequency: 9
+--- !u!114 &185991166709721278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8514623158254487877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3177d31d673e54634bc42011cb88e53d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.MuzzleFlashController
+  muzzleFlashPrefab: {fileID: 9119287051031445214, guid: d7ebd79bdc5610a4ea870fb4696f472b, type: 3}
+  resourcesFallbackPath: Effect/GunFire/GunFire
+--- !u!114 &4369407142360775183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8514623158254487877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 718aa3a74b2fe4f9e87b083dbff5a68a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.CharacterFallEffect
+  groundImpactPrefab: {fileID: 8775978091646465560, guid: 4bcf94ca68f8d40fd8048bc91279eaa7, type: 3}
+  resourcesFallbackPath: Effect/GroundImpact
+  groundImpactLifetime: 1.5
+  groundOffsetY: 0.03

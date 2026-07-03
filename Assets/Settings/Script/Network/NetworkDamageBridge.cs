@@ -1,3 +1,4 @@
+using System;
 using Unity.Netcode;
 using UnityEngine;
 using ProjectM.Player;
@@ -33,6 +34,13 @@ namespace ProjectM.Network
             0f,
             NetworkVariableReadPermission.Everyone,
             NetworkVariableWritePermission.Server);
+
+        /// <summary>
+        /// ReviveSystem이 없는 엔티티(적)가 게스트 클라이언트에서 사망 상태로 전환될 때 1회 발생.
+        /// EnemyAIController.OnDeath는 서버/싱글플레이에서만 실행되므로, 순수 게스트 클라이언트의
+        /// 시각 효과(쓰러짐 이펙트 등)는 이 이벤트로 트리거한다.
+        /// </summary>
+        public event Action OnClientVisualDeath;
 
         private HealthSystem health;
         private ReviveSystem revive;
@@ -261,10 +269,17 @@ namespace ProjectM.Network
 
         private void HandleClientHpChanged(float _, float __) => ApplyClientHealthSnapshot();
 
-        private void HandleClientLifeStateChanged(byte _, byte __)
+        private void HandleClientLifeStateChanged(byte previous, byte current)
         {
-            if (revive == null) return;
-            revive.ApplyNetworkLifeState(netLifeState.Value);
+            if (revive != null)
+            {
+                revive.ApplyNetworkLifeState(current);
+                return;
+            }
+
+            // ReviveSystem이 없는 엔티티(적): Alive/Down -> Dead 전환 시점에만 게스트 시각 효과 트리거.
+            if (current == LifeDead && previous != LifeDead)
+                OnClientVisualDeath?.Invoke();
         }
 
         private void HandleClientReviveProgressChanged(float _, float __)

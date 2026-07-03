@@ -51,6 +51,12 @@ namespace ProjectM.Player
         public bool IsActive { get; set; } = true;
         public WeaponDefinition CurrentDefinition { get; private set; }
 
+        /// <summary>레거시(비부착) 경로에서 현재 카메라 소켓에 인스턴스화된 뷰모델. 부착 모드에서는 null.</summary>
+        public GameObject ViewModelInstance => viewModelInstance;
+        public PlayerAttachedWeaponVisual AttachedVisual => attachedVisual;
+        /// <summary>실제 히트스캔 레이가 나가는 기준 카메라. 총구 이펙트를 실제 탄도 방향에 맞추는 데 사용.</summary>
+        public Camera ViewCamera => viewCamera;
+
         public event Action OnFired;
         public event Action OnReloadStart;
         public event Action OnReloadEnd;

@@ -40,6 +40,12 @@ namespace ProjectM.Player
         public float range = 200f;
         public bool isAutomatic = true;
 
+        [Header("총구 화염 (Ranged 전용)")]
+        [Tooltip("무기 모델 로컬 좌표계 기준 총구(머즐) 위치. Play 모드에서 미세조정.")]
+        public Vector3 muzzleLocalOffset = new(0f, 0f, 0.5f);
+        [Tooltip("총구 이펙트 로컬 회전(도). 기본은 무기 정면 방향과 동일.")]
+        public Vector3 muzzleLocalEuler = Vector3.zero;
+
         [Header("근접 (Melee 전용)")]
         [Tooltip("1회 공격 사이 간격(초). 기획서 '공격 속도'.")]
         public float attackInterval = 2.5f;

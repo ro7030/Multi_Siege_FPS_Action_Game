@@ -16,9 +16,11 @@ MonoBehaviour:
   slot: 0
   kind: 0
   price: 80
-  damage: 20
+  damage: 30
   icon: {fileID: 21300000, guid: b049fda8233dba0448b639e33c9fe953, type: 3}
   viewModelPrefab: {fileID: 7209185108777654096, guid: c214f39d559297a43a03f834d9dd4e0c, type: 3}
+  worldModelPrefab: {fileID: 0}
+  attachedFpAlignOffset: {x: 0, y: 0, z: 0}
   fireRate: 5
   magazineSize: 30
   reloadDuration: 2.4
@@ -27,3 +29,5 @@ MonoBehaviour:
   attackInterval: 2.5
   meleeRange: 2.5
   meleeAngle: 100
+  muzzleLocalOffset: {x: 0, y: 0.02, z: 0.55}
+  muzzleLocalEuler: {x: 0, y: 0, z: 0}

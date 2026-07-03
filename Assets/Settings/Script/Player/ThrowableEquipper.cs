@@ -209,12 +209,15 @@ namespace ProjectM.Player
 
             if (NetworkSessionHelper.IsMultiplayerSession
                 && TryGetComponent<NetworkThrowableInventory>(out var netThrow)
-                && netThrow.IsSpawned
-                && !NetworkSessionHelper.IsServer)
+                && netThrow.IsSpawned)
             {
-                netThrow.RequestThrowFromOwner(type, origin, velocity);
+                if (NetworkSessionHelper.IsServer)
+                    netThrow.ServerExecuteThrow(type, origin, velocity);
+                else
+                    netThrow.RequestThrowFromOwner(type, origin, velocity);
+
                 OnThrown?.Invoke();
-                Debug.Log($"[Throw] {def.displayName} 투척 요청");
+                Debug.Log($"[Throw] {def.displayName} 투척");
                 return;
             }
 

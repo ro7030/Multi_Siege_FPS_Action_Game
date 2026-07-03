@@ -18,7 +18,7 @@ MonoBehaviour:
   damage: 0
   radius: 5
   fuseTime: 1.5
-  effectDuration: 0
+  effectDuration: 3
   projectilePrefab: {fileID: 4867813091239152202, guid: 0d1c4d402651e654cb2d8f202b60c007, type: 3}
   heldViewModelPrefab: {fileID: 4867813091239152202, guid: 0d1c4d402651e654cb2d8f202b60c007, type: 3}
   attachedFpAlignOffset: {x: 0, y: 0.1, z: 0.02}
