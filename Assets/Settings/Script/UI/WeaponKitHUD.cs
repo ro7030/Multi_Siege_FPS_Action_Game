@@ -185,32 +185,25 @@ namespace ProjectM.UI
                 }
             }
 
-            // 슬롯 4: 투척무기 — 보유량 0이면 아이콘/카운트 미표시
+            // 슬롯 4: 투척무기 — 전량 소진 시 슬롯 숨김, 보유 시 종류 아이콘만 표시
             if (throwableSlot != null)
             {
-                ThrowableType iconType = ThrowableType.None;
-                if (throwableEquipper != null)
+                if (throwableInventory == null || !throwableInventory.HasAny())
                 {
-                    if (throwEquipped
-                        && throwableInventory != null
-                        && throwableInventory.Has(throwableEquipper.EquippedThrowable))
-                        iconType = throwableEquipper.EquippedThrowable;
-                    else if (throwableShowLastSelectedWhenIdle
-                        && throwableInventory != null
-                        && throwableInventory.Has(throwableEquipper.LastSelected))
-                        iconType = throwableEquipper.LastSelected;
+                    throwableSlot.SetShown(false);
+                    lastAppliedThrowableIcon = (ThrowableType)(-1);
                 }
-                ApplyThrowableSlotIcon(iconType);
-                throwableSlot.SetHighlight(throwEquipped);
-
-                if (throwableInventory != null && throwableEquipper != null)
+                else
                 {
-                    var t = throwableEquipper.IsThrowableEquipped
-                        ? throwableEquipper.EquippedThrowable
-                        : throwableEquipper.LastSelected;
-                    throwableSlot.SetInfo(t != ThrowableType.None && throwableInventory.Has(t)
-                        ? $"{throwableInventory.GetCount(t)}"
-                        : "");
+                    throwableSlot.SetShown(true);
+
+                    ThrowableType iconType = throwableEquipper != null
+                        ? throwableEquipper.ResolveHudIconType(throwableShowLastSelectedWhenIdle)
+                        : ThrowableType.None;
+
+                    ApplyThrowableSlotIcon(iconType);
+                    throwableSlot.SetHighlight(throwEquipped);
+                    throwableSlot.SetInfo("");
                 }
             }
         }

@@ -38,6 +38,9 @@ namespace ProjectM.Player
         public bool IsActive { get; set; } = false;
         public WeaponDefinition CurrentDefinition { get; private set; }
 
+        public Transform FirstPersonViewTransform =>
+            viewModelInstance != null ? viewModelInstance.transform : null;
+
         public event Action OnAttack;
         public event Action<GameObject, float> OnHit;
 

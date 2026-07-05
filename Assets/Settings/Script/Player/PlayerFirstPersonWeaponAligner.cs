@@ -20,8 +20,11 @@ namespace ProjectM.Player
         [SerializeField] private Transform throwableSocket;
         [SerializeField] private ThrowableEquipper throwableEquipper;
 
-        [Tooltip("검 1인칭 스냅 기본 오프셋(소켓 로컬).")]
-        [SerializeField] private Vector3 meleeFirstPersonLocalOffset = Vector3.zero;
+        [Tooltip("검 1인칭 idle 오프셋(소켓 로컬). MC 손에 든 느낌.")]
+        [SerializeField] private Vector3 meleeFirstPersonLocalOffset = new(0.10f, -0.07f, 0.04f);
+
+        [Tooltip("검 1인칭 idle 회전(소켓 로컬 Euler).")]
+        [SerializeField] private Vector3 meleeFirstPersonLocalEuler = new(5f, -30f, 12f);
 
         [Tooltip("투척무기 1인칭 스냅 기본 오프셋(소켓 로컬). 하단 UI 가림 방지.")]
         [SerializeField] private Vector3 throwableFirstPersonLocalOffset = new(0f, 0.18f, 0.03f);
@@ -81,6 +84,7 @@ namespace ProjectM.Player
 
                 position = target.TransformPoint(localOffset);
                 position += ComputeMeleeWalkBob(target);
+                rotation = target.rotation * Quaternion.Euler(meleeFirstPersonLocalEuler);
             }
             else if (kind == AttachedWeaponDisplayKind.Throwable)
             {

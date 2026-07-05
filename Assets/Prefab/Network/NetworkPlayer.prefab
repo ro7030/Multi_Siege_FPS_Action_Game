@@ -317,6 +317,7 @@ GameObject:
   - component: {fileID: 9200000000000000011}
   - component: {fileID: 9200000000000000012}
   - component: {fileID: 9200000000000000013}
+  - component: {fileID: 9200000000000000014}
   - component: {fileID: 185991166709721278}
   - component: {fileID: 4369407142360775183}
   m_Layer: 0
@@ -905,11 +906,37 @@ MonoBehaviour:
   kitSocket: {fileID: 0}
   throwableSocket: {fileID: 5424259374410102992}
   throwableEquipper: {fileID: 1250960470891422125}
-  meleeFirstPersonLocalOffset: {x: 0, y: 0, z: 0}
+  meleeFirstPersonLocalOffset: {x: 0.1, y: -0.07, z: 0.04}
+  meleeFirstPersonLocalEuler: {x: 5, y: -30, z: 12}
   throwableFirstPersonLocalOffset: {x: 0, y: 0.18, z: 0.03}
   enableMeleeWalkBob: 0
   meleeWalkBobAmplitude: 0.025
   meleeWalkBobFrequency: 9
+--- !u!114 &9200000000000000014
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8514623158254487877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7f3c2e81b4d4f6a9e0d5b8c3a1f7e2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.MeleeFirstPersonSwingController
+  meleeWeapon: {fileID: 5816225677010246847}
+  attachedVisual: {fileID: 9200000000000000012}
+  meleeSocket: {fileID: 8724971255838169413}
+  networkObject: {fileID: 36363586663884873}
+  swingDuration: 0.24
+  arcHorizontal: 0.24
+  verticalDip: -0.03
+  forwardPush: 0.09
+  yawDegrees: 56
+  rollDegrees: -36
+  pitchDegrees: 10
+  legacyIdleLocalOffset: {x: 0.1, y: -0.07, z: 0.04}
+  legacyIdleLocalEuler: {x: 5, y: -30, z: 12}
 --- !u!114 &185991166709721278
 MonoBehaviour:
   m_ObjectHideFlags: 0

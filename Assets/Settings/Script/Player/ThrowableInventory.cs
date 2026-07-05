@@ -42,6 +42,9 @@ namespace ProjectM.Player
 
         public bool Has(ThrowableType type) => GetCount(type) > 0;
 
+        public bool HasAny() =>
+            grenadeCount > 0 || molotovCount > 0 || flashCount > 0;
+
         /// <summary>스폰 시점에 starting 값이 반드시 적용되도록 보장한다.</summary>
         internal void ApplyStartingCounts()
         {

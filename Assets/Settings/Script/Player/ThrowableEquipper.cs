@@ -95,7 +95,46 @@ namespace ProjectM.Player
 
         private void HandleInventoryChanged(ThrowableType type, int newCount)
         {
-            if (EquippedThrowable == type && newCount <= 0) SetEquipped(ThrowableType.None);
+            if (EquippedThrowable == type && newCount <= 0)
+                SetEquipped(ThrowableType.None);
+
+            if (LastSelected == type && newCount <= 0)
+            {
+                var next = GetFirstOwnedInCycleOrder();
+                if (next != ThrowableType.None)
+                    LastSelected = next;
+            }
+        }
+
+        /// <summary>cycleOrder 기준 첫 보유 투척무기. 없으면 None.</summary>
+        public ThrowableType GetFirstOwnedInCycleOrder()
+        {
+            if (inventory == null || cycleOrder == null)
+                return ThrowableType.None;
+
+            for (int i = 0; i < cycleOrder.Length; i++)
+            {
+                var t = cycleOrder[i];
+                if (t != ThrowableType.None && inventory.Has(t))
+                    return t;
+            }
+
+            return ThrowableType.None;
+        }
+
+        /// <summary>하단 HUD 슬롯에 표시할 투척무기 종류.</summary>
+        public ThrowableType ResolveHudIconType(bool showLastSelectedWhenIdle = true)
+        {
+            if (inventory == null || !inventory.HasAny())
+                return ThrowableType.None;
+
+            if (IsThrowableEquipped && inventory.Has(EquippedThrowable))
+                return EquippedThrowable;
+
+            if (showLastSelectedWhenIdle && inventory.Has(LastSelected))
+                return LastSelected;
+
+            return GetFirstOwnedInCycleOrder();
         }
 
         // ─────────────────────────────────────────────────────────────
