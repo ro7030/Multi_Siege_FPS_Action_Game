@@ -121,7 +121,7 @@ namespace ProjectM.CharacterSelect.Editor
 
             var nameTagRoot = CreateUiImage(nameCanvasGo.transform, "NameTagRoot", nameBoxSprite,
                 new Vector2(0.05f, 0.15f), new Vector2(0.95f, 0.85f));
-            var nameText = CreateTmpText(nameTagRoot.transform, "NameTagText", "Waiting...",
+            var nameText = CreateTmpText(nameTagRoot.transform, "NameTagText", "waiting...",
                 28, TextAlignmentOptions.Center, font, new Color(0.35f, 0.95f, 0.35f, 1f),
                 Vector2.zero, Vector2.one);
 
@@ -177,12 +177,12 @@ namespace ProjectM.CharacterSelect.Editor
             var actionBtn = CreateSpriteButton(controlRect, "ActionButton",
                 Resources.Load<Sprite>(ResActionButton),
                 new Vector2(0.12f, 0.08f), new Vector2(0.88f, 0.5f));
-            var actionLabel = CreateTmpText(actionBtn.transform, "Label", "Start",
+            var actionLabel = CreateTmpText(actionBtn.transform, "Label", "start",
                 36, TextAlignmentOptions.Center, font, Color.black,
                 Vector2.zero, Vector2.one);
 
             var statusText = CreateTmpText(canvasRect, "LobbyStatusText",
-                "Select a character.", 20, TextAlignmentOptions.Bottom,
+                "select a character.", 20, TextAlignmentOptions.Bottom,
                 font, new Color(0.9f, 0.9f, 0.9f, 1f),
                 new Vector2(0.2f, 0.01f), new Vector2(0.8f, 0.05f));
 
@@ -235,12 +235,8 @@ namespace ProjectM.CharacterSelect.Editor
 
         private static Button CreateBackButton(RectTransform canvas, TMP_FontAsset font)
         {
-            var backBtn = CreateSpriteButton(canvas, "BackButton", LoadBackButtonSprite(),
+            return CreateSpriteButton(canvas, "BackButton", LoadBackButtonSprite(),
                 new Vector2(0.02f, 0.90f), new Vector2(0.16f, 0.98f));
-            CreateTmpText(backBtn.transform, "Label", "세션 나가기",
-                22, TextAlignmentOptions.Center, font, Color.black,
-                new Vector2(0.08f, 0.1f), new Vector2(0.92f, 0.9f));
-            return backBtn;
         }
 
         private static Sprite LoadBackButtonSprite()

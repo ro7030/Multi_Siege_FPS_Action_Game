@@ -150,7 +150,7 @@ namespace ProjectM.Network
 
                 if (NetworkSessionHelper.IsServer && director != null && rematchHostClientId != 0)
                 {
-                    string roomName = $"{AuthSessionManager.ResolveNickname("Player")} Rematch";
+                    string roomName = $"{AuthSessionManager.ResolveNickname("player")} rematch";
                     director.RequestRematchRoomCreationOnClient(
                         rematchHostClientId,
                         rematchGroupId,
@@ -187,7 +187,7 @@ namespace ProjectM.Network
                 yield break;
             }
 
-            string roomName = $"{AuthSessionManager.ResolveNickname("Player")} Rematch";
+            string roomName = $"{AuthSessionManager.ResolveNickname("player")} rematch";
             Debug.Log($"[Rematch] Create rematch room group={rematchGroupId}");
 
             var createTask = relay.CreateRematchRoomAsync(rematchGroupId, roomName);

@@ -25,8 +25,8 @@ namespace ProjectM.CharacterSelect
         [SerializeField] private GameObject emptyStateRoot;
 
         [Header("Text Format")]
-        [SerializeField] private string emptyNicknameText = "Waiting...";
-        [SerializeField] private string scoreSuffix = "P";
+        [SerializeField] private string emptyNicknameText = "waiting...";
+        [SerializeField] private string scoreSuffix = "p";
 
         public int SlotIndex => slotIndex;
 

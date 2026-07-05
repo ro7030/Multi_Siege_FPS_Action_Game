@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 231bc6f6657b9aa47a0cafbf46edeb43, type: 3}
   m_Name: Kit_HerbMix
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.HealKitDefinition
-  displayName: HerbMix
+  displayName: herbmix
   price: 25
   healAmount: 25
   heldViewModelPrefab: {fileID: 8551378835401080124, guid: 4021f3d72d4459e46a5c92c8fde995f3, type: 3}

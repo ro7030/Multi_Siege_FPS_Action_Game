@@ -55,7 +55,7 @@ namespace ProjectM.Network
 
             if (IsOwner)
             {
-                SubmitNicknameServerRpc(new FixedString64Bytes(AuthSessionManager.ResolveNickname("Player")));
+                SubmitNicknameServerRpc(new FixedString64Bytes(AuthSessionManager.ResolveNickname("player")));
                 string authId = AuthSessionManager.Instance != null
                     ? AuthSessionManager.Instance.PlayerId
                     : string.Empty;

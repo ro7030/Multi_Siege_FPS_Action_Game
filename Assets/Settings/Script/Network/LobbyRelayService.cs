@@ -111,7 +111,7 @@ namespace ProjectM.Network
                 throw new InvalidOperationException("비밀번호는 8자리 숫자여야 합니다.");
 
             string displayName = string.IsNullOrWhiteSpace(roomName)
-                ? $"{AuthSessionManager.ResolveNickname("Host")}의 방"
+                ? $"{AuthSessionManager.ResolveNickname("host")}의 방"
                 : roomName.Trim();
 
             var lobbyOptions = new CreateLobbyOptions
@@ -121,7 +121,7 @@ namespace ProjectM.Network
                 Data = BuildLobbyData(displayName, joinCode, hasPassword)
             };
 
-            string nickname = AuthSessionManager.ResolveNickname("Host");
+            string nickname = AuthSessionManager.ResolveNickname("host");
             var lobby = await LobbyService.Instance.CreateLobbyAsync(displayName, maxPlayers, lobbyOptions);
 
             ApplyRelayServerData(allocation);
@@ -159,7 +159,7 @@ namespace ProjectM.Network
             string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
 
             string displayName = string.IsNullOrWhiteSpace(roomName)
-                ? $"{AuthSessionManager.ResolveNickname("Host")} Rematch"
+                ? $"{AuthSessionManager.ResolveNickname("host")} rematch"
                 : roomName.Trim();
 
             var lobbyOptions = new CreateLobbyOptions

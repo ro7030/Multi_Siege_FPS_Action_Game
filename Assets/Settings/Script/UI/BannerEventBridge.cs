@@ -16,8 +16,8 @@ namespace ProjectM.UI
         [SerializeField] private FarmManager farmManager;
 
         [Header("메시지 문구 (편집 가능, {wave} 치환)")]
-        [SerializeField] private string waveStartedFormat = "Wave {wave} 시작!";
-        [SerializeField] private string waveClearedFormat = "Wave {wave} 클리어!";
+        [SerializeField] private string waveStartedFormat = "wave {wave} 시작!";
+        [SerializeField] private string waveClearedFormat = "wave {wave} 클리어!";
         [SerializeField] private string preparationFormat = "정비 시간 — 다음 웨이브를 준비하세요";
         [SerializeField] private string matchClearedText = "방어 성공! 모든 웨이브 클리어!";
         [SerializeField] private string matchFailedText  = "베이스가 파괴되었습니다…";

@@ -13,6 +13,8 @@ namespace ProjectM.UI
     /// </summary>
     public class ScoreboardView : MonoBehaviour
     {
+        private const string DefaultFontResourcePath = "Fonts/Jalnan2/Jalnan2TTF SDF";
+
         [SerializeField] private GameSessionManager session;
         [SerializeField] private Key holdKey = Key.Tab;
 
@@ -43,6 +45,8 @@ namespace ProjectM.UI
 
         private void BuildPanel()
         {
+            var uiFont = Resources.Load<TMP_FontAsset>(DefaultFontResourcePath);
+
             var root = UIRoot.Instance.RootTransform;
             var bg = UIRoot.CreatePanel("Scoreboard", root, new Color(0, 0, 0, 0.72f));
             panelGo = bg.gameObject;
@@ -52,14 +56,16 @@ namespace ProjectM.UI
             rt.sizeDelta = new Vector2(920, 480);
 
             var header = UIRoot.CreateText("Header", rt, 32, TextAnchor.UpperCenter);
+            if (uiFont != null) header.font = uiFont;
             header.fontStyle = FontStyles.Bold;
             header.color = new Color(1, 0.9f, 0.4f);
-            header.text = "SCOREBOARD";
+            header.text = "scoreboard";
             var hrt = header.rectTransform;
             hrt.anchorMin = new Vector2(0, 1); hrt.anchorMax = new Vector2(1, 1);
             hrt.offsetMin = new Vector2(20, -70); hrt.offsetMax = new Vector2(-20, -10);
 
             bodyText = UIRoot.CreateText("Body", rt, 20, TextAnchor.UpperLeft);
+            if (uiFont != null) bodyText.font = uiFont;
             var brt = bodyText.rectTransform;
             brt.anchorMin = new Vector2(0, 0); brt.anchorMax = new Vector2(1, 1);
             brt.offsetMin = new Vector2(40, 30); brt.offsetMax = new Vector2(-40, -80);
@@ -69,9 +75,12 @@ namespace ProjectM.UI
         {
             var sb = new System.Text.StringBuilder();
             if (session != null)
-                sb.AppendLine($"Phase: {session.State.CurrentPhase}    Wave: {session.State.CurrentWave}/{session.State.MaxWave}\n");
+            {
+                string phase = session.State.CurrentPhase.ToString().ToLowerInvariant();
+                sb.AppendLine($"phase: {phase}    wave: {session.State.CurrentWave}/{session.State.MaxWave}\n");
+            }
 
-            sb.AppendLine($"{"Nickname",-16} {"Kills",5} {"Damage",8} {"Harvest",7} {"Revive",6} {"Score",6}");
+            sb.AppendLine($"{"nickname",-16} {"kills",5} {"damage",8} {"harvest",7} {"revive",6} {"score",6}");
             sb.AppendLine(new string('-', 62));
 
             var netStats = NetworkMatchStats.Instance;
@@ -111,7 +120,7 @@ namespace ProjectM.UI
 
         private static void AppendEntryRow(System.Text.StringBuilder sb, MatchStatEntry entry)
         {
-            string name = entry.Nickname.IsEmpty ? $"Player{entry.ClientId}" : entry.Nickname.ToString();
+            string name = entry.Nickname.IsEmpty ? $"player{entry.ClientId}" : entry.Nickname.ToString();
             sb.AppendLine($"{name,-16} {entry.Kills,5} {entry.DamageDealt,8:F0} {entry.HarvestCount,7} {entry.ReviveCount,6} {entry.Score,6}");
         }
     }

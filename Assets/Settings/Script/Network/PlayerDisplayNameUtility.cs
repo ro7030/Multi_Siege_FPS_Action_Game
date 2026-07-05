@@ -8,7 +8,7 @@ namespace ProjectM.Network
     /// </summary>
     public static class PlayerDisplayNameUtility
     {
-        public static string GetDisplayName(GameObject playerRoot, string fallback = "Player")
+        public static string GetDisplayName(GameObject playerRoot, string fallback = "player")
         {
             if (playerRoot == null) return fallback;
 
@@ -22,7 +22,7 @@ namespace ProjectM.Network
             return AuthSessionManager.ResolveNickname(fallback);
         }
 
-        public static string GetDisplayName(Component component, string fallback = "Player")
+        public static string GetDisplayName(Component component, string fallback = "player")
         {
             return component != null ? GetDisplayName(component.gameObject, fallback) : fallback;
         }

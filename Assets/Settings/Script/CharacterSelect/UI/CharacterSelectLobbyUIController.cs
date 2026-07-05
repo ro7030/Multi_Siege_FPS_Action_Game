@@ -10,9 +10,9 @@ namespace ProjectM.CharacterSelect
     /// </summary>
     public class CharacterSelectLobbyUIController : MonoBehaviour
     {
-        private const string HostActionLabel = "Start";
-        private const string GuestActionLabel = "Ready";
-        private const string GuestCancelLabel = "Cancel";
+        private const string HostActionLabel = "start";
+        private const string GuestActionLabel = "ready";
+        private const string GuestCancelLabel = "cancel";
 
         [Header("Services")]
         [SerializeField] private RoomServiceBootstrapper roomServiceBootstrapper;
@@ -65,8 +65,8 @@ namespace ProjectM.CharacterSelect
             RefreshCharacterButtons();
             RefreshBackButton();
             SetStatus(_room.IsLocalHost
-                ? "All players ready? Press Start to begin."
-                : "Select a character and press Ready.");
+                ? "all players ready? press start to begin."
+                : "select a character and press ready.");
         }
 
         private void Update()
@@ -133,11 +133,11 @@ namespace ProjectM.CharacterSelect
             {
                 if (!_room.CanStartGame)
                 {
-                    SetStatus("All guests must be Ready before Start.");
+                    SetStatus("all guests must be ready before start.");
                     return;
                 }
                 _room.TryStartGame();
-                SetStatus("Starting game...");
+                SetStatus("starting game...");
                 return;
             }
 
@@ -204,9 +204,9 @@ namespace ProjectM.CharacterSelect
             if (actionButton != null) actionButton.interactable = data.IsOccupied;
 
             if (data.IsReady)
-                SetStatus("Ready! Waiting for host to Start...");
+                SetStatus("ready! waiting for host to start...");
             else
-                SetStatus("Select a character and press Ready.");
+                SetStatus("select a character and press ready.");
         }
 
         private void RefreshCharacterButtons()
@@ -220,8 +220,9 @@ namespace ProjectM.CharacterSelect
 
         private void RefreshBackButton()
         {
-            if (backButtonLabel == null || _room == null) return;
-            backButtonLabel.text = _room.IsLocalHost ? "세션 종료" : "세션 나가기";
+            if (backButtonLabel == null) return;
+            backButtonLabel.text = string.Empty;
+            backButtonLabel.gameObject.SetActive(false);
         }
 
         private void SetStatus(string message)

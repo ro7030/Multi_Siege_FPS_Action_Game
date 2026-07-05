@@ -37,7 +37,7 @@ namespace ProjectM.UI.Editor
             var panel = CreatePanel("LoginPanel", canvasGo.transform, new Color(0.08f, 0.1f, 0.16f, 0.92f));
             Stretch(panel.GetComponent<RectTransform>(), 0.25f, 0.2f, 0.75f, 0.8f);
 
-            var title = CreateText("TitleText", panel.transform, "Project M", 48, font);
+            var title = CreateText("TitleText", panel.transform, "project m", 48, font);
             Anchor(title.rectTransform, 0.1f, 0.78f, 0.9f, 0.95f);
 
             var nicknameLabel = CreateText("NicknameLabel", panel.transform, "닉네임", 28, font);

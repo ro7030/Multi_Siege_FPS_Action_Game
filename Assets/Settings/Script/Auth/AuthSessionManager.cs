@@ -53,7 +53,7 @@ namespace ProjectM.Auth
             AuthMode = AuthMode.None;
         }
 
-        public static string ResolveNickname(string fallback = "Player")
+        public static string ResolveNickname(string fallback = "player")
         {
             if (Instance != null && !string.IsNullOrWhiteSpace(Instance.Nickname))
                 return Instance.Nickname.Trim();

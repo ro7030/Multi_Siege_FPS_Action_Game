@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 231bc6f6657b9aa47a0cafbf46edeb43, type: 3}
   m_Name: Kit_PillsTube
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.HealKitDefinition
-  displayName: PillsTube
+  displayName: pillstube
   price: 75
   healAmount: 75
   heldViewModelPrefab: {fileID: 9018083828553603102, guid: 0048aa371190684478e421570bc2672b, type: 3}

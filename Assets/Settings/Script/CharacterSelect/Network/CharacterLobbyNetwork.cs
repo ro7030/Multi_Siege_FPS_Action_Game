@@ -109,7 +109,7 @@ namespace ProjectM.CharacterSelect
                 : string.Empty;
 
             RegisterLocalPlayerServerRpc(
-                AuthSessionManager.ResolveNickname("Player"),
+                AuthSessionManager.ResolveNickname("player"),
                 NetworkManager.LocalClientId,
                 new FixedString64Bytes(authId));
         }

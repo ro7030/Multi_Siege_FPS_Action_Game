@@ -3384,7 +3384,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: new text
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d9c3847de03d37948bf1e3d46f58ebbc, type: 2}
   m_sharedMaterial: {fileID: 5028249470243527467, guid: d9c3847de03d37948bf1e3d46f58ebbc, type: 2}
@@ -4553,8 +4553,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.UI.BannerEventBridge
   session: {fileID: 0}
   farmManager: {fileID: 487639004}
-  waveStartedFormat: "Wave {wave} \uC2DC\uC791!"
-  waveClearedFormat: "Wave {wave} \uD074\uB9AC\uC5B4!"
+  waveStartedFormat: "wave {wave} \uC2DC\uC791!"
+  waveClearedFormat: "wave {wave} \uD074\uB9AC\uC5B4!"
   preparationFormat: "\uC815\uBE44 \uC2DC\uAC04 \u2014 \uB2E4\uC74C \uC6E8\uC774\uBE0C\uB97C
     \uC900\uBE44\uD558\uC138\uC694"
   matchClearedText: "\uBC29\uC5B4 \uC131\uACF5! \uBAA8\uB4E0 \uC6E8\uC774\uBE0C \uD074\uB9AC\uC5B4!"
@@ -5237,7 +5237,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Wave 2/4
+  m_text: wave 2/4
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d9c3847de03d37948bf1e3d46f58ebbc, type: 2}
   m_sharedMaterial: {fileID: 5028249470243527467, guid: d9c3847de03d37948bf1e3d46f58ebbc, type: 2}
@@ -7515,7 +7515,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Player 3
+  m_text: player 3
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d9c3847de03d37948bf1e3d46f58ebbc, type: 2}
   m_sharedMaterial: {fileID: 5028249470243527467, guid: d9c3847de03d37948bf1e3d46f58ebbc, type: 2}
@@ -8533,7 +8533,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Player 4
+  m_text: player 4
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d9c3847de03d37948bf1e3d46f58ebbc, type: 2}
   m_sharedMaterial: {fileID: 5028249470243527467, guid: d9c3847de03d37948bf1e3d46f58ebbc, type: 2}
@@ -11096,7 +11096,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Player 1
+  m_text: player 1
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d9c3847de03d37948bf1e3d46f58ebbc, type: 2}
   m_sharedMaterial: {fileID: 5028249470243527467, guid: d9c3847de03d37948bf1e3d46f58ebbc, type: 2}
@@ -12402,7 +12402,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Player 2 \uBD80\uD65C"
+  m_text: "player 2 \uBD80\uD65C"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d9c3847de03d37948bf1e3d46f58ebbc, type: 2}
   m_sharedMaterial: {fileID: 5028249470243527467, guid: d9c3847de03d37948bf1e3d46f58ebbc, type: 2}
@@ -16152,7 +16152,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Wave 9
+  m_text: wave 9
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d9c3847de03d37948bf1e3d46f58ebbc, type: 2}
   m_sharedMaterial: {fileID: 5028249470243527467, guid: d9c3847de03d37948bf1e3d46f58ebbc, type: 2}
@@ -16742,11 +16742,11 @@ MonoBehaviour:
   rewardText: {fileID: 0}
   rematchStatusText: {fileID: 956418641}
   rematchStatusFont: {fileID: 11400000, guid: d9c3847de03d37948bf1e3d46f58ebbc, type: 2}
-  victoryLabel: Victory
-  defeatLabel: Game Over
+  victoryLabel: victory
+  defeatLabel: game over
   victoryColor: {r: 0.5, g: 1, b: 0.7, a: 1}
   defeatColor: {r: 1, g: 0.4, b: 0.4, a: 1}
-  playerLabelFormat: Player {0}
+  playerLabelFormat: player {0}
   localPlayerIndex: 1
   resultImage: {fileID: 639428465}
   victorySprite: {fileID: 21300000, guid: 1d4b4527b022cd74eb48baf83e97b6f1, type: 3}
@@ -18566,7 +18566,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Player 2
+  m_text: player 2
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d9c3847de03d37948bf1e3d46f58ebbc, type: 2}
   m_sharedMaterial: {fileID: 5028249470243527467, guid: d9c3847de03d37948bf1e3d46f58ebbc, type: 2}

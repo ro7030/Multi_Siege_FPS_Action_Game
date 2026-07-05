@@ -80,7 +80,7 @@ namespace ProjectM.Network
             for (int i = 0; i < payload.PlayerCount; i++)
             {
                 var entry = payload.GetPlayer(i);
-                string name = entry.Nickname.IsEmpty ? "Player" : entry.Nickname.ToString();
+                string name = entry.Nickname.IsEmpty ? "player" : entry.Nickname.ToString();
                 string status = entry.PlayerState switch
                 {
                     RematchPlayerState.RetryReady => "완료 · 다시하기",

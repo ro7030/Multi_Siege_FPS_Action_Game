@@ -157,7 +157,7 @@ namespace ProjectM.UI
             }
 
             if (string.IsNullOrWhiteSpace(playerHealthBar.displayName))
-                playerHealthBar.displayName = "HP";
+                playerHealthBar.displayName = "hp";
         }
 
         private static void Anchor(RectTransform rt, Vector2 aMin, Vector2 aMax, Vector2 offMin, Vector2 offMax)
@@ -286,7 +286,7 @@ namespace ProjectM.UI
 
             if (playerWeapon != null && reloadText != null)
             {
-                if (playerWeapon.IsReloading) reloadText.text = "RELOADING...";
+                if (playerWeapon.IsReloading) reloadText.text = "reloading...";
                 else if (reloadText.text != "") reloadText.text = "";
             }
             if (session != null && session.State.CurrentPhase == GamePhase.Preparation)
@@ -336,13 +336,13 @@ namespace ProjectM.UI
         private void RefreshWave()
         {
             if (session == null || waveText == null) return;
-            waveText.text = $"Wave {session.State.CurrentWave}";
+            waveText.text = $"wave {session.State.CurrentWave}";
         }
 
         private void RefreshReload()
         {
             if (reloadText == null) return;
-            reloadText.text = (playerWeapon != null && playerWeapon.IsReloading) ? "RELOADING..." : "";
+            reloadText.text = (playerWeapon != null && playerWeapon.IsReloading) ? "reloading..." : "";
         }
 
         private void RefreshKit()

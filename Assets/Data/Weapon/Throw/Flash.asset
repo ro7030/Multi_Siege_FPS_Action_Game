@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f03305f3a4d64a94fbbdb41f755a0c2a, type: 3}
   m_Name: Flash
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.ThrowableDefinition
-  displayName: Flash
+  displayName: flash
   type: 3
   effect: 2
   damage: 0

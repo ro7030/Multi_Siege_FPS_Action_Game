@@ -26,9 +26,9 @@ namespace ProjectM.CharacterSelect
         [SerializeField] private string gameplaySceneName = "GamePlay";
 
         [Header("Button Labels")]
-        [SerializeField] private string startLabel = "Start";
-        [SerializeField] private string readyLabel = "Ready";
-        [SerializeField] private string cancelLabel = "Cancel";
+        [SerializeField] private string startLabel = "start";
+        [SerializeField] private string readyLabel = "ready";
+        [SerializeField] private string cancelLabel = "cancel";
 
         private IRoomService _room;
 

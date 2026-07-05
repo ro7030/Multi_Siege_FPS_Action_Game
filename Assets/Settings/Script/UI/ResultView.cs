@@ -41,11 +41,11 @@ namespace ProjectM.UI
         [SerializeField] private TMP_FontAsset rematchStatusFont;
 
         [Header("표시 라벨")]
-        [SerializeField] private string victoryLabel = "Victory";
-        [SerializeField] private string defeatLabel  = "Game Over";
+        [SerializeField] private string victoryLabel = "victory";
+        [SerializeField] private string defeatLabel  = "game over";
         [SerializeField] private Color  victoryColor = new Color(0.5f, 1f, 0.7f);
         [SerializeField] private Color  defeatColor  = new Color(1f, 0.4f, 0.4f);
-        [SerializeField] private string playerLabelFormat = "Player {0}";
+        [SerializeField] private string playerLabelFormat = "player {0}";
         [SerializeField] private int    localPlayerIndex  = 1;
 
         [Header("승패 이미지 (선택)")]
@@ -175,7 +175,7 @@ namespace ProjectM.UI
                 playerText.text = ResolveLocalDisplayName();
 
             if (waveText != null && session != null)
-                waveText.text = $"Wave {session.State.CurrentWave} / {session.State.MaxWave}";
+                waveText.text = $"wave {session.State.CurrentWave} / {session.State.MaxWave}";
 
             if (playTimeText != null && session != null)
             {

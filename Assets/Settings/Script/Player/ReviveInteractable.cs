@@ -43,7 +43,7 @@ namespace ProjectM.Player
             {
                 string n = target != null
                     ? PlayerDisplayNameUtility.GetDisplayName(target)
-                    : "Player";
+                    : "player";
                 return promptFormat.Replace("{name}", n);
             }
         }

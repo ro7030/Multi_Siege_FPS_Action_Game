@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 231bc6f6657b9aa47a0cafbf46edeb43, type: 3}
   m_Name: Kit_Pill
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.HealKitDefinition
-  displayName: Pill
+  displayName: pill
   price: 50
   healAmount: 50
   heldViewModelPrefab: {fileID: 2093170353575555094, guid: 914bfa6fb4b7ff644b2f3dff7688d145, type: 3}

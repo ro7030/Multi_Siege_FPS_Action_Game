@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 231bc6f6657b9aa47a0cafbf46edeb43, type: 3}
   m_Name: Kit_FirstAidKit
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.HealKitDefinition
-  displayName: FirstAidKit
+  displayName: firstaidkit
   price: 100
   healAmount: 100
   heldViewModelPrefab: {fileID: 5396988188536389404, guid: a878263a8b8f3ef4d9b4989733883f3a, type: 3}
