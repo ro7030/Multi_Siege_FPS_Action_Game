@@ -8,10 +8,8 @@ using ProjectM.Player;
 
 namespace ProjectM.Economy
 {
-    /// <summary>
-    /// 상점. 카탈로그에서 아이템 구매 요청을 검증하고, 화폐를 차감한 뒤 효과를 적용한다.
-    /// 효과 적용은 ItemType에 따라 분기. UI는 ShopView가 이 컴포넌트의 API만 사용한다.
-    /// </summary>
+    // 상점. 카탈로그에서 아이템 구매 요청을 검증하고, 화폐를 차감한 뒤 효과를 적용한다.
+    // 효과 적용은 ItemType에 따라 분기. UI는 ShopView가 이 컴포넌트의 API만 사용한다.
     public class ShopController : MonoBehaviour
     {
         [SerializeField] private ItemCatalog catalog;
@@ -87,7 +85,7 @@ namespace ProjectM.Economy
             return TryPurchaseWeaponTier(slot, next);
         }
 
-        /// <summary>원하는 무기 티어를 바로 구매(순서 무관, 미보유 티어만).</summary>
+        // 원하는 무기 티어를 바로 구매(순서 무관, 미보유 티어만).
         public bool TryPurchaseWeaponTier(WeaponSlot slot, int tierIndex)
         {
             if (NetworkSessionHelper.IsMultiplayerSession)
@@ -164,7 +162,7 @@ namespace ProjectM.Economy
             return true;
         }
 
-        /// <summary>서버 구매 후 Owner 클라이언트에만 적용 — NGO 미동기화 즉시 효과(탄약 등).</summary>
+        // 서버 구매 후 Owner 클라이언트에만 적용 — NGO 미동기화 즉시 효과(탄약 등).
         public void ApplyPurchasedEffectOnOwner(GameObject buyer, string itemId)
         {
             if (catalog == null || buyer == null || string.IsNullOrEmpty(itemId)) return;

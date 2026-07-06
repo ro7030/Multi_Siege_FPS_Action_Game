@@ -2,9 +2,7 @@ using UnityEngine;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// Phase 3 임시 디버그 UI. 체력/탄약/다운 상태를 화면에 출력하고 테스트 버튼을 제공한다.
-    /// </summary>
+    // Phase 3 임시 디버그 UI. 체력/탄약/다운 상태를 화면에 출력하고 테스트 버튼을 제공한다.
     public class PlayerDebugUI : MonoBehaviour
     {
         [SerializeField] private HealthSystem health;

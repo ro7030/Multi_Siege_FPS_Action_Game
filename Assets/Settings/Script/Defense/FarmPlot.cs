@@ -5,13 +5,11 @@ using ProjectM.Player;
 
 namespace ProjectM.Defense
 {
-    /// <summary>
-    /// 농작물 밭. 기획서 7-3 + 10-2 + 사용자 보정 기준.
-    /// - 적 공격 대상 (DefenseObject + HealthSystem)
-    /// - 매 웨이브 종료 시 yieldPerWave 만큼 1인당 수익이 누적됨
-    /// - 플레이어가 밭 근처에서 F 키(PlayerInteractor) → 누적분을 팀 전체 분배 (FarmManager.HarvestFarm)
-    /// - 파괴되면 누적분은 0 으로 손실
-    /// </summary>
+    // 농작물 밭. 기획서 7-3 + 10-2 + 사용자 보정 기준.
+    // - 적 공격 대상 (DefenseObject + HealthSystem)
+    // - 매 웨이브 종료 시 yieldPerWave 만큼 1인당 수익이 누적됨
+    // - 플레이어가 밭 근처에서 F 키(PlayerInteractor) → 누적분을 팀 전체 분배 (FarmManager.HarvestFarm)
+    // - 파괴되면 누적분은 0 으로 손실
     [RequireComponent(typeof(DefenseObject))]
     public class FarmPlot : MonoBehaviour, IInteractable
     {
@@ -40,7 +38,7 @@ namespace ProjectM.Defense
         public int AccumulatedYield { get; private set; }
         public bool HasYieldToHarvest => AccumulatedYield > 0 && State == FarmState.Active;
 
-        /// <summary>설치된 웨이브 번호 (FarmManager 가 설정).</summary>
+        // 설치된 웨이브 번호 (FarmManager 가 설정).
         public int InstalledOnWave { get; set; }
 
         public event Action<FarmPlot, int> OnYieldAdded;     // (plot, addedAmount)
@@ -123,7 +121,7 @@ namespace ProjectM.Defense
         // FarmManager 가 호출
         // ─────────────────────────────────────────────────────────────
 
-        /// <summary>웨이브가 1회 지났을 때 호출. 누적 수익 증가.</summary>
+        // 웨이브가 1회 지났을 때 호출. 누적 수익 증가.
         public void OnWavePassed()
         {
             if (State != FarmState.Active) return;
@@ -135,7 +133,7 @@ namespace ProjectM.Defense
                 bridge.ServerSyncFromPlot();
         }
 
-        /// <summary>수확 실행. 누적분 반환 후 0 으로 초기화. 실제 지갑 지급은 FarmManager 가 수행.</summary>
+        // 수확 실행. 누적분 반환 후 0 으로 초기화. 실제 지갑 지급은 FarmManager 가 수행.
         public int HarvestNow()
         {
             int amount = AccumulatedYield;
@@ -149,7 +147,7 @@ namespace ProjectM.Defense
             return amount;
         }
 
-        /// <summary>클라이언트 NGO 미러용. 서버 로직은 변경하지 않는다.</summary>
+        // 클라이언트 NGO 미러용. 서버 로직은 변경하지 않는다.
         internal void ApplyNetworkMirror(int accumulatedYield, FarmState state)
         {
             if (NetworkSessionHelper.IsGameplayAuthority)
@@ -168,7 +166,7 @@ namespace ProjectM.Defense
             }
         }
 
-        /// <summary>파괴 시 비주얼·콜라이더 비활성화 (서버/클라이언트 공통).</summary>
+        // 파괴 시 비주얼·콜라이더 비활성화 (서버/클라이언트 공통).
         internal void ApplyDestroyedPresentation()
         {
             foreach (var renderer in GetComponentsInChildren<Renderer>(true))

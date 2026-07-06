@@ -3,10 +3,8 @@ using ProjectM.Network;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// 다운된 동료 부활 상호작용 (홀드형). PlayerInteractor 가 F키 입력을 전달한다.
-    /// 자기 자신은 부활 불가. 다운 상태일 때만 프롬프트가 뜬다.
-    /// </summary>
+    // 다운된 동료 부활 상호작용 (홀드형). PlayerInteractor 가 F키 입력을 전달한다.
+    // 자기 자신은 부활 불가. 다운 상태일 때만 프롬프트가 뜬다.
     public class ReviveInteractable : MonoBehaviour, IInteractable
     {
         [SerializeField] private ReviveSystem target;

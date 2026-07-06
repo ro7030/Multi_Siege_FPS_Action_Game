@@ -7,9 +7,7 @@ using UnityEngine.UI;
 
 namespace ProjectM.UI
 {
-    /// <summary>
-    /// 방 만들기 패널 — Unity Lobby + Relay + NGO Host.
-    /// </summary>
+    // 방 만들기 패널 — Unity Lobby + Relay + NGO Host.
     public class CreateRoomPanelController : MonoBehaviour
     {
         [Header("연결")]

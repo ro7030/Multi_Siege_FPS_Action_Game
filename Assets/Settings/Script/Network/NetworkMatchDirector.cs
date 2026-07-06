@@ -9,9 +9,7 @@ using ProjectM.Wave;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// 서버 매치 진행 상태를 클라이언트 UI에 미러링하고 rematch intent를 집계한다.
-    /// </summary>
+    // 서버 매치 진행 상태를 클라이언트 UI에 미러링하고 rematch intent를 집계한다.
     [RequireComponent(typeof(NetworkObject))]
     public class NetworkMatchDirector : NetworkBehaviour
     {

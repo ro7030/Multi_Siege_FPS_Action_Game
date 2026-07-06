@@ -5,9 +5,7 @@ using UnityEngine.SceneManagement;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// GamePlay 씬에서만 NetworkPlayer를 스폰한다. 오프라인은 offlineScenePlayer 사용.
-    /// </summary>
+    // GamePlay 씬에서만 NetworkPlayer를 스폰한다. 오프라인은 offlineScenePlayer 사용.
     public class NetworkPlayerSpawner : NetworkBehaviour
     {
         [SerializeField] private string gameplaySceneName = "GamePlay";

@@ -5,20 +5,18 @@ using ProjectM.Player;
 
 namespace ProjectM.UI
 {
-    /// <summary>
-    /// "(F) 메시지" 상호작용 프롬프트. PlayerInteractor 의 현재 대상을 따라 월드 위치에 표시한다.
-    ///
-    /// [편집 가능]
-    ///   - keyIcon        : F키 아이콘 이미지 (Inspector 에서 Sprite 교체)
-    ///   - keyIconOutline : 키 아이콘 외곽 링. 홀드 진행도(0~1)에 맞춰 Radial360 으로 채워짐.
-    ///                      반드시 Image.Type = Filled, FillMethod = Radial360 으로 사용.
-    ///                      시각적으로는 가운데가 비어 있는 "링" 모양 스프라이트를 권장.
-    ///   - messageText  : 메시지 텍스트 (내용은 대상이 정함, 폰트/색/크기는 여기서 편집)
-    ///   - progressFill : 홀드형 진행바 (선택, 기존 하단 가로 바)
-    ///
-    /// 자동 생성형이지만, 직접 Canvas 로 만든 요소를 Inspector 슬롯에 연결하면 그것을 사용한다.
-    /// (null 인 슬롯만 자동 생성)
-    /// </summary>
+    // "(F) 메시지" 상호작용 프롬프트. PlayerInteractor 의 현재 대상을 따라 월드 위치에 표시한다.
+
+    // [편집 가능]
+    // - keyIcon        : F키 아이콘 이미지 (Inspector 에서 Sprite 교체)
+    // - keyIconOutline : 키 아이콘 외곽 링. 홀드 진행도(0~1)에 맞춰 Radial360 으로 채워짐.
+    // 반드시 Image.Type = Filled, FillMethod = Radial360 으로 사용.
+    // 시각적으로는 가운데가 비어 있는 "링" 모양 스프라이트를 권장.
+    // - messageText  : 메시지 텍스트 (내용은 대상이 정함, 폰트/색/크기는 여기서 편집)
+    // - progressFill : 홀드형 진행바 (선택, 기존 하단 가로 바)
+
+    // 자동 생성형이지만, 직접 Canvas 로 만든 요소를 Inspector 슬롯에 연결하면 그것을 사용한다.
+    // (null 인 슬롯만 자동 생성)
     public class InteractionPromptView : MonoBehaviour
     {
         [Header("참조")]
@@ -51,7 +49,7 @@ namespace ProjectM.UI
         [SerializeField] private Vector2 screenOffset = new(0, 0);
 
         private RectTransform rootRt;
-        /// <summary>promptRoot가 이 오브젝트와 같을 때 true. SetActive(self)는 스크립트를 꺼버리므로 자식만 토글한다.</summary>
+        // promptRoot가 이 오브젝트와 같을 때 true. SetActive(self)는 스크립트를 꺼버리므로 자식만 토글한다.
         private bool promptRootIsSelf;
 
         [SerializeField] private float localPlayerRescanInterval = 0.5f;

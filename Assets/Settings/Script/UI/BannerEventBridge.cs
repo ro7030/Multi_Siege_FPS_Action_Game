@@ -5,10 +5,8 @@ using ProjectM.Defense;
 
 namespace ProjectM.UI
 {
-    /// <summary>
-    /// 게임 이벤트를 NotificationBanner 로 연결한다.
-    /// 표시 문구는 Inspector 에서 편집 가능. {wave} 는 웨이브 번호로 치환된다.
-    /// </summary>
+    // 게임 이벤트를 NotificationBanner 로 연결한다.
+    // 표시 문구는 Inspector 에서 편집 가능. {wave} 는 웨이브 번호로 치환된다.
     public class BannerEventBridge : MonoBehaviour
     {
         [Header("참조 (자동 탐색)")]

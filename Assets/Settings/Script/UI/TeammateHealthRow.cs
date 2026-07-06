@@ -6,13 +6,11 @@ namespace ProjectM.UI
 {
     public enum TeammateStatus { Alive, Down, Dead }
 
-    /// <summary>
-    /// 팀원 체력바 1줄의 UI 참조 묶음.
-    /// 상태 아이콘은 다운/사망 두 개를 각각 둔다 (Canvas 에서 이미지 직접 넣기).
-    ///   - 생존: 둘 다 숨김
-    ///   - 다운: downIcon 표시
-    ///   - 사망: deadIcon 표시
-    /// </summary>
+    // 팀원 체력바 1줄의 UI 참조 묶음.
+    // 상태 아이콘은 다운/사망 두 개를 각각 둔다 (Canvas 에서 이미지 직접 넣기).
+    // - 생존: 둘 다 숨김
+    // - 다운: downIcon 표시
+    // - 사망: deadIcon 표시
     public class TeammateHealthRow : MonoBehaviour
     {
         [SerializeField] private TMP_Text nameText;
@@ -53,7 +51,7 @@ namespace ProjectM.UI
 
         public void SetFillColor(Color c) { if (fillImage != null) fillImage.color = c; }
 
-        /// <summary>상태에 맞는 아이콘만 켠다.</summary>
+        // 상태에 맞는 아이콘만 켠다.
         public void SetStatus(TeammateStatus status)
         {
             if (downIcon != null) downIcon.SetActive(status == TeammateStatus.Down);

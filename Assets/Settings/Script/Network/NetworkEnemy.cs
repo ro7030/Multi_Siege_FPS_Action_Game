@@ -5,9 +5,7 @@ using ProjectM.Enemy;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// NGO 적 루트. 서버만 AI/NavMesh, 클라이언트는 Transform 동기화 표시.
-    /// </summary>
+    // NGO 적 루트. 서버만 AI/NavMesh, 클라이언트는 Transform 동기화 표시.
     [RequireComponent(typeof(NetworkObject))]
     public class NetworkEnemy : NetworkBehaviour
     {

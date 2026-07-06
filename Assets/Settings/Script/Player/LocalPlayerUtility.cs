@@ -4,10 +4,8 @@ using ProjectM.Network;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// 씬에 <see cref="HealthSystem"/> 이 여러 개일 때,
-    /// <see cref="PlayerController.IsLocalPlayer"/> 가 true 인 오브젝트를 우선한다.
-    /// </summary>
+    // 씬에 <see cref="HealthSystem"/> 이 여러 개일 때,
+    // <see cref="PlayerController.IsLocalPlayer"/> 가 true 인 오브젝트를 우선한다.
     public static class LocalPlayerUtility
     {
         public static GameObject FindLocalPlayerObject()
@@ -38,10 +36,8 @@ namespace ProjectM.Player
             return null;
         }
 
-        /// <summary>
-        /// 로컬 플레이어의 지갑을 반환. 멀티플레이 환경에서 IsLocalPlayer=true 인 Player 의 CurrencyWallet 을 우선.
-        /// HUD/상점/보상 UI 가 "내 잔액"을 표시할 때 사용. 팀 전체에 분배할 때는 직접 FindObjectsByType 사용.
-        /// </summary>
+        // 로컬 플레이어의 지갑을 반환. 멀티플레이 환경에서 IsLocalPlayer=true 인 Player 의 CurrencyWallet 을 우선.
+        // HUD/상점/보상 UI 가 "내 잔액"을 표시할 때 사용. 팀 전체에 분배할 때는 직접 FindObjectsByType 사용.
         public static CurrencyWallet FindLocalCurrencyWallet()
         {
             var wallet = FindLocalComponent<CurrencyWallet>();

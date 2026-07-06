@@ -5,10 +5,8 @@ using ProjectM.Player;
 
 namespace ProjectM.Economy
 {
-    /// <summary>
-    /// 웨이브 종료 시 보상을 계산하여 CurrencyWallet에 지급한다.
-    /// MVP 공식: baseReward + (waveNumber * waveBonus)
-    /// </summary>
+    // 웨이브 종료 시 보상을 계산하여 CurrencyWallet에 지급한다.
+    // MVP 공식: baseReward + (waveNumber * waveBonus)
     public class RewardCalculator : MonoBehaviour
     {
         [SerializeField] private GameSessionManager session;

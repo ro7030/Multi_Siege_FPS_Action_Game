@@ -13,12 +13,10 @@ using ProjectM.Audio;
 
 namespace ProjectM.UI
 {
-    /// <summary>
-    /// 상점 UI.
-    /// · 상단/하단 탭: 카테고리 전환만
-    /// · 왼쪽 목록: 이름만, 클릭 시 선택
-    /// · 오른쪽 상세: 이름·가격·스프라이트(Image) + 구매 버튼으로만 구매
-    /// </summary>
+    // 상점 UI.
+    // · 상단/하단 탭: 카테고리 전환만
+    // · 왼쪽 목록: 이름만, 클릭 시 선택
+    // · 오른쪽 상세: 이름·가격·스프라이트(Image) + 구매 버튼으로만 구매
     public class ShopView : MonoBehaviour
     {
         [Header("참조 (비우면 자동 탐색)")]
@@ -112,7 +110,7 @@ namespace ProjectM.UI
             Hide();
         }
 
-        /// <summary>NGO 구매 결과·지갑 동기화 후 UI 갱신.</summary>
+        // NGO 구매 결과·지갑 동기화 후 UI 갱신.
         public void RefreshFromNetwork()
         {
             TryRebindLocalWallet();
@@ -526,9 +524,7 @@ namespace ProjectM.UI
         }
 
 #if UNITY_EDITOR
-        /// <summary>
-        /// 에디터 메뉴: ShopPanel 자식(탭·카테고리·목록·상세)을 만들고 인스펙터에 연결한다.
-        /// </summary>
+        // 에디터 메뉴: ShopPanel 자식(탭·카테고리·목록·상세)을 만들고 인스펙터에 연결한다.
         public void EditorRebuildPanelUi()
         {
             panelRoot = gameObject;

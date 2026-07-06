@@ -12,10 +12,8 @@ using TMPro;
 
 namespace ProjectM.Network.Editor
 {
-    /// <summary>
-    /// Phase 5: 매치 통계 NGO, 결과 UI, TCP 레거시 제거.
-    /// 메뉴: ProjectM/Setup Phase 5 Match Results
-    /// </summary>
+    // Phase 5: 매치 통계 NGO, 결과 UI, TCP 레거시 제거.
+    // 메뉴: ProjectM/Setup Phase 5 Match Results
     public static class Phase5MatchResultsSetup
     {
         private const string GamePlayScenePath = "Assets/Scenes/GamePlay.unity";

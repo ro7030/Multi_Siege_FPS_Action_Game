@@ -2,10 +2,8 @@ using UnityEngine;
 
 namespace ProjectM.Economy
 {
-    /// <summary>
-    /// 밭 시스템 전역 설정. 웨이브 구간 × 인원수 별 수확량과 한도를 정의.
-    /// 기획서 10-2 밭 수익 데이터 기준.
-    /// </summary>
+    // 밭 시스템 전역 설정. 웨이브 구간 × 인원수 별 수확량과 한도를 정의.
+    // 기획서 10-2 밭 수익 데이터 기준.
     [CreateAssetMenu(menuName = "ProjectM/Economy/FarmSettings", fileName = "FarmSettings")]
     public class FarmSettings : ScriptableObject
     {
@@ -33,7 +31,7 @@ namespace ProjectM.Economy
         public int earlyEndWave = 3;   // 1~3: early
         public int midEndWave   = 6;   // 4~6: mid
 
-        /// <summary>현재 웨이브와 인원수로 1인당 지급액 계산.</summary>
+        // 현재 웨이브와 인원수로 1인당 지급액 계산.
         public int GetYieldPerPlayer(int waveNumber, int playerCount)
         {
             YieldByPlayers band;

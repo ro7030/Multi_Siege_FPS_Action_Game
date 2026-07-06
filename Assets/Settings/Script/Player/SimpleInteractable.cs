@@ -3,16 +3,14 @@ using UnityEngine.Events;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// 범용 상호작용 컴포넌트. 코드 없이 Inspector 에서 메시지/아이콘/동작을 설정한다.
-    /// 게이트 설치, 버튼, 임의 트리거 등 커스텀 상호작용에 붙여 쓴다.
-    ///
-    /// [편집 가능]
-    ///   - promptText : 프롬프트 메시지 (직접 입력)
-    ///   - promptIcon : 아이콘 Sprite (직접 연결)
-    ///   - isHold + holdDuration : 홀드형 여부와 필요 시간
-    ///   - onInteract / onHoldComplete : 실행할 동작 (UnityEvent 로 연결)
-    /// </summary>
+    // 범용 상호작용 컴포넌트. 코드 없이 Inspector 에서 메시지/아이콘/동작을 설정한다.
+    // 게이트 설치, 버튼, 임의 트리거 등 커스텀 상호작용에 붙여 쓴다.
+
+    // [편집 가능]
+    // - promptText : 프롬프트 메시지 (직접 입력)
+    // - promptIcon : 아이콘 Sprite (직접 연결)
+    // - isHold + holdDuration : 홀드형 여부와 필요 시간
+    // - onInteract / onHoldComplete : 실행할 동작 (UnityEvent 로 연결)
     public class SimpleInteractable : MonoBehaviour, IInteractable
     {
         [Header("프롬프트 (직접 편집)")]

@@ -2,9 +2,7 @@ using UnityEngine;
 
 namespace ProjectM.Audio
 {
-    /// <summary>
-    /// 씬에 배치된 배경음악. 씬 이탈 시 오브젝트가 파괴되며 자동 정지된다.
-    /// </summary>
+    // 씬에 배치된 배경음악. 씬 이탈 시 오브젝트가 파괴되며 자동 정지된다.
     [DisallowMultipleComponent]
     public class SceneBackgroundMusic : MonoBehaviour
     {

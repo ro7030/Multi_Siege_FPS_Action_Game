@@ -4,9 +4,7 @@ using ProjectM.Player;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// 플레이어 무기 티어·활성 슬롯을 서버 권한으로 NGO 동기화한다.
-    /// </summary>
+    // 플레이어 무기 티어·활성 슬롯을 서버 권한으로 NGO 동기화한다.
     [RequireComponent(typeof(PlayerArsenal))]
     public class NetworkPlayerArsenal : NetworkBehaviour
     {
@@ -60,7 +58,7 @@ namespace ProjectM.Network
             }
         }
 
-        /// <summary>Owner 입력으로 활성 슬롯을 서버에 반영한다.</summary>
+        // Owner 입력으로 활성 슬롯을 서버에 반영한다.
         public void OwnerPublishActiveSlot(WeaponSlot slot)
         {
             if (!IsSpawned || !IsOwner || arsenal == null)

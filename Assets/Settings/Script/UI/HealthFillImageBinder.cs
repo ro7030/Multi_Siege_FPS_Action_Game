@@ -5,11 +5,9 @@ using ProjectM.Player;
 
 namespace ProjectM.UI
 {
-    /// <summary>
-    /// HealthSystem 의 체력 비율을 UI Image fillAmount 에 반영한다.
-    /// 플레이어 HUD(HUDPresenter)와 달리 에디터에서 만든 월드/스크린 HP 바는
-    /// Image Type 이 Simple 이면 fill 이 안 보이므로, 기본으로 Filled 로 맞춘다.
-    /// </summary>
+    // HealthSystem 의 체력 비율을 UI Image fillAmount 에 반영한다.
+    // 플레이어 HUD(HUDPresenter)와 달리 에디터에서 만든 월드/스크린 HP 바는
+    // Image Type 이 Simple 이면 fill 이 안 보이므로, 기본으로 Filled 로 맞춘다.
     [DisallowMultipleComponent]
     public class HealthFillImageBinder : MonoBehaviour
     {
@@ -27,7 +25,7 @@ namespace ProjectM.UI
             ApplyImageSettings();
         }
 
-        /// <summary>런타임 생성 UI(월드 체력바 등)에서 호출.</summary>
+        // 런타임 생성 UI(월드 체력바 등)에서 호출.
         public void Initialize(HealthSystem targetHealth, Image targetFill)
         {
             health = targetHealth;
@@ -78,10 +76,8 @@ namespace ProjectM.UI
             fillImage.fillAmount = ratio;
         }
 
-        /// <summary>
-        /// 자식 Image 중 이름에 Fill 이 포함된 것을 우선한다.
-        /// (Background 가 먼저 나오는 GetComponentInChildren 순서 때문에 체력이 안 닳아 보이던 문제 방지)
-        /// </summary>
+        // 자식 Image 중 이름에 Fill 이 포함된 것을 우선한다.
+        // (Background 가 먼저 나오는 GetComponentInChildren 순서 때문에 체력이 안 닳아 보이던 문제 방지)
         private Image ResolveFillImage()
         {
             var direct = transform.Find("HpFill");

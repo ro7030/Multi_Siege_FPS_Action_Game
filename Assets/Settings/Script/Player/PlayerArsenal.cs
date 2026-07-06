@@ -6,16 +6,14 @@ using ProjectM.UI;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// 플레이어 무기고. 주무기(총)/보조무기(칼) 슬롯 전환 + 단계(업그레이드) 관리.
-    ///
-    /// 입력
-    ///   - 1번키: 주 무기 장착 / 2번키: 보조 무기 장착 (기획서 8-2)
-    ///   - 무기 전환 시 키트는 자동으로 내려놓음
-    ///
-    /// 업그레이드는 ShopController.TryUpgradeWeapon 이 화폐 차감 후 TryUpgrade 를 호출한다.
-    /// 단계 데이터는 WeaponProgression(SO) 에서 읽으며, Unity 에서 자유롭게 추가/삭제 가능.
-    /// </summary>
+    // 플레이어 무기고. 주무기(총)/보조무기(칼) 슬롯 전환 + 단계(업그레이드) 관리.
+
+    // 입력
+    // - 1번키: 주 무기 장착 / 2번키: 보조 무기 장착 (기획서 8-2)
+    // - 무기 전환 시 키트는 자동으로 내려놓음
+
+    // 업그레이드는 ShopController.TryUpgradeWeapon 이 화폐 차감 후 TryUpgrade 를 호출한다.
+    // 단계 데이터는 WeaponProgression(SO) 에서 읽으며, Unity 에서 자유롭게 추가/삭제 가능.
     public class PlayerArsenal : MonoBehaviour
     {
         [Header("데이터")]
@@ -119,7 +117,7 @@ namespace ProjectM.Player
             }
         }
 
-        /// <summary>네트워크 미러용. NGO 재전파 없이 ActiveSlot·표시만 갱신.</summary>
+        // 네트워크 미러용. NGO 재전파 없이 ActiveSlot·표시만 갱신.
         public void MirrorActiveSlot(WeaponSlot slot)
         {
             ApplyActiveSlotLocal(slot, holsterItems: false);
@@ -143,14 +141,14 @@ namespace ProjectM.Player
             return d != null ? d.price : 0;
         }
 
-        /// <summary>다음 단계로 업그레이드(화폐 차감은 호출자 책임).</summary>
+        // 다음 단계로 업그레이드(화폐 차감은 호출자 책임).
         public bool TryUpgrade(WeaponSlot slot)
         {
             if (!CanUpgrade(slot)) return false;
             return TrySetTier(slot, CurrentTierIndex(slot) + 1);
         }
 
-        /// <summary>지정 단계로 바로 설정(상점에서 임의 티어 구매).</summary>
+        // 지정 단계로 바로 설정(상점에서 임의 티어 구매).
         public bool TrySetTier(WeaponSlot slot, int tierIndex)
         {
             if (progression == null) return false;
@@ -167,7 +165,7 @@ namespace ProjectM.Player
             return ApplyNetworkTier(slot, tierIndex);
         }
 
-        /// <summary>네트워크 미러 또는 오프라인 로컬 적용.</summary>
+        // 네트워크 미러 또는 오프라인 로컬 적용.
         public bool ApplyNetworkTier(WeaponSlot slot, int tierIndex)
         {
             if (progression == null || progression.GetTier(slot, tierIndex) == null)
@@ -184,14 +182,14 @@ namespace ProjectM.Player
             return true;
         }
 
-        /// <summary>ActiveSlot 기준 IsActive·1인칭 뷰모델 재동기화.</summary>
+        // ActiveSlot 기준 IsActive·1인칭 뷰모델 재동기화.
         private void ResyncWeaponActivation()
         {
             SyncWeaponInputState();
             SyncWeaponViewModels();
         }
 
-        /// <summary>네트워크 스폰·티어 변경 후 외부에서 표시 상태를 재동기화.</summary>
+        // 네트워크 스폰·티어 변경 후 외부에서 표시 상태를 재동기화.
         public void ResyncWeaponPresentation() => ResyncWeaponActivation();
 
         public int GetTierPrice(WeaponSlot slot, int tierIndex)
@@ -200,7 +198,7 @@ namespace ProjectM.Player
             return def != null ? def.price : 0;
         }
 
-        /// <summary>아직 보유하지 않은 티어만 구매 가능 (0티어는 기본 지급).</summary>
+        // 아직 보유하지 않은 티어만 구매 가능 (0티어는 기본 지급).
         public bool CanPurchaseTier(WeaponSlot slot, int tierIndex)
         {
             if (progression == null || tierIndex <= 0) return false;
@@ -251,7 +249,7 @@ namespace ProjectM.Player
                 Debug.Log($"[Arsenal] 슬롯 전환: {slot}");
         }
 
-        /// <summary>ActiveSlot + 키트/투척 상태 기준으로 IsActive만 갱신(유일한 진입점).</summary>
+        // ActiveSlot + 키트/투척 상태 기준으로 IsActive만 갱신(유일한 진입점).
         private void SyncWeaponInputState()
         {
             bool weaponsActive = AreWeaponsInputAllowed();
@@ -262,7 +260,7 @@ namespace ProjectM.Player
                 meleeWeapon.IsActive = weaponsActive && ActiveSlot == WeaponSlot.Secondary;
         }
 
-        /// <summary>ActiveSlot + 키트/투척 상태 기준으로 1인칭 뷰모델 표시만 갱신.</summary>
+        // ActiveSlot + 키트/투척 상태 기준으로 1인칭 뷰모델 표시만 갱신.
         private void SyncWeaponViewModels()
         {
             bool weaponsVisible = AreWeaponsInputAllowed();

@@ -7,9 +7,7 @@ using ProjectM.Player;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// 게이트 설치 상태를 NGO로 동기화한다.
-    /// </summary>
+    // 게이트 설치 상태를 NGO로 동기화한다.
     [RequireComponent(typeof(GateInstaller))]
     public class NetworkGateInstaller : NetworkBehaviour
     {

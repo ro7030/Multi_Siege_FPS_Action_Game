@@ -5,9 +5,7 @@ using ProjectM.Audio;
 
 namespace ProjectM.UI
 {
-    /// <summary>
-    /// ShopView 용 화면 UI를 런타임에 구성한다. (씬 ShopPanel 자식이 비어 있을 때)
-    /// </summary>
+    // ShopView 용 화면 UI를 런타임에 구성한다. (씬 ShopPanel 자식이 비어 있을 때)
     public static class ShopUiBuilder
     {
         public struct BuiltRefs

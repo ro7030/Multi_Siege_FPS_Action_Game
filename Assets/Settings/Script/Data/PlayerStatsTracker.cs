@@ -9,10 +9,8 @@ using ProjectM.Player;
 
 namespace ProjectM.Data
 {
-    /// <summary>
-    /// 로컬 플레이어의 인게임 기여도를 추적한다.
-    /// NGO 세션에서는 NetworkMatchStats 스냅샷을 읽는 파사드, 오프라인에서는 로컬 이벤트 구독.
-    /// </summary>
+    // 로컬 플레이어의 인게임 기여도를 추적한다.
+    // NGO 세션에서는 NetworkMatchStats 스냅샷을 읽는 파사드, 오프라인에서는 로컬 이벤트 구독.
     public class PlayerStatsTracker : MonoBehaviour
     {
         [SerializeField] private GameObject localPlayer;

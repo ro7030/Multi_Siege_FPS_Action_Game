@@ -16,9 +16,7 @@ using UnityEngine;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// Unity Lobby + Relay + NGO Host/Client 세션 관리.
-    /// </summary>
+    // Unity Lobby + Relay + NGO Host/Client 세션 관리.
     public class LobbyRelayService : MonoBehaviour
     {
         public const string DataRoomName = "roomName";
@@ -143,7 +141,7 @@ namespace ProjectM.Network
             Debug.Log($"[LobbyRelay] Room created: {displayName} lobbyId={lobby.Id} relay={joinCode}");
         }
 
-        /// <summary>호스트 퇴장 후 rematch — rematchGroupId(S1)로 검색 가능한 공개 방 생성.</summary>
+        // 호스트 퇴장 후 rematch — rematchGroupId(S1)로 검색 가능한 공개 방 생성.
         public async Task CreateRematchRoomAsync(string rematchGroupId, string roomName)
         {
             await EnsureServicesReadyAsync();
@@ -189,7 +187,7 @@ namespace ProjectM.Network
             Debug.Log($"[LobbyRelay] Rematch room created: {displayName} group={rematchGroupId} lobbyId={lobby.Id}");
         }
 
-        /// <summary>rematchGroupId(S1)로 열린 rematch 로비 검색.</summary>
+        // rematchGroupId(S1)로 열린 rematch 로비 검색.
         public async Task<string> TryFindRematchLobbyAsync(string rematchGroupId)
         {
             if (string.IsNullOrEmpty(rematchGroupId))

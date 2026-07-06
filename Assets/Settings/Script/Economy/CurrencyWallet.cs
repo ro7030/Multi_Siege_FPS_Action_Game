@@ -4,10 +4,8 @@ using ProjectM.Network;
 
 namespace ProjectM.Economy
 {
-    /// <summary>
-    /// 플레이어 화폐 지갑. 잔액 관리 및 이벤트 발행.
-    /// MVP에서는 로컬에서 동작. 네트워크 단계에서는 Host 권한.
-    /// </summary>
+    // 플레이어 화폐 지갑. 잔액 관리 및 이벤트 발행.
+    // MVP에서는 로컬에서 동작. 네트워크 단계에서는 Host 권한.
     public class CurrencyWallet : MonoBehaviour
     {
         [SerializeField] private int startingBalance = 0;
@@ -74,7 +72,7 @@ namespace ProjectM.Economy
             NotifyBalance(value);
         }
 
-        /// <summary>서버/네트워크 동기화용. 잔액 갱신 + 이벤트 발행.</summary>
+        // 서버/네트워크 동기화용. 잔액 갱신 + 이벤트 발행.
         public void NotifyBalance(int value, int added = 0, int spent = 0)
         {
             balance = Mathf.Max(0, value);

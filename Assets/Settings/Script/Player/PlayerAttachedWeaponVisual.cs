@@ -13,10 +13,8 @@ namespace ProjectM.Player
         Throwable
     }
 
-    /// <summary>
-    /// useAttachedWeapons=true 일 때 총/검/키트/투척을 몽키 Hand_r_equipment 단일 소켓에 부착한다.
-    /// false 이면 기존 카메라 소켓 경로(WeaponController 등)를 그대로 사용한다.
-    /// </summary>
+    // useAttachedWeapons=true 일 때 총/검/키트/투척을 몽키 Hand_r_equipment 단일 소켓에 부착한다.
+    // false 이면 기존 카메라 소켓 경로(WeaponController 등)를 그대로 사용한다.
     [DisallowMultipleComponent]
     public class PlayerAttachedWeaponVisual : MonoBehaviour
     {
@@ -122,9 +120,7 @@ namespace ProjectM.Player
             RefreshPresentation();
         }
 
-        /// <summary>
-        /// 카메라 스냅 이후에도 손 본 추적이 필요할 때(검 등) 로컬 그립 오프셋을 복원한다.
-        /// </summary>
+        // 카메라 스냅 이후에도 손 본 추적이 필요할 때(검 등) 로컬 그립 오프셋을 복원한다.
         public void RestoreActiveHandOffset()
         {
             var instance = ActiveDisplayedInstance;

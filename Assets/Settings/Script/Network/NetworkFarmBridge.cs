@@ -6,9 +6,7 @@ using ProjectM.Economy;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// 밭 누적 수확량·파괴 상태를 NGO로 복제한다.
-    /// </summary>
+    // 밭 누적 수확량·파괴 상태를 NGO로 복제한다.
     [RequireComponent(typeof(FarmPlot))]
     public class NetworkFarmBridge : NetworkBehaviour
     {

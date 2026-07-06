@@ -2,10 +2,8 @@ using UnityEngine;
 
 namespace ProjectM.Core
 {
-    /// <summary>
-    /// Phase 1 임시 디버그 UI. 게임 세션 흐름을 화면 버튼으로 직접 호출하여 검증한다.
-    /// MVP 검증 완료 후 제거 예정.
-    /// </summary>
+    // Phase 1 임시 디버그 UI. 게임 세션 흐름을 화면 버튼으로 직접 호출하여 검증한다.
+    // MVP 검증 완료 후 제거 예정.
     public class GameDebugUI : MonoBehaviour
     {
         [SerializeField] private GameSessionManager session;

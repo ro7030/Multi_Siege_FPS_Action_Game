@@ -7,10 +7,8 @@ using ProjectM.Network;
 
 namespace ProjectM.UI
 {
-    /// <summary>
-    /// 인게임 스코어보드. Tab 키 길게 누름으로 표시.
-    /// NGO: NetworkPlayerRegistry + NetworkMatchStats.
-    /// </summary>
+    // 인게임 스코어보드. Tab 키 길게 누름으로 표시.
+    // NGO: NetworkPlayerRegistry + NetworkMatchStats.
     public class ScoreboardView : MonoBehaviour
     {
         private const string DefaultFontResourcePath = "Fonts/Jalnan2/Jalnan2TTF SDF";

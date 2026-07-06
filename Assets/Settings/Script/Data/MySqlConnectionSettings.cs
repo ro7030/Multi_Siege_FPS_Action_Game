@@ -3,9 +3,7 @@ using UnityEngine;
 
 namespace ProjectM.Data
 {
-    /// <summary>
-    /// MySQL 연결 설정. MySqlConnectionTester, MySqlSessionRepository 등에서 공유한다.
-    /// </summary>
+    // MySQL 연결 설정. MySqlConnectionTester, MySqlSessionRepository 등에서 공유한다.
     public class MySqlConnectionSettings : MonoBehaviour
     {
         [SerializeField] private string server = "127.0.0.1";

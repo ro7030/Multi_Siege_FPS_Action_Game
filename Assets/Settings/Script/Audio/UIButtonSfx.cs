@@ -9,9 +9,7 @@ namespace ProjectM.Audio
         Purchase,
     }
 
-    /// <summary>
-    /// Button 클릭 시 UI 효과음을 재생한다.
-    /// </summary>
+    // Button 클릭 시 UI 효과음을 재생한다.
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Button))]
     public class UIButtonSfx : MonoBehaviour

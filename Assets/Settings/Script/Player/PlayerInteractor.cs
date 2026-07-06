@@ -4,12 +4,10 @@ using UnityEngine.InputSystem;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// 플레이어 주변의 IInteractable 을 찾아 F키 상호작용을 처리한다.
-    /// - 매 프레임 가장 적합한 대상(가깝고 정면에 가까운)을 골라 OnTargetChanged 로 알림
-    /// - InteractionPromptView 가 이 이벤트를 받아 "(F) 메시지" 를 표시
-    /// - F키: 단발형은 누르는 순간 Interact(), 홀드형은 누르는 동안 InteractHold()
-    /// </summary>
+    // 플레이어 주변의 IInteractable 을 찾아 F키 상호작용을 처리한다.
+    // - 매 프레임 가장 적합한 대상(가깝고 정면에 가까운)을 골라 OnTargetChanged 로 알림
+    // - InteractionPromptView 가 이 이벤트를 받아 "(F) 메시지" 를 표시
+    // - F키: 단발형은 누르는 순간 Interact(), 홀드형은 누르는 동안 InteractHold()
     public class PlayerInteractor : MonoBehaviour
     {
         [Header("탐지")]
@@ -26,10 +24,10 @@ namespace ProjectM.Player
 
         [SerializeField] private Key interactKey = Key.F;
 
-        /// <summary>현재 조준 중인 상호작용 대상 (없으면 null).</summary>
+        // 현재 조준 중인 상호작용 대상 (없으면 null).
         public IInteractable Current { get; private set; }
 
-        /// <summary>대상이 바뀔 때 발생 (UI 가 구독).</summary>
+        // 대상이 바뀔 때 발생 (UI 가 구독).
         public event Action<IInteractable> OnTargetChanged;
 
         [Header("디버그")]

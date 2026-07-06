@@ -9,9 +9,7 @@ using ProjectM.Enemy;
 
 namespace ProjectM.UI
 {
-    /// <summary>
-    /// 인게임 HUD. 로컬 플레이어 체력 1칸 + (선택) 팀원 체력 슬롯을 인스펙터에서 연결한다.
-    /// </summary>
+    // 인게임 HUD. 로컬 플레이어 체력 1칸 + (선택) 팀원 체력 슬롯을 인스펙터에서 연결한다.
     public class HUDPresenter : MonoBehaviour
     {
         [Header("게임 상태 참조 (자동 탐색)")]
@@ -61,7 +59,7 @@ namespace ProjectM.UI
             RefreshAll();
         }
 
-        /// <summary>팀 슬롯에 UI만 비어 있으면 HUD 자식 TeammateHpBg 등을 0번 슬롯에 연결.</summary>
+        // 팀 슬롯에 UI만 비어 있으면 HUD 자식 TeammateHpBg 등을 0번 슬롯에 연결.
         private void ResolveTeamBarUiFromChildren()
         {
             if (teamHealthBars == null || teamHealthBars.Length == 0) return;

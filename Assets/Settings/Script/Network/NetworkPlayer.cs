@@ -10,9 +10,7 @@ using ProjectM.UI;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// NGO 플레이어 루트. Owner만 입력·카메라·CharacterController 사용.
-    /// </summary>
+    // NGO 플레이어 루트. Owner만 입력·카메라·CharacterController 사용.
     [RequireComponent(typeof(NetworkObject))]
     public class NetworkPlayer : NetworkBehaviour
     {

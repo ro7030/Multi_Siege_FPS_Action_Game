@@ -5,9 +5,7 @@ using ProjectM.Player;
 
 namespace ProjectM.UI
 {
-    /// <summary>
-    /// 팀원 체력바. Canvas 에 직접 배치한 행(Row)들을 연결해서 사용한다.
-    /// </summary>
+    // 팀원 체력바. Canvas 에 직접 배치한 행(Row)들을 연결해서 사용한다.
     public class TeammateHealthView : MonoBehaviour
     {
         [Header("직접 배치한 행 (위치/디자인 자유)")]

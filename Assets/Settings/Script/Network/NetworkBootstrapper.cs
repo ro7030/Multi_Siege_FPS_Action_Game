@@ -4,9 +4,7 @@ using UnityEngine;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// MainMenu 등에서 NetworkManager와 LobbyRelayService를 준비한다.
-    /// </summary>
+    // MainMenu 등에서 NetworkManager와 LobbyRelayService를 준비한다.
     public class NetworkBootstrapper : MonoBehaviour
     {
         [SerializeField] private NetworkManager networkManagerPrefab;

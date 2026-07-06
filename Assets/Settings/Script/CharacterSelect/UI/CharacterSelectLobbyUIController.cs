@@ -5,9 +5,7 @@ using TMPro;
 
 namespace ProjectM.CharacterSelect
 {
-    /// <summary>
-    /// LobbyScene 방식 UI — Host Start / Guest Ready·Cancel, 슬롯 World Space 갱신.
-    /// </summary>
+    // LobbyScene 방식 UI — Host Start / Guest Ready·Cancel, 슬롯 World Space 갱신.
     public class CharacterSelectLobbyUIController : MonoBehaviour
     {
         private const string HostActionLabel = "start";

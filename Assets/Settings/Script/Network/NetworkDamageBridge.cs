@@ -5,9 +5,7 @@ using ProjectM.Player;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// NGO 체력 권한: 클라이언트 데미지/회복 요청은 ServerRpc, HP·다운 상태는 NetworkVariable로 복제.
-    /// </summary>
+    // NGO 체력 권한: 클라이언트 데미지/회복 요청은 ServerRpc, HP·다운 상태는 NetworkVariable로 복제.
     [RequireComponent(typeof(HealthSystem))]
     public class NetworkDamageBridge : NetworkBehaviour
     {
@@ -35,11 +33,9 @@ namespace ProjectM.Network
             NetworkVariableReadPermission.Everyone,
             NetworkVariableWritePermission.Server);
 
-        /// <summary>
-        /// ReviveSystem이 없는 엔티티(적)가 게스트 클라이언트에서 사망 상태로 전환될 때 1회 발생.
-        /// EnemyAIController.OnDeath는 서버/싱글플레이에서만 실행되므로, 순수 게스트 클라이언트의
-        /// 시각 효과(쓰러짐 이펙트 등)는 이 이벤트로 트리거한다.
-        /// </summary>
+        // ReviveSystem이 없는 엔티티(적)가 게스트 클라이언트에서 사망 상태로 전환될 때 1회 발생.
+        // EnemyAIController.OnDeath는 서버/싱글플레이에서만 실행되므로, 순수 게스트 클라이언트의
+        // 시각 효과(쓰러짐 이펙트 등)는 이 이벤트로 트리거한다.
         public event Action OnClientVisualDeath;
 
         private HealthSystem health;
@@ -198,7 +194,7 @@ namespace ProjectM.Network
             netReviveProgress.Value = revive != null ? revive.ReviveProgress : 0f;
         }
 
-        /// <summary>게이트 설치 등 비활성→활성 전환 후 서버 HP 스냅샷을 즉시 밀어넣는다.</summary>
+        // 게이트 설치 등 비활성→활성 전환 후 서버 HP 스냅샷을 즉시 밀어넣는다.
         public void ServerSyncHealthNow()
         {
             if (!IsServer || !IsSpawned || health == null)

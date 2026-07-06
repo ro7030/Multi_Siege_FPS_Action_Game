@@ -3,9 +3,7 @@ using UnityEngine;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// ResultView Retry/Home → MatchRematchCoordinator 위임.
-    /// </summary>
+    // ResultView Retry/Home → MatchRematchCoordinator 위임.
     public static class MatchExitHelper
     {
         public const string CharacterSelectScene = MatchRematchCoordinator.CharacterSelectScene;

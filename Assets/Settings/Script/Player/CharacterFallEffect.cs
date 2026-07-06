@@ -4,13 +4,11 @@ using ProjectM.Network;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// 캐릭터(플레이어/적)가 쓰러질 때 지면 충격 파티클을 재생한다. 플레이어/적 공용 컴포넌트.
-    /// - 플레이어: ReviveSystem.OnDowned (호스트/게스트 모두 NetworkDamageBridge가 이미 동기화해줌)
-    ///   → 다운 중 플립북 반복, OnRevived / OnFullDeath 시 중지
-    /// - 적(서버/싱글플레이): EnemyAIController.OnDeath
-    /// - 적(순수 게스트 클라이언트): NetworkDamageBridge.OnClientVisualDeath (ReviveSystem이 없는 경우에만 발생)
-    /// </summary>
+    // 캐릭터(플레이어/적)가 쓰러질 때 지면 충격 파티클을 재생한다. 플레이어/적 공용 컴포넌트.
+    // - 플레이어: ReviveSystem.OnDowned (호스트/게스트 모두 NetworkDamageBridge가 이미 동기화해줌)
+    // → 다운 중 플립북 반복, OnRevived / OnFullDeath 시 중지
+    // - 적(서버/싱글플레이): EnemyAIController.OnDeath
+    // - 적(순수 게스트 클라이언트): NetworkDamageBridge.OnClientVisualDeath (ReviveSystem이 없는 경우에만 발생)
     [DisallowMultipleComponent]
     public class CharacterFallEffect : MonoBehaviour
     {

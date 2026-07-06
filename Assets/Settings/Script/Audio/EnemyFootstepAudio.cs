@@ -5,9 +5,7 @@ using ProjectM.Network;
 
 namespace ProjectM.Audio
 {
-    /// <summary>
-    /// 적 지상 이동 시 3D 발자국 루프를 재생한다. 멀티 클라이언트는 Transform 차분으로 속도를 추정한다.
-    /// </summary>
+    // 적 지상 이동 시 3D 발자국 루프를 재생한다. 멀티 클라이언트는 Transform 차분으로 속도를 추정한다.
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(200)]
     public class EnemyFootstepAudio : MonoBehaviour

@@ -5,14 +5,12 @@ using ProjectM.Player;
 
 namespace ProjectM.UI
 {
-    /// <summary>
-    /// GTA식 키트 선택 라디얼 휠. KitEquipper 의 선택 상태를 폴링하여 표시한다.
-    /// - 3번키를 누르고 있는 동안만 표시
-    /// - 위=회복 / 좌하=수리 / 우하=밭, 마우스 방향으로 가리킨 칸이 강조됨
-    /// - 중앙 포인터가 현재 선택 방향을 가리킴
-    ///
-    /// 자동 생성형 UI. 직접 Canvas 로 만들고 싶으면 이 컴포넌트를 빼고 별도 구현하면 된다.
-    /// </summary>
+    // GTA식 키트 선택 라디얼 휠. KitEquipper 의 선택 상태를 폴링하여 표시한다.
+    // - 3번키를 누르고 있는 동안만 표시
+    // - 위=회복 / 좌하=수리 / 우하=밭, 마우스 방향으로 가리킨 칸이 강조됨
+    // - 중앙 포인터가 현재 선택 방향을 가리킴
+
+    // 자동 생성형 UI. 직접 Canvas 로 만들고 싶으면 이 컴포넌트를 빼고 별도 구현하면 된다.
     public class KitWheelView : MonoBehaviour
     {
         [SerializeField] private KitEquipper equipper;

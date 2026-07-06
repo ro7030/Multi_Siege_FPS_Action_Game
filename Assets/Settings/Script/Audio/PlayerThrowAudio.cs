@@ -4,9 +4,7 @@ using ProjectM.Player;
 
 namespace ProjectM.Audio
 {
-    /// <summary>
-    /// 로컬 플레이어 투척 시 던지기 SFX를 재생한다.
-    /// </summary>
+    // 로컬 플레이어 투척 시 던지기 SFX를 재생한다.
     [DisallowMultipleComponent]
     [RequireComponent(typeof(ThrowableEquipper))]
     public class PlayerThrowAudio : MonoBehaviour

@@ -4,11 +4,9 @@ using UnityEngine;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// 플레이어 프리팹의 비주얼 슬롯. 선택된 캐릭터 인덱스에 해당하는
-    /// CharacterData.gameplayPrefab을 visualRoot 아래에 인스턴스화한다.
-    /// 네트워크 동기화는 NetworkPlayer가 담당하고, 이 컴포넌트는 비주얼 교체만 수행.
-    /// </summary>
+    // 플레이어 프리팹의 비주얼 슬롯. 선택된 캐릭터 인덱스에 해당하는
+    // CharacterData.gameplayPrefab을 visualRoot 아래에 인스턴스화한다.
+    // 네트워크 동기화는 NetworkPlayer가 담당하고, 이 컴포넌트는 비주얼 교체만 수행.
     public class CharacterVisualBinder : MonoBehaviour
     {
         public const string HandEquipmentSocketName = "Hand_r_equipment";

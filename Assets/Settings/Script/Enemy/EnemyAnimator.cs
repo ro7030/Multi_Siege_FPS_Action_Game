@@ -4,11 +4,9 @@ using ProjectM.Network;
 
 namespace ProjectM.Enemy
 {
-    /// <summary>
-    /// NavMeshAgent·FSM 상태를 Animator 파라미터(Speed/Grounded/Attack)에 반영한다.
-    /// 서버(Host)가 계산한 값을 NetworkEnemyAnimationBridge로 복제하고,
-    /// 클라이언트는 해당 브리지 값을 그대로 재생한다.
-    /// </summary>
+    // NavMeshAgent·FSM 상태를 Animator 파라미터(Speed/Grounded/Attack)에 반영한다.
+    // 서버(Host)가 계산한 값을 NetworkEnemyAnimationBridge로 복제하고,
+    // 클라이언트는 해당 브리지 값을 그대로 재생한다.
     [DisallowMultipleComponent]
     public class EnemyAnimator : MonoBehaviour
     {
@@ -95,7 +93,7 @@ namespace ProjectM.Enemy
             animBridge?.PublishAttack();
         }
 
-        /// <summary>서버가 전파한 Attack 트리거를 클라이언트에서 재생한다 (서버 자신은 위 HandleStateChanged에서 이미 처리).</summary>
+        // 서버가 전파한 Attack 트리거를 클라이언트에서 재생한다 (서버 자신은 위 HandleStateChanged에서 이미 처리).
         private void HandleRemoteAttack()
         {
             if (animator == null) return;

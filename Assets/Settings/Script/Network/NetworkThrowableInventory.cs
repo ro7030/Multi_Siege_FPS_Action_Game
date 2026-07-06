@@ -4,9 +4,7 @@ using ProjectM.Player;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// 플레이어 투척무기 보유량을 서버 권한으로 NGO 동기화한다.
-    /// </summary>
+    // 플레이어 투척무기 보유량을 서버 권한으로 NGO 동기화한다.
     [RequireComponent(typeof(ThrowableInventory))]
     public class NetworkThrowableInventory : NetworkBehaviour
     {
@@ -132,7 +130,7 @@ namespace ProjectM.Network
             }
         }
 
-        /// <summary>Owner 클라이언트 투척 요청 (Guest).</summary>
+        // Owner 클라이언트 투척 요청 (Guest).
         public void RequestThrowFromOwner(ThrowableType type, Vector3 origin, Vector3 velocity)
         {
             if (!IsOwner || type == ThrowableType.None)
@@ -141,7 +139,7 @@ namespace ProjectM.Network
             RequestThrowServerRpc((int)type, origin, velocity);
         }
 
-        /// <summary>서버 권한 투척 (Host 직접 호출 + ServerRpc 공용).</summary>
+        // 서버 권한 투척 (Host 직접 호출 + ServerRpc 공용).
         public bool ServerExecuteThrow(ThrowableType type, Vector3 origin, Vector3 velocity)
         {
             if (!IsServer || type == ThrowableType.None || equipper == null)

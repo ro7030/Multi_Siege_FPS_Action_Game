@@ -5,9 +5,7 @@ using UnityEngine.SceneManagement;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// GamePlay가 아닌 씬(MainMenu, CharacterSelect 등)에서는 NetworkPlayer(PlayerObject)를 두지 않는다.
-    /// </summary>
+    // GamePlay가 아닌 씬(MainMenu, CharacterSelect 등)에서는 NetworkPlayer(PlayerObject)를 두지 않는다.
     [DefaultExecutionOrder(100)]
     public class NetworkPlayerSessionGuard : MonoBehaviour
     {

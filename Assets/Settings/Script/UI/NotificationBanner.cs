@@ -5,18 +5,16 @@ using TMPro;
 
 namespace ProjectM.UI
 {
-    /// <summary>
-    /// 상단 중앙 공지/안내 배너. 메시지를 큐에 넣으면 순서대로 표시 후 자동으로 사라진다.
-    /// 페이드 인/아웃 지원. 웨이브 시작, 거점 파괴 경고, 시스템 안내 등에 사용.
-    ///
-    /// 사용:
-    ///   NotificationBanner.Instance.Show("Wave 3 시작!");
-    ///   NotificationBanner.Instance.Show("성문이 파괴되었습니다!", 4f);
-    ///
-    /// 두 가지 사용법
-    ///   1) UI 슬롯 비움 → 코드가 자동 생성 (위치/색/폰트 Inspector 조절)
-    ///   2) 직접 Canvas 로 배너 만들고 슬롯 연결 → 그 디자인 사용
-    /// </summary>
+    // 상단 중앙 공지/안내 배너. 메시지를 큐에 넣으면 순서대로 표시 후 자동으로 사라진다.
+    // 페이드 인/아웃 지원. 웨이브 시작, 거점 파괴 경고, 시스템 안내 등에 사용.
+
+    // 사용:
+    // NotificationBanner.Instance.Show("Wave 3 시작!");
+    // NotificationBanner.Instance.Show("성문이 파괴되었습니다!", 4f);
+
+    // 두 가지 사용법
+    // 1) UI 슬롯 비움 → 코드가 자동 생성 (위치/색/폰트 Inspector 조절)
+    // 2) 직접 Canvas 로 배너 만들고 슬롯 연결 → 그 디자인 사용
     public class NotificationBanner : MonoBehaviour
     {
         public static NotificationBanner Instance { get; private set; }
@@ -67,14 +65,14 @@ namespace ProjectM.UI
         }
 
         // ── 공개 API ─────────────────────────────────────────────
-        /// <summary>배너 메시지 표시 (현재 표시 중이면 큐에 대기).</summary>
+        // 배너 메시지 표시 (현재 표시 중이면 큐에 대기).
         public void Show(string message, float duration = -1f)
         {
             if (duration <= 0f) duration = defaultDuration;
             queue.Enqueue((message, duration));
         }
 
-        /// <summary>즉시 모든 큐 비우고 현재 배너 숨김.</summary>
+        // 즉시 모든 큐 비우고 현재 배너 숨김.
         public void ClearAll()
         {
             queue.Clear();

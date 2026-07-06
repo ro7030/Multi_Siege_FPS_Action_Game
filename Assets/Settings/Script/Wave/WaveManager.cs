@@ -7,10 +7,8 @@ using ProjectM.Network;
 
 namespace ProjectM.Wave
 {
-    /// <summary>
-    /// 웨이브 순서대로 EnemySpawner에게 스폰 지시를 보낸다.
-    /// Host 권한. GameSessionManager의 OnWaveStarted/OnWaveEnded 이벤트와 연동.
-    /// </summary>
+    // 웨이브 순서대로 EnemySpawner에게 스폰 지시를 보낸다.
+    // Host 권한. GameSessionManager의 OnWaveStarted/OnWaveEnded 이벤트와 연동.
     public class WaveManager : MonoBehaviour
     {
         [SerializeField] private GameSessionManager session;

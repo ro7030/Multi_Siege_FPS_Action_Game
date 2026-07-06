@@ -4,9 +4,7 @@ using UnityEngine;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// Owner 클라이언트의 Animator 파라미터를 NetworkVariable로 복제한다.
-    /// </summary>
+    // Owner 클라이언트의 Animator 파라미터를 NetworkVariable로 복제한다.
     [DisallowMultipleComponent]
     public class NetworkPlayerAnimationBridge : NetworkBehaviour
     {
@@ -63,9 +61,9 @@ namespace ProjectM.Network
         public bool SyncedIsMelee => netIsMelee.Value;
 
         public event Action OnSyncedStateChanged;
-        /// <summary>Owner가 투척을 실행한 순간마다 정확히 1회 발생 (Remote 애니메이션 트리거용).</summary>
+        // Owner가 투척을 실행한 순간마다 정확히 1회 발생 (Remote 애니메이션 트리거용).
         public event Action OnThrowRequested;
-        /// <summary>Owner가 근접 공격을 실행한 순간마다 정확히 1회 발생 (Remote 애니메이션 트리거용).</summary>
+        // Owner가 근접 공격을 실행한 순간마다 정확히 1회 발생 (Remote 애니메이션 트리거용).
         public event Action OnAttackRequested;
 
         public void Publish(float speed, bool grounded, float verticalSpeed, bool isAiming, bool isReloading, bool isMelee)
@@ -112,7 +110,7 @@ namespace ProjectM.Network
             lastSentVerticalSpeed = verticalSpeed;
         }
 
-        /// <summary>투척 1회 이벤트를 Remote에 전파한다. bool과 달리 값이 매번 바뀌어 edge가 유실되지 않는다.</summary>
+        // 투척 1회 이벤트를 Remote에 전파한다. bool과 달리 값이 매번 바뀌어 edge가 유실되지 않는다.
         public void PublishThrow()
         {
             if (!IsSpawned || !IsOwner) return;
@@ -123,7 +121,7 @@ namespace ProjectM.Network
             }
         }
 
-        /// <summary>근접 공격 1회 이벤트를 Remote에 전파한다 (netThrowToken과 동일한 edge-보존 방식).</summary>
+        // 근접 공격 1회 이벤트를 Remote에 전파한다 (netThrowToken과 동일한 edge-보존 방식).
         public void PublishAttack()
         {
             if (!IsSpawned || !IsOwner) return;

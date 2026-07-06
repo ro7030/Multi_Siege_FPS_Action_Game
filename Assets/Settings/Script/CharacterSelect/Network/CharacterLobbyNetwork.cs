@@ -38,10 +38,8 @@ namespace ProjectM.CharacterSelect
         }
     }
 
-    /// <summary>
-    /// NGO 캐릭터 선택 로비 상태 — 4슬롯, Ready, Start → GamePlay.
-    /// rematch 시 OriginalHostAuthPlayerId 기준 슬롯 0 복원.
-    /// </summary>
+    // NGO 캐릭터 선택 로비 상태 — 4슬롯, Ready, Start → GamePlay.
+    // rematch 시 OriginalHostAuthPlayerId 기준 슬롯 0 복원.
     public class CharacterLobbyNetwork : NetworkBehaviour
     {
         public const int MaxSlots = 4;

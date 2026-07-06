@@ -5,15 +5,13 @@ using ProjectM.Network;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// 투척무기 장착/투척 (배그식 탭 사이클 + 빠른 투척).
-    ///   - 4번키 "한 번 누름": cycleOrder 순서대로 보유 투척무기를 순환 장착
-    ///       · 미장착 상태에서 누르면 첫 번째 보유 종류를 장착
-    ///       · 이미 장착된 상태에서 누르면 다음 보유 종류로 교체 (한 종류만 있으면 그대로)
-    ///   - 좌클릭(투척 장착 중): 선택한 투척무기를 던짐
-    ///   - G키: 어느 상태든 마지막 선택 투척무기를 즉시 던짐 (빠른 투척)
-    /// 키트와 상호 배타 (하나 들면 다른 건 내려놓음).
-    /// </summary>
+    // 투척무기 장착/투척 (배그식 탭 사이클 + 빠른 투척).
+    // - 4번키 "한 번 누름": cycleOrder 순서대로 보유 투척무기를 순환 장착
+    // · 미장착 상태에서 누르면 첫 번째 보유 종류를 장착
+    // · 이미 장착된 상태에서 누르면 다음 보유 종류로 교체 (한 종류만 있으면 그대로)
+    // - 좌클릭(투척 장착 중): 선택한 투척무기를 던짐
+    // - G키: 어느 상태든 마지막 선택 투척무기를 즉시 던짐 (빠른 투척)
+    // 키트와 상호 배타 (하나 들면 다른 건 내려놓음).
     [RequireComponent(typeof(ThrowableInventory))]
     public class ThrowableEquipper : MonoBehaviour
     {
@@ -75,7 +73,7 @@ namespace ProjectM.Player
         public float SelectionMaxRadius => 1f;
 
         public event Action<ThrowableType> OnEquippedChanged;
-        /// <summary>투척이 실제로 실행(소모 확정 또는 서버 요청 전송)된 순간마다 발생 — 애니메이션 트리거용.</summary>
+        // 투척이 실제로 실행(소모 확정 또는 서버 요청 전송)된 순간마다 발생 — 애니메이션 트리거용.
         public event Action OnThrown;
 
         private PlayerCombatInputGate combatInputGate;
@@ -112,7 +110,7 @@ namespace ProjectM.Player
             }
         }
 
-        /// <summary>cycleOrder 기준 첫 보유 투척무기. 없으면 None.</summary>
+        // cycleOrder 기준 첫 보유 투척무기. 없으면 None.
         public ThrowableType GetFirstOwnedInCycleOrder()
         {
             if (inventory == null || cycleOrder == null)
@@ -128,7 +126,7 @@ namespace ProjectM.Player
             return ThrowableType.None;
         }
 
-        /// <summary>하단 HUD 슬롯에 표시할 투척무기 종류.</summary>
+        // 하단 HUD 슬롯에 표시할 투척무기 종류.
         public ThrowableType ResolveHudIconType(bool showLastSelectedWhenIdle = true)
         {
             if (inventory == null || !inventory.HasAny())
@@ -167,11 +165,9 @@ namespace ProjectM.Player
             }
         }
 
-        /// <summary>
-        /// cycleOrder 에 정의된 순서대로, 현재 장착 종류 다음 칸부터 한 바퀴 돌며
-        /// 보유 중(인벤토리 ≥ 1)인 첫 투척무기를 장착한다.
-        /// 보유 투척무기가 하나도 없으면 변경 없음.
-        /// </summary>
+        // cycleOrder 에 정의된 순서대로, 현재 장착 종류 다음 칸부터 한 바퀴 돌며
+        // 보유 중(인벤토리 ≥ 1)인 첫 투척무기를 장착한다.
+        // 보유 투척무기가 하나도 없으면 변경 없음.
         public void CycleEquipped()
         {
             if (inventory == null || cycleOrder == null || cycleOrder.Length == 0)

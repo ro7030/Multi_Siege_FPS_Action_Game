@@ -4,9 +4,7 @@ using UnityEngine.UI;
 
 namespace ProjectM.Audio
 {
-    /// <summary>
-    /// 씬의 Button에 기본 클릭 효과음 컴포넌트를 자동 부착한다.
-    /// </summary>
+    // 씬의 Button에 기본 클릭 효과음 컴포넌트를 자동 부착한다.
     public class UISoundBinder : MonoBehaviour
     {
         private static bool sceneHookRegistered;

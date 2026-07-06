@@ -4,10 +4,8 @@ using ProjectM.Network;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// 다운/부활 상태 관리. HealthSystem이 0이 되면 즉시 Death가 아닌 Down 상태로 진입한다.
-    /// 일정 시간 안에 동료가 부활시키지 못하면 완전 사망으로 전환된다.
-    /// </summary>
+    // 다운/부활 상태 관리. HealthSystem이 0이 되면 즉시 Death가 아닌 Down 상태로 진입한다.
+    // 일정 시간 안에 동료가 부활시키지 못하면 완전 사망으로 전환된다.
     [RequireComponent(typeof(HealthSystem))]
     public class ReviveSystem : MonoBehaviour
     {

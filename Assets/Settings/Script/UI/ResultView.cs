@@ -11,10 +11,8 @@ using ProjectM.Player;
 
 namespace ProjectM.UI
 {
-    /// <summary>
-    /// 매치 종료 시 자동으로 표시되는 결과 화면.
-    /// Retry는 전원 확인 후 orchestrated rematch, Home은 rematch 그룹에서 제외.
-    /// </summary>
+    // 매치 종료 시 자동으로 표시되는 결과 화면.
+    // Retry는 전원 확인 후 orchestrated rematch, Home은 rematch 그룹에서 제외.
     public class ResultView : MonoBehaviour
     {
         private const string DefaultFontResourcePath = "Fonts/Jalnan2/Jalnan2TTF SDF";

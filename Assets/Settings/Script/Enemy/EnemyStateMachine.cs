@@ -6,10 +6,8 @@ namespace ProjectM.Enemy
 {
     public enum EnemyState { Idle, Chase, Attack, Dead }
 
-    /// <summary>
-    /// 가벼운 상태 머신. 상태별 Enter/Update/Exit 콜백을 외부에서 등록한다.
-    /// EnemyAIController가 소유하고 매 프레임 Tick()을 호출한다.
-    /// </summary>
+    // 가벼운 상태 머신. 상태별 Enter/Update/Exit 콜백을 외부에서 등록한다.
+    // EnemyAIController가 소유하고 매 프레임 Tick()을 호출한다.
     public class EnemyStateMachine
     {
         public EnemyState Current { get; private set; } = EnemyState.Idle;

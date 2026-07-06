@@ -7,9 +7,7 @@ using UnityEngine;
 
 namespace ProjectM.Data
 {
-    /// <summary>
-    /// SessionResultDto를 session_results + player_stats 테이블에 트랜잭션으로 저장한다.
-    /// </summary>
+    // SessionResultDto를 session_results + player_stats 테이블에 트랜잭션으로 저장한다.
     public class MySqlSessionRepository : MonoBehaviour
     {
         [SerializeField] private MySqlConnectionSettings settings;

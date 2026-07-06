@@ -4,10 +4,8 @@ using ProjectM.Player;
 
 namespace ProjectM.Defense
 {
-    /// <summary>
-    /// 방어 구조물 공통 베이스. HealthSystem 위에서 수리/파괴 이벤트를 제공한다.
-    /// "DefenseObject" 태그가 자동으로 적용되어 EnemyAI의 우선 타깃이 된다.
-    /// </summary>
+    // 방어 구조물 공통 베이스. HealthSystem 위에서 수리/파괴 이벤트를 제공한다.
+    // "DefenseObject" 태그가 자동으로 적용되어 EnemyAI의 우선 타깃이 된다.
     [RequireComponent(typeof(HealthSystem))]
     public class DefenseObject : MonoBehaviour
     {
@@ -53,7 +51,7 @@ namespace ProjectM.Defense
             Debug.Log($"[Defense] {displayName} 파괴됨");
         }
 
-        /// <summary>디버그 UI 전용 일괄 회복.</summary>
+        // 디버그 UI 전용 일괄 회복.
         public void RepairInstant(float amount)
         {
             if (IsDestroyed || amount <= 0f) return;

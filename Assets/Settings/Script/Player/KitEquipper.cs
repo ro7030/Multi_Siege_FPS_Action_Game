@@ -8,19 +8,17 @@ using ProjectM.UI;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// 플레이어 키트 장착/사용 시스템 (배그식 탭 사이클).
-    ///
-    /// 동작
-    ///   - 3번키 "한 번 누름": 보유 중인 키트를 cycleOrder 순서대로 한 칸씩 순환 장착
-    ///       · 미장착 상태에서 누르면 cycleOrder 의 첫 번째 보유 키트를 장착
-    ///       · 이미 장착된 상태에서 누르면 다음 보유 키트로 교체 (한 종류만 있으면 그대로 유지)
-    ///       · 보유 키트가 전혀 없으면 변경 없음
-    ///   - 키트 장착 후 좌클릭: 장착한 키트 사용
-    ///       · HealKit: 자신을 회복 / RepairKit: 시선 끝 방어물 수리 / FarmKit: 시선 끝 지면에 밭 설치
-    ///   - 키트가 장착된 동안 WeaponController 가 사격을 억제
-    ///   - 1/2 번 키로 무기 전환 시 PlayerArsenal 이 Holster() 를 호출하여 키트를 내려놓음
-    /// </summary>
+    // 플레이어 키트 장착/사용 시스템 (배그식 탭 사이클).
+
+    // 동작
+    // - 3번키 "한 번 누름": 보유 중인 키트를 cycleOrder 순서대로 한 칸씩 순환 장착
+    // · 미장착 상태에서 누르면 cycleOrder 의 첫 번째 보유 키트를 장착
+    // · 이미 장착된 상태에서 누르면 다음 보유 키트로 교체 (한 종류만 있으면 그대로 유지)
+    // · 보유 키트가 전혀 없으면 변경 없음
+    // - 키트 장착 후 좌클릭: 장착한 키트 사용
+    // · HealKit: 자신을 회복 / RepairKit: 시선 끝 방어물 수리 / FarmKit: 시선 끝 지면에 밭 설치
+    // - 키트가 장착된 동안 WeaponController 가 사격을 억제
+    // - 1/2 번 키로 무기 전환 시 PlayerArsenal 이 Holster() 를 호출하여 키트를 내려놓음
     [RequireComponent(typeof(KitInventory))]
     public class KitEquipper : MonoBehaviour
     {
@@ -84,7 +82,7 @@ namespace ProjectM.Player
         // ── 장착 상태 ──
         public KitType EquippedKit { get; private set; } = KitType.None;
         public bool IsKitEquipped => EquippedKit != KitType.None;
-        /// <summary>최근에 장착했던 키트 종류. 무기로 전환해도 유지되어 HUD 슬롯3 아이콘 복귀에 사용.</summary>
+        // 최근에 장착했던 키트 종류. 무기로 전환해도 유지되어 HUD 슬롯3 아이콘 복귀에 사용.
         public KitType LastSelected { get; private set; } = KitType.FarmKit;
 
         // ── (구) 휠 호환용 — 항상 비활성. 기존 KitWheelView 가 컴파일/실행은 되지만 표시되지 않음. ──
@@ -166,11 +164,9 @@ namespace ProjectM.Player
                 UseEquippedKit();
         }
 
-        /// <summary>
-        /// cycleOrder 에 정의된 순서대로, 현재 장착 키트 다음 칸부터 한 바퀴 돌며
-        /// 보유 중(인벤토리 ≥ 1)인 첫 키트를 장착한다.
-        /// 보유 키트가 하나도 없으면 변경 없음.
-        /// </summary>
+        // cycleOrder 에 정의된 순서대로, 현재 장착 키트 다음 칸부터 한 바퀴 돌며
+        // 보유 중(인벤토리 ≥ 1)인 첫 키트를 장착한다.
+        // 보유 키트가 하나도 없으면 변경 없음.
         public void CycleEquipped()
         {
             if (inventory == null || cycleOrder == null || cycleOrder.Length == 0)
@@ -254,7 +250,7 @@ namespace ProjectM.Player
             return null;
         }
 
-        /// <summary>키트를 내려놓는다(무기로 복귀). 무기 전환 시 PlayerArsenal 이 호출.</summary>
+        // 키트를 내려놓는다(무기로 복귀). 무기 전환 시 PlayerArsenal 이 호출.
         public void Holster() => SetEquipped(KitType.None);
 
         // ── 힐킷 업그레이드 (PlayerArsenal.TryUpgrade 와 동일 패턴) ──────
@@ -269,14 +265,14 @@ namespace ProjectM.Player
             return d != null ? d.price : 0;
         }
 
-        /// <summary>다음 단계로 업그레이드(화폐 차감은 호출자 책임).</summary>
+        // 다음 단계로 업그레이드(화폐 차감은 호출자 책임).
         public bool TryUpgradeHealKit()
         {
             if (!CanUpgradeHealKit()) return false;
             return TrySetHealTier(currentHealTier + 1);
         }
 
-        /// <summary>지정 단계로 바로 설정(상점에서 임의 티어 구매).</summary>
+        // 지정 단계로 바로 설정(상점에서 임의 티어 구매).
         public bool TrySetHealTier(int tierIndex)
         {
             if (healProgression == null) return false;
@@ -293,7 +289,7 @@ namespace ProjectM.Player
             return ApplyNetworkHealTier(tierIndex);
         }
 
-        /// <summary>네트워크 미러 또는 오프라인 로컬 적용.</summary>
+        // 네트워크 미러 또는 오프라인 로컬 적용.
         public bool ApplyNetworkHealTier(int tierIndex)
         {
             if (healProgression == null || healProgression.GetTier(tierIndex) == null)
@@ -318,7 +314,7 @@ namespace ProjectM.Player
             return def != null ? def.price : 0;
         }
 
-        /// <summary>아직 보유하지 않은 티어만 구매 가능 (0티어는 기본 지급).</summary>
+        // 아직 보유하지 않은 티어만 구매 가능 (0티어는 기본 지급).
         public bool CanPurchaseHealTier(int tierIndex)
         {
             if (healProgression == null || tierIndex <= 0) return false;

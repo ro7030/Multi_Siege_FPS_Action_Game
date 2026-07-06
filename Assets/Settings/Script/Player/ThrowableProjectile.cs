@@ -9,10 +9,8 @@ using ProjectM.Network;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// 던져진 투척무기. fuseTime 후(또는 충돌 시) 폭발하여 반경 내 적에게 효과를 적용한다.
-    /// 방어물/플레이어/던진 사람은 피해 대상에서 제외 (적만 타격).
-    /// </summary>
+    // 던져진 투척무기. fuseTime 후(또는 충돌 시) 폭발하여 반경 내 적에게 효과를 적용한다.
+    // 방어물/플레이어/던진 사람은 피해 대상에서 제외 (적만 타격).
     [RequireComponent(typeof(Rigidbody))]
     public class ThrowableProjectile : MonoBehaviour
     {
@@ -28,7 +26,7 @@ namespace ProjectM.Player
         [Tooltip("Instantiate 후 적용할 추가 회전(도).")]
         [SerializeField] private Vector3 explosionVfxRotationEuler;
 
-        /// <summary>Explode()가 실제로 실행될 때(피해 판정 권한이 있는 쪽) 1회 발생 — NGO 게스트 가시성 브리지용.</summary>
+        // Explode()가 실제로 실행될 때(피해 판정 권한이 있는 쪽) 1회 발생 — NGO 게스트 가시성 브리지용.
         public event Action OnExploded;
 
         private ThrowableDefinition def;
@@ -247,7 +245,7 @@ namespace ProjectM.Player
             }
         }
 
-        /// <summary>로컬에서 폭발 VFX만 재생한다(피해 판정 없음). NGO 게스트 클라이언트의 ClientRpc 수신 측에서 사용.</summary>
+        // 로컬에서 폭발 VFX만 재생한다(피해 판정 없음). NGO 게스트 클라이언트의 ClientRpc 수신 측에서 사용.
         public void PlayExplosionVfxOnly()
         {
             SpawnExplosionVfx();

@@ -7,11 +7,9 @@ using UnityEngine;
 
 namespace ProjectM.EditorTools
 {
-    /// <summary>
-    /// 고블린(Enemy_Normal) 전용 Animator Controller를 빌드한다.
-    /// Mixamo Walking.fbx 하나에서 Idle(정지 포즈)과 Walk 두 클립을 분리 추출해
-    /// 고블린 자체 Avatar 기준으로 재생되도록 한다 (StylizedCharacterPack Rabbit 리그와의 불일치 해소).
-    /// </summary>
+    // 고블린(Enemy_Normal) 전용 Animator Controller를 빌드한다.
+    // Mixamo Walking.fbx 하나에서 Idle(정지 포즈)과 Walk 두 클립을 분리 추출해
+    // 고블린 자체 Avatar 기준으로 재생되도록 한다 (StylizedCharacterPack Rabbit 리그와의 불일치 해소).
     public static class GoblinAnimatorBuilder
     {
         private const string WalkingFbxPath = "Assets/Resources/Gobin Ani/X Bot@Walking.fbx";
@@ -51,10 +49,8 @@ namespace ProjectM.EditorTools
             Debug.Log("[GoblinAnimatorBuilder] Goblin animator build complete.");
         }
 
-        /// <summary>
-        /// Walking.fbx 하나를 Humanoid로 재설정하고, 원본 프레임 범위를 기준으로
-        /// 전체 구간(Walk)과 첫 프레임 정지 포즈(Idle) 두 클립으로 분리한다.
-        /// </summary>
+        // Walking.fbx 하나를 Humanoid로 재설정하고, 원본 프레임 범위를 기준으로
+        // 전체 구간(Walk)과 첫 프레임 정지 포즈(Idle) 두 클립으로 분리한다.
         private static bool ConfigureClipImport()
         {
             var importer = AssetImporter.GetAtPath(WalkingFbxPath) as ModelImporter;

@@ -3,10 +3,8 @@ using ProjectM.Network;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// NetworkPlayer 비주얼 Animator를 이동·견착·재장전·투척과 동기화한다.
-    /// Owner는 로컬 입력을 적용 후 NetworkPlayerAnimationBridge로 복제한다.
-    /// </summary>
+    // NetworkPlayer 비주얼 Animator를 이동·견착·재장전·투척과 동기화한다.
+    // Owner는 로컬 입력을 적용 후 NetworkPlayerAnimationBridge로 복제한다.
     [DisallowMultipleComponent]
     public class PlayerAnimationController : MonoBehaviour
     {

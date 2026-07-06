@@ -8,9 +8,7 @@ using UnityEngine.UI;
 
 namespace ProjectM.UI
 {
-    /// <summary>
-    /// 방 참여 패널 — Lobby 목록 + ScrollView + 비밀번호 검증 + Relay Client.
-    /// </summary>
+    // 방 참여 패널 — Lobby 목록 + ScrollView + 비밀번호 검증 + Relay Client.
     public class JoinRoomPanelController : MonoBehaviour
     {
         [Header("연결")]
@@ -54,7 +52,7 @@ namespace ProjectM.UI
             EnsureListContentLayout();
         }
 
-        /// <summary>방 참여 패널이 열릴 때 MainMenuController에서 호출.</summary>
+        // 방 참여 패널이 열릴 때 MainMenuController에서 호출.
         public void RefreshNow() => RefreshLobbyListAsync();
 
         private void OnEnable()

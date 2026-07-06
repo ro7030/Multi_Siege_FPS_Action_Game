@@ -4,9 +4,7 @@ using ProjectM.UI;
 
 namespace ProjectM.Audio
 {
-    /// <summary>
-    /// 로컬 플레이어 지상 이동 시 발자국 루프를 재생한다.
-    /// </summary>
+    // 로컬 플레이어 지상 이동 시 발자국 루프를 재생한다.
     [DisallowMultipleComponent]
     [RequireComponent(typeof(CharacterController))]
     public class PlayerFootstepAudio : MonoBehaviour

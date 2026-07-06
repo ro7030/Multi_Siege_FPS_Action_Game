@@ -3,12 +3,10 @@ using UnityEngine;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// 무기 단계 진행표. 주무기/보조무기 각각의 단계 목록을 리스트 순서로 정의한다.
-    /// Unity 에서 WeaponDefinition 에셋을 리스트에 추가/제거하면 단계가 늘거나 준다.
-    ///   primaryTiers[0]   = 기본 지급 주무기 (러스트 카빈)
-    ///   primaryTiers[1..] = 업그레이드 단계
-    /// </summary>
+    // 무기 단계 진행표. 주무기/보조무기 각각의 단계 목록을 리스트 순서로 정의한다.
+    // Unity 에서 WeaponDefinition 에셋을 리스트에 추가/제거하면 단계가 늘거나 준다.
+    // primaryTiers[0]   = 기본 지급 주무기 (러스트 카빈)
+    // primaryTiers[1..] = 업그레이드 단계
     [CreateAssetMenu(menuName = "ProjectM/Weapon/WeaponProgression", fileName = "WeaponProgression")]
     public class WeaponProgression : ScriptableObject
     {

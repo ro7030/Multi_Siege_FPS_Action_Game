@@ -5,10 +5,8 @@ using TMPro;
 
 namespace ProjectM.UI
 {
-    /// <summary>
-    /// 정식 게임 UI 루트. Canvas + CanvasScaler + GraphicRaycaster + EventSystem을 자동 생성한다.
-    /// 다른 Presenter들은 UIRoot.Instance.RootTransform에 자식으로 추가된다.
-    /// </summary>
+    // 정식 게임 UI 루트. Canvas + CanvasScaler + GraphicRaycaster + EventSystem을 자동 생성한다.
+    // 다른 Presenter들은 UIRoot.Instance.RootTransform에 자식으로 추가된다.
     public class UIRoot : MonoBehaviour
     {
         public static UIRoot Instance { get; private set; }
@@ -69,7 +67,7 @@ namespace ProjectM.UI
             return txt;
         }
 
-        /// <summary>레거시 TextAnchor → TMP TextAlignmentOptions 변환.</summary>
+        // 레거시 TextAnchor → TMP TextAlignmentOptions 변환.
         public static TextAlignmentOptions ToTMPAlign(TextAnchor anchor) => anchor switch
         {
             TextAnchor.UpperLeft    => TextAlignmentOptions.TopLeft,

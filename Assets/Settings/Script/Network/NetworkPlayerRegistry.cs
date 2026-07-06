@@ -3,9 +3,7 @@ using ProjectM.Player;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// 스폰된 NetworkPlayer 목록. LocalPlayerUtility 등에서 참조.
-    /// </summary>
+    // 스폰된 NetworkPlayer 목록. LocalPlayerUtility 등에서 참조.
     public static class NetworkPlayerRegistry
     {
         private static readonly List<NetworkPlayer> players = new();

@@ -6,10 +6,8 @@ using ProjectM.Player;
 
 namespace ProjectM.Audio
 {
-    /// <summary>
-    /// 게임 SFX 중앙 재생·선로드·디버그 로그.
-    /// 씬에 없으면 최초 접근 시 자동 생성된다.
-    /// </summary>
+    // 게임 SFX 중앙 재생·선로드·디버그 로그.
+    // 씬에 없으면 최초 접근 시 자동 생성된다.
     public class GameSoundManager : MonoBehaviour
     {
         public static GameSoundManager Instance { get; private set; }

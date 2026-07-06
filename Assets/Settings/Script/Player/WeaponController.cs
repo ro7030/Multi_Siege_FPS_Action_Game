@@ -5,10 +5,8 @@ using ProjectM.Defense;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// 1인칭 무기 컨트롤러. MVP: 히트스캔(레이캐스트) 기반 사격 + 탄창/예비 탄약 + 재장전.
-    /// 발사 판정은 로컬에서 즉시 수행하고, 네트워크 단계에서는 Host에 발사 요청 패킷으로 대체된다.
-    /// </summary>
+    // 1인칭 무기 컨트롤러. MVP: 히트스캔(레이캐스트) 기반 사격 + 탄창/예비 탄약 + 재장전.
+    // 발사 판정은 로컬에서 즉시 수행하고, 네트워크 단계에서는 Host에 발사 요청 패킷으로 대체된다.
     public class WeaponController : MonoBehaviour
     {
         [Header("기준 카메라")]
@@ -44,18 +42,18 @@ namespace ProjectM.Player
         public int CurrentMagazine { get; private set; }
         public int ReserveAmmo => reserveAmmo;
         public bool IsReloading { get; private set; }
-        /// <summary>좌클릭 견착 유지(연발 중 fireRate 쿨다운 제외, 탄창·재장전 조건).</summary>
+        // 좌클릭 견착 유지(연발 중 fireRate 쿨다운 제외, 탄창·재장전 조건).
         public bool IsAimHeld { get; private set; }
         public bool IsLocalPlayer { get => isLocalPlayer; set => isLocalPlayer = value; }
 
-        /// <summary>주무기 슬롯이 활성일 때만 true. PlayerArsenal 이 토글.</summary>
+        // 주무기 슬롯이 활성일 때만 true. PlayerArsenal 이 토글.
         public bool IsActive { get; set; } = true;
         public WeaponDefinition CurrentDefinition { get; private set; }
 
-        /// <summary>레거시(비부착) 경로에서 현재 카메라 소켓에 인스턴스화된 뷰모델. 부착 모드에서는 null.</summary>
+        // 레거시(비부착) 경로에서 현재 카메라 소켓에 인스턴스화된 뷰모델. 부착 모드에서는 null.
         public GameObject ViewModelInstance => viewModelInstance;
         public PlayerAttachedWeaponVisual AttachedVisual => attachedVisual;
-        /// <summary>실제 히트스캔 레이가 나가는 기준 카메라. 총구 이펙트를 실제 탄도 방향에 맞추는 데 사용.</summary>
+        // 실제 히트스캔 레이가 나가는 기준 카메라. 총구 이펙트를 실제 탄도 방향에 맞추는 데 사용.
         public Camera ViewCamera => viewCamera;
 
         public event Action OnFired;
@@ -169,7 +167,7 @@ namespace ProjectM.Player
             OnReserveAmmoChanged?.Invoke();
         }
 
-        /// <summary>무기 정의(단계)를 적용한다. PlayerArsenal 이 장착/업그레이드 시 호출.</summary>
+        // 무기 정의(단계)를 적용한다. PlayerArsenal 이 장착/업그레이드 시 호출.
         public void ApplyDefinition(WeaponDefinition def)
         {
             if (def == null) return;

@@ -5,10 +5,8 @@ using ProjectM.Network;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// 체력 관리. 플레이어/적/방어 오브젝트가 공용으로 사용한다.
-    /// 실제 데미지 판정은 Host 권한이지만 MVP 검증 단계에서는 로컬에서 직접 호출 가능.
-    /// </summary>
+    // 체력 관리. 플레이어/적/방어 오브젝트가 공용으로 사용한다.
+    // 실제 데미지 판정은 Host 권한이지만 MVP 검증 단계에서는 로컬에서 직접 호출 가능.
     public class HealthSystem : MonoBehaviour, IDamageable
     {
         [SerializeField] private float maxHp = 100f;
@@ -100,7 +98,7 @@ namespace ProjectM.Player
             OnHpChanged?.Invoke(currentHp, maxHp);
         }
 
-        /// <summary>클라이언트 UI용 HP 미러. OnDied/Revive는 NetworkDamageBridge가 별도 동기화.</summary>
+        // 클라이언트 UI용 HP 미러. OnDied/Revive는 NetworkDamageBridge가 별도 동기화.
         public void SetNetworkSnapshot(float current, float max)
         {
             if (NetworkSessionHelper.IsGameplayAuthority) return;

@@ -41,9 +41,7 @@ namespace ProjectM.Network
         }
     }
 
-    /// <summary>
-    /// 서버 권한 매치 통계. 킬·데미지·수확·부활을 집계하고 NetworkList로 전원에 복제한다.
-    /// </summary>
+    // 서버 권한 매치 통계. 킬·데미지·수확·부활을 집계하고 NetworkList로 전원에 복제한다.
     public class NetworkMatchStats : NetworkBehaviour
     {
         public static NetworkMatchStats Instance { get; private set; }

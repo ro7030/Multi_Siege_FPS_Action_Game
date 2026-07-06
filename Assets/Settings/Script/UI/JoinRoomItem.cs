@@ -5,9 +5,7 @@ using UnityEngine.UI;
 
 namespace ProjectM.UI
 {
-    /// <summary>
-    /// 방 참여 패널의 한 줄. 방 이름과 대기자 수를 표시하고, 클릭되면 부모 패널에 알린다.
-    /// </summary>
+    // 방 참여 패널의 한 줄. 방 이름과 대기자 수를 표시하고, 클릭되면 부모 패널에 알린다.
     public class JoinRoomItem : MonoBehaviour
     {
         [Header("표시")]

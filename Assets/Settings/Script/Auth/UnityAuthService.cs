@@ -7,10 +7,8 @@ using UnityEngine;
 
 namespace ProjectM.Auth
 {
-    /// <summary>
-    /// Unity Gaming Services Authentication 래퍼.
-    /// 게스트(Anonymous) / Unity Player Accounts 로그인을 제공한다.
-    /// </summary>
+    // Unity Gaming Services Authentication 래퍼.
+    // 게스트(Anonymous) / Unity Player Accounts 로그인을 제공한다.
     public class UnityAuthService : MonoBehaviour
     {
         private static Task initializeTask;

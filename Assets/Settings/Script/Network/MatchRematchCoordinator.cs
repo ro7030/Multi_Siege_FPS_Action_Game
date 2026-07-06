@@ -8,10 +8,8 @@ using UnityEngine.SceneManagement;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// ResultView Retry/Home → orchestrated rematch(새 Lobby/Relay) 또는 MainMenu 복귀 조율.
-    /// LobbyRelayService DontDestroyOnLoad 오브젝트에 부착.
-    /// </summary>
+    // ResultView Retry/Home → orchestrated rematch(새 Lobby/Relay) 또는 MainMenu 복귀 조율.
+    // LobbyRelayService DontDestroyOnLoad 오브젝트에 부착.
     public class MatchRematchCoordinator : MonoBehaviour
     {
         public const string CharacterSelectScene = "CharacterSelect";
@@ -43,7 +41,7 @@ namespace ProjectM.Network
                 Instance = null;
         }
 
-        /// <summary>오프라인 Retry — 로컬 CharacterSelect.</summary>
+        // 오프라인 Retry — 로컬 CharacterSelect.
         public void RequestRematchOffline()
         {
             if (isBusy) return;
@@ -55,7 +53,7 @@ namespace ProjectM.Network
             StartCoroutine(HomeRoutine());
         }
 
-        /// <summary>NetworkMatchDirector — 전원 Retry 확인 후 서버에서 1회 호출.</summary>
+        // NetworkMatchDirector — 전원 Retry 확인 후 서버에서 1회 호출.
         public void BeginOrchestratedRematch(
             string rematchHostAuthPlayerId,
             string rematchGroupId,
@@ -68,17 +66,15 @@ namespace ProjectM.Network
                 rematchHostClientId));
         }
 
-        /// <summary>Guest rematch host — NetworkMatchDirector ClientRpc.</summary>
+        // Guest rematch host — NetworkMatchDirector ClientRpc.
         public void CreateRematchRoomAsOwner(string rematchGroupId, string roomName)
         {
             if (string.IsNullOrEmpty(rematchGroupId)) return;
             StartCoroutine(CreateRematchRoomAsOwnerRoutine(rematchGroupId, roomName));
         }
 
-        /// <summary>
-        /// NetworkMatchDirector SyncRematchJoinClientRpc (연결 유지 시).
-        /// Leave 이후에는 Lobby 검색으로 Join한다.
-        /// </summary>
+        // NetworkMatchDirector SyncRematchJoinClientRpc (연결 유지 시).
+        // Leave 이후에는 Lobby 검색으로 Join한다.
         public void JoinOrchestratedRematch(string lobbyId)
         {
             if (string.IsNullOrEmpty(lobbyId)) return;
@@ -90,7 +86,7 @@ namespace ProjectM.Network
             StartCoroutine(GuestJoinOrchestratedRematchRoutine(lobbyId));
         }
 
-        /// <summary>NetworkMatchDirector SyncRematchTransitionClientRpc — 전원 UI 잠금 + Leave.</summary>
+        // NetworkMatchDirector SyncRematchTransitionClientRpc — 전원 UI 잠금 + Leave.
         public void HandleRematchTransitionStarted()
         {
             Time.timeScale = 1f;
@@ -100,7 +96,7 @@ namespace ProjectM.Network
             StartCoroutine(ClientOrchestratedRematchRoutine());
         }
 
-        /// <summary>NetworkMatchDirector — Host Home 알림.</summary>
+        // NetworkMatchDirector — Host Home 알림.
         public void HandleHostReturnedHome()
         {
             MatchPartyContext.HostLeftViaHome = true;

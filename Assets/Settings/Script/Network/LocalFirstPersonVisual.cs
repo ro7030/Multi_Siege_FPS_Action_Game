@@ -2,9 +2,7 @@ using UnityEngine;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// 로컬 Owner 1인칭: 몸통은 LocalPlayerBody(카메라 제외), 무기는 LocalPlayerWeapon(카메라 포함).
-    /// </summary>
+    // 로컬 Owner 1인칭: 몸통은 LocalPlayerBody(카메라 제외), 무기는 LocalPlayerWeapon(카메라 포함).
     public static class LocalFirstPersonVisual
     {
         public const string BodyLayerName = "LocalPlayerBody";

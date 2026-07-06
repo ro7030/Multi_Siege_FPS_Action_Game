@@ -5,9 +5,7 @@ using ProjectM.Player;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// Gate Body NGO: 서버 사망 시 슬롯 설치 해제, 재설치 시 HP·NetworkObject·NavMesh 복구.
-    /// </summary>
+    // Gate Body NGO: 서버 사망 시 슬롯 설치 해제, 재설치 시 HP·NetworkObject·NavMesh 복구.
     [RequireComponent(typeof(HealthSystem))]
     [RequireComponent(typeof(NetworkObject))]
     public class NetworkGateBodyBridge : NetworkBehaviour
@@ -35,7 +33,7 @@ namespace ProjectM.Network
                 health.OnDied -= HandleServerDied;
         }
 
-        /// <summary>서버: 재설치 전 Body HP·NetworkObject·NavMesh를 복구한다.</summary>
+        // 서버: 재설치 전 Body HP·NetworkObject·NavMesh를 복구한다.
         public void ServerPrepareForInstall()
         {
             if (!NetworkSessionHelper.IsServer || health == null)

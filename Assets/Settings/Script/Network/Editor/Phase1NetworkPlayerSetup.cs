@@ -9,10 +9,8 @@ using ProjectM.Network;
 
 namespace ProjectM.Network.Editor
 {
-    /// <summary>
-    /// Phase 1: NetworkPlayer 프리팹, 중앙 스폰 포인트, GamePlay NGO 스폰 설정.
-    /// 메뉴: ProjectM/Setup Phase 1 Network Player
-    /// </summary>
+    // Phase 1: NetworkPlayer 프리팹, 중앙 스폰 포인트, GamePlay NGO 스폰 설정.
+    // 메뉴: ProjectM/Setup Phase 1 Network Player
     public static class Phase1NetworkPlayerSetup
     {
         private const string PrefabPath = "Assets/Prefab/Network/NetworkPlayer.prefab";

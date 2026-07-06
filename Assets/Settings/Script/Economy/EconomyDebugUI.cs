@@ -3,9 +3,7 @@ using ProjectM.Player;
 
 namespace ProjectM.Economy
 {
-    /// <summary>
-    /// Phase 6 임시 디버그 UI. 잔액 표시, 잠금 해제된 아이템 목록, 구매 버튼.
-    /// </summary>
+    // Phase 6 임시 디버그 UI. 잔액 표시, 잠금 해제된 아이템 목록, 구매 버튼.
     public class EconomyDebugUI : MonoBehaviour
     {
         [SerializeField] private CurrencyWallet wallet;

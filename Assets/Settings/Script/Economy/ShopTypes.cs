@@ -47,7 +47,7 @@ namespace ProjectM.Economy
         public WeaponSlot weaponSlot;
         public int weaponTierIndex;
 
-        /// <summary>상세 패널 Image 스프라이트.</summary>
+        // 상세 패널 Image 스프라이트.
         public Sprite icon;
     }
 }

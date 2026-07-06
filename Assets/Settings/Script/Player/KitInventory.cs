@@ -6,11 +6,9 @@ namespace ProjectM.Player
 {
     public enum KitType { None, HealKit, RepairKit, FarmKit }
 
-    /// <summary>
-    /// 플레이어 키트 인벤토리. 상점에서 구매하면 카운트가 증가하고,
-    /// KitEquipper 가 좌클릭으로 사용할 때 1개 소모.
-    /// 기본 지급: 밭 설치 키트 1개 (기획서 10-5)
-    /// </summary>
+    // 플레이어 키트 인벤토리. 상점에서 구매하면 카운트가 증가하고,
+    // KitEquipper 가 좌클릭으로 사용할 때 1개 소모.
+    // 기본 지급: 밭 설치 키트 1개 (기획서 10-5)
     [DefaultExecutionOrder(-100)]
     public class KitInventory : MonoBehaviour
     {
@@ -30,7 +28,7 @@ namespace ProjectM.Player
         public int RepairKitCount => repairKitCount;
         public int FarmKitCount   => farmKitCount;
 
-        /// <summary>(KitType, 새 보유량)</summary>
+        // (KitType, 새 보유량)
         public event Action<KitType, int> OnCountChanged;
 
         private void Awake() => ApplyStartingCounts();
@@ -48,7 +46,7 @@ namespace ProjectM.Player
 
         public bool Has(KitType type) => GetCount(type) > 0;
 
-        /// <summary>스폰 시점에 starting 값이 반드시 적용되도록 보장한다.</summary>
+        // 스폰 시점에 starting 값이 반드시 적용되도록 보장한다.
         internal void ApplyStartingCounts()
         {
             if (startingCountsApplied)
@@ -91,7 +89,7 @@ namespace ProjectM.Player
             return TryConsumeLocal(type);
         }
 
-        /// <summary>서버/네트워크 동기화용. 카운트 갱신 + 이벤트 발행.</summary>
+        // 서버/네트워크 동기화용. 카운트 갱신 + 이벤트 발행.
         public void NotifyCount(KitType type, int value)
         {
             value = Mathf.Max(0, value);
@@ -106,7 +104,7 @@ namespace ProjectM.Player
             OnCountChanged?.Invoke(type, value);
         }
 
-        /// <summary>스폰 직후 클라이언트 스냅샷 일괄 적용.</summary>
+        // 스폰 직후 클라이언트 스냅샷 일괄 적용.
         public void NotifyAllCounts(int heal, int repair, int farm)
         {
             NotifyCount(KitType.HealKit, heal);

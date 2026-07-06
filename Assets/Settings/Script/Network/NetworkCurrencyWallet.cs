@@ -4,9 +4,7 @@ using ProjectM.Economy;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// 플레이어 지갑 잔액을 서버 권한으로 NGO 동기화한다.
-    /// </summary>
+    // 플레이어 지갑 잔액을 서버 권한으로 NGO 동기화한다.
     [RequireComponent(typeof(CurrencyWallet))]
     public class NetworkCurrencyWallet : NetworkBehaviour
     {

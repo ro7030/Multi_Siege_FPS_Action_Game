@@ -5,14 +5,12 @@ using ProjectM.Player;
 
 namespace ProjectM.Defense
 {
-    /// <summary>
-    /// 게이트 설치 지점. 평소엔 게이트가 비활성 상태이고, 플레이어가 문 키트를 들고
-    /// 이 지점에서 F키(PlayerInteractor)로 상호작용하면 게이트를 활성화(설치)한다.
-    ///
-    /// 구조 (게이트는 비활성이면 PlayerInteractor 가 감지 못하므로 분리)
-    ///   GateSlot (항상 활성) + [GateInstaller]  ← 상호작용 담당
-    ///   └ Gate   (비활성)                        ← gateObject 로 연결
-    /// </summary>
+    // 게이트 설치 지점. 평소엔 게이트가 비활성 상태이고, 플레이어가 문 키트를 들고
+    // 이 지점에서 F키(PlayerInteractor)로 상호작용하면 게이트를 활성화(설치)한다.
+
+    // 구조 (게이트는 비활성이면 PlayerInteractor 가 감지 못하므로 분리)
+    // GateSlot (항상 활성) + [GateInstaller]  ← 상호작용 담당
+    // └ Gate   (비활성)                        ← gateObject 로 연결
     public class GateInstaller : MonoBehaviour, IInteractable
     {
         [Header("설치 대상")]
@@ -140,7 +138,7 @@ namespace ProjectM.Defense
             return TryInstallFromServer(interactor, requireEquippedKit: true);
         }
 
-        /// <summary>서버 권한 설치. NGO 클라이언트는 장착 상태 대신 인벤토리만 검증한다.</summary>
+        // 서버 권한 설치. NGO 클라이언트는 장착 상태 대신 인벤토리만 검증한다.
         public bool TryInstallFromServer(GameObject interactor, bool requireEquippedKit = false)
         {
             return TryInstallFromServer(interactor, requireEquippedKit, out _);

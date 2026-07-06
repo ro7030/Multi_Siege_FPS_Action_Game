@@ -3,9 +3,7 @@ using ProjectM.Enemy;
 
 namespace ProjectM.Wave
 {
-    /// <summary>
-    /// Phase 4 임시 디버그 UI. 웨이브 상태/스폰 진행/잔존 적 수를 표시한다.
-    /// </summary>
+    // Phase 4 임시 디버그 UI. 웨이브 상태/스폰 진행/잔존 적 수를 표시한다.
     public class WaveDebugUI : MonoBehaviour
     {
         [SerializeField] private WaveManager waveManager;

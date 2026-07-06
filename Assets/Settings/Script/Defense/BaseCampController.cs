@@ -4,10 +4,8 @@ using ProjectM.Network;
 
 namespace ProjectM.Defense
 {
-    /// <summary>
-    /// 베이스 캠프. HP가 0이 되면 즉시 매치 패배 처리.
-    /// GameSessionManager.EndMatch(false)를 호출한다.
-    /// </summary>
+    // 베이스 캠프. HP가 0이 되면 즉시 매치 패배 처리.
+    // GameSessionManager.EndMatch(false)를 호출한다.
     [RequireComponent(typeof(DefenseObject))]
     public class BaseCampController : MonoBehaviour
     {

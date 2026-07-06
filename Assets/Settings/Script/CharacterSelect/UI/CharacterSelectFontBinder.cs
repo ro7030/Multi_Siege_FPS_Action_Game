@@ -3,9 +3,7 @@ using UnityEngine;
 
 namespace ProjectM.CharacterSelect
 {
-    /// <summary>
-    /// CharacterSelect Canvas 하위 TMP UI에 Jalnan2 폰트를 일괄 적용한다.
-    /// </summary>
+    // CharacterSelect Canvas 하위 TMP UI에 Jalnan2 폰트를 일괄 적용한다.
     public class CharacterSelectFontBinder : MonoBehaviour
     {
         private const string DefaultFontResourcePath = "Fonts/Jalnan2/Jalnan2TTF SDF";

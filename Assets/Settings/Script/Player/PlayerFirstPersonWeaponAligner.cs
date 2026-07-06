@@ -4,10 +4,8 @@ using ProjectM.Network;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// Owner + useAttachedWeapons 일 때 활성 무기를 카메라 소켓 포즈에 스냅해 1인칭 느낌을 유지한다.
-    /// 원격 클라이언트는 비활성 — 손 본 애니메이션을 따른다.
-    /// </summary>
+    // Owner + useAttachedWeapons 일 때 활성 무기를 카메라 소켓 포즈에 스냅해 1인칭 느낌을 유지한다.
+    // 원격 클라이언트는 비활성 — 손 본 애니메이션을 따른다.
     [DisallowMultipleComponent]
     public class PlayerFirstPersonWeaponAligner : MonoBehaviour
     {

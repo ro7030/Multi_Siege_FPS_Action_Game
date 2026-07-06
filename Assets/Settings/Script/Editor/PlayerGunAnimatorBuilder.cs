@@ -14,7 +14,7 @@ namespace ProjectM.EditorTools
         private const string ChibiAvatarPath = "Assets/Suriyun/Pspsps/FBX/Characters/Chibi_Monkey.fbx";
         private const string ControllerPath = "Assets/Animations/Player/PlayerGunAnimator.controller";
 
-        /// <summary>Idle/Walk ↔ Run 전환 기준 속도(m/s). walkSpeed 5 / sprintSpeed 8의 중간값.</summary>
+        // Idle/Walk ↔ Run 전환 기준 속도(m/s). walkSpeed 5 / sprintSpeed 8의 중간값.
         private const float SwordSprintSpeedThreshold = 6.5f;
 
         private static readonly (string assetPath, string clipName, bool loop)[] ClipSources =
@@ -350,7 +350,7 @@ namespace ProjectM.EditorTools
             transition.AddCondition(value ? AnimatorConditionMode.If : AnimatorConditionMode.IfNot, 0f, param);
         }
 
-        /// <summary>여러 조건을 모두 만족해야(AND) 전이되는 전환을 추가한다.</summary>
+        // 여러 조건을 모두 만족해야(AND) 전이되는 전환을 추가한다.
         private static void AddMultiConditionTransition(
             AnimatorState from,
             AnimatorState to,

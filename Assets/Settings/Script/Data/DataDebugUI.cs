@@ -3,9 +3,7 @@ using UnityEngine;
 
 namespace ProjectM.Data
 {
-    /// <summary>
-    /// Phase 8 임시 디버그 UI. 누적 통계, MySQL/API 구성 여부, 로컬 대기 큐 정보를 표시한다.
-    /// </summary>
+    // Phase 8 임시 디버그 UI. 누적 통계, MySQL/API 구성 여부, 로컬 대기 큐 정보를 표시한다.
     public class DataDebugUI : MonoBehaviour
     {
         [SerializeField] private PlayerStatsTracker stats;

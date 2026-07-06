@@ -5,10 +5,8 @@ using ProjectM.Network;
 
 namespace ProjectM.UI
 {
-    /// <summary>
-    /// 정비(Preparation) 시간 카운트다운. MatchBootstrapper 의 남은 시간을 표시한다.
-    /// 웨이브 종료 후 준비 시간(예: 60 → 59 → 58 …) 동안만 보인다.
-    /// </summary>
+    // 정비(Preparation) 시간 카운트다운. MatchBootstrapper 의 남은 시간을 표시한다.
+    // 웨이브 종료 후 준비 시간(예: 60 → 59 → 58 …) 동안만 보인다.
     public class PreparationTimerPresenter : MonoBehaviour
     {
         [SerializeField] private TMP_Text timerText;

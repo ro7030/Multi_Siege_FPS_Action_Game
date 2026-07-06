@@ -6,11 +6,9 @@ using UnityEngine.Networking;
 
 namespace ProjectM.Data
 {
-    /// <summary>
-    /// 백엔드 API Layer와 통신하는 HTTP 클라이언트.
-    /// UnityWebRequest 기반. 모든 요청은 비동기 코루틴.
-    /// baseUrl이 비어있으면 자동으로 실패 처리되어 ResultUploader가 로컬 폴백을 사용한다.
-    /// </summary>
+    // 백엔드 API Layer와 통신하는 HTTP 클라이언트.
+    // UnityWebRequest 기반. 모든 요청은 비동기 코루틴.
+    // baseUrl이 비어있으면 자동으로 실패 처리되어 ResultUploader가 로컬 폴백을 사용한다.
     public class DbApiClient : MonoBehaviour
     {
         [SerializeField] private string baseUrl = ""; // 예: "http://127.0.0.1:8080"

@@ -3,9 +3,7 @@ using ProjectM.Auth;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// 플레이어 표시 이름. Login(AuthSession) → NetworkPlayer.DisplayName 순으로 해석한다.
-    /// </summary>
+    // 플레이어 표시 이름. Login(AuthSession) → NetworkPlayer.DisplayName 순으로 해석한다.
     public static class PlayerDisplayNameUtility
     {
         public static string GetDisplayName(GameObject playerRoot, string fallback = "player")

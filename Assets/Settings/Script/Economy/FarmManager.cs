@@ -9,16 +9,14 @@ using ProjectM.Network;
 
 namespace ProjectM.Economy
 {
-    /// <summary>
-    /// 밭 시스템 중앙 매니저.
-    ///
-    /// 책임
-    /// - 활성 밭 추적 (최대 N개 제한)
-    /// - 정비 시간(Preparation) 에만 설치 허용
-    /// - 웨이브 종료 시: 모든 활성 밭에 yieldPerWave 누적 (FarmPlot.OnWavePassed)
-    /// - 플레이어 F 키 수확 시: 해당 밭의 누적분을 팀 전체 지갑에 균등 분배
-    /// - 파괴된 밭은 매니저에서 제거 (누적분도 0)
-    /// </summary>
+    // 밭 시스템 중앙 매니저.
+
+    // 책임
+    // - 활성 밭 추적 (최대 N개 제한)
+    // - 정비 시간(Preparation) 에만 설치 허용
+    // - 웨이브 종료 시: 모든 활성 밭에 yieldPerWave 누적 (FarmPlot.OnWavePassed)
+    // - 플레이어 F 키 수확 시: 해당 밭의 누적분을 팀 전체 지갑에 균등 분배
+    // - 파괴된 밭은 매니저에서 제거 (누적분도 0)
     public class FarmManager : MonoBehaviour
     {
         public static FarmManager Instance { get; private set; }
@@ -106,7 +104,7 @@ namespace ProjectM.Economy
             return PlaceFarmInternal(position, rotation, out placed);
         }
 
-        /// <summary>서버 전용 설치. NetworkFarmManagerBridge·Host 가 호출.</summary>
+        // 서버 전용 설치. NetworkFarmManagerBridge·Host 가 호출.
         public bool PlaceFarmInternal(Vector3 position, Quaternion rotation, out FarmPlot placed)
         {
             placed = null;
@@ -164,7 +162,7 @@ namespace ProjectM.Economy
             return session.State.CurrentPhase == GamePhase.Preparation;
         }
 
-        /// <summary>설치 불가 시 플레이어에게 보여줄 메시지.</summary>
+        // 설치 불가 시 플레이어에게 보여줄 메시지.
         public string GetPlacementBlockMessage()
         {
             if (!CanPlaceMore)
@@ -174,7 +172,7 @@ namespace ProjectM.Economy
             return "밭을 설치할 수 없습니다.";
         }
 
-        /// <summary>Guest 클라이언트: Despawn 후 fake-null 항목 정리.</summary>
+        // Guest 클라이언트: Despawn 후 fake-null 항목 정리.
         public void CleanupStaleFarmEntries()
         {
             if (NetworkSessionHelper.IsGameplayAuthority)
@@ -199,7 +197,7 @@ namespace ProjectM.Economy
             Debug.Log($"[FarmManager] 밭 파괴됨 — 누적 수익 손실 ({ActiveCount}/{MaxFarms})");
         }
 
-        /// <summary>클라이언트 NGO 미러: 서버에서 파괴된 밭을 로컬 목록에서 제거.</summary>
+        // 클라이언트 NGO 미러: 서버에서 파괴된 밭을 로컬 목록에서 제거.
         public void NotifyFarmDestroyedFromMirror(FarmPlot plot)
         {
             if (NetworkSessionHelper.IsGameplayAuthority)
@@ -208,7 +206,7 @@ namespace ProjectM.Economy
             HandleFarmDestroyed(plot);
         }
 
-        /// <summary>매치 시작 시 활성 밭 목록·네트워크 카운트 초기화.</summary>
+        // 매치 시작 시 활성 밭 목록·네트워크 카운트 초기화.
         public void ResetForMatch()
         {
             foreach (var plot in activeFarms)
@@ -256,7 +254,7 @@ namespace ProjectM.Economy
         // 수확 (플레이어 F 키 → FarmPlot 이 호출)
         // ─────────────────────────────────────────────────────────────
 
-        /// <summary>플레이어가 F 키로 수확 시도. FarmPlot 의 누적분을 팀 전원 지갑에 균등 분배.</summary>
+        // 플레이어가 F 키로 수확 시도. FarmPlot 의 누적분을 팀 전원 지갑에 균등 분배.
         public void HarvestFarm(FarmPlot plot, ulong harvesterClientId = ulong.MaxValue)
         {
             if (NetworkSessionHelper.IsMultiplayerSession && !NetworkSessionHelper.IsServer)

@@ -5,12 +5,10 @@ namespace ProjectM.Player
     public enum WeaponSlot { Primary, Secondary }   // 주 무기 / 보조 무기
     public enum WeaponKind { Ranged, Melee }        // 원거리(총) / 근접(칼)
 
-    /// <summary>
-    /// 무기 1종(=1단계)의 데이터. ScriptableObject 라서 Unity 에서 자유롭게 추가/삭제 가능.
-    /// 기획서 9-2(주무기), 9-3(보조무기) 기준.
-    ///
-    /// 같은 무기의 단계들은 WeaponProgression 의 리스트 순서로 정의된다.
-    /// </summary>
+    // 무기 1종(=1단계)의 데이터. ScriptableObject 라서 Unity 에서 자유롭게 추가/삭제 가능.
+    // 기획서 9-2(주무기), 9-3(보조무기) 기준.
+
+    // 같은 무기의 단계들은 WeaponProgression 의 리스트 순서로 정의된다.
     [CreateAssetMenu(menuName = "ProjectM/Weapon/WeaponDefinition", fileName = "WeaponDef")]
     public class WeaponDefinition : ScriptableObject
     {

@@ -9,9 +9,7 @@ namespace ProjectM.Auth
         PlayerAccount
     }
 
-    /// <summary>
-    /// 로그인 세션 정보를 씬 전환 후에도 유지하는 싱글톤.
-    /// </summary>
+    // 로그인 세션 정보를 씬 전환 후에도 유지하는 싱글톤.
     public class AuthSessionManager : MonoBehaviour
     {
         public static AuthSessionManager Instance { get; private set; }

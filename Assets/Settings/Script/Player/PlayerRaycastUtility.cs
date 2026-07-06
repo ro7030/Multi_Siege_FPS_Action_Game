@@ -3,9 +3,7 @@ using UnityEngine;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// 1인칭 레이캐스트 공통 처리. 자기 CharacterController/비주얼 히트를 건너뛴다.
-    /// </summary>
+    // 1인칭 레이캐스트 공통 처리. 자기 CharacterController/비주얼 히트를 건너뛴다.
     public static class PlayerRaycastUtility
     {
         private const float DefaultOriginForwardOffset = 0.1f;

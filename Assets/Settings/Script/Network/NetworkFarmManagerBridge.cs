@@ -9,10 +9,8 @@ using ProjectM.UI;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// 클라이언트 밭 설치 요청을 서버 FarmManager 로 전달하고,
-    /// 팀 활성 밭 개수를 NetworkVariable 로 복제한다.
-    /// </summary>
+    // 클라이언트 밭 설치 요청을 서버 FarmManager 로 전달하고,
+    // 팀 활성 밭 개수를 NetworkVariable 로 복제한다.
     public class NetworkFarmManagerBridge : NetworkBehaviour
     {
         public static NetworkFarmManagerBridge Instance { get; private set; }
@@ -48,7 +46,7 @@ namespace ProjectM.Network
                 Instance = null;
         }
 
-        /// <summary>서버 FarmManager 가 활성 밭 수 변경 시 호출.</summary>
+        // 서버 FarmManager 가 활성 밭 수 변경 시 호출.
         public void ServerSyncActiveFarmCount(int count)
         {
             if (!IsServer)

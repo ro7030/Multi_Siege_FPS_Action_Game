@@ -2,11 +2,9 @@ using UnityEngine;
 
 namespace ProjectM.CharacterSelect
 {
-    /// <summary>
-    /// CharacterSelect 프리뷰 Chibi를 Idle 상태로 고정한다.
-    /// 프리뷰 인스턴스의 Animator에 Controller가 비어있는 경우를 대비해
-    /// 스포너가 전달하는 fallback Controller로 보정한다.
-    /// </summary>
+    // CharacterSelect 프리뷰 Chibi를 Idle 상태로 고정한다.
+    // 프리뷰 인스턴스의 Animator에 Controller가 비어있는 경우를 대비해
+    // 스포너가 전달하는 fallback Controller로 보정한다.
     [DisallowMultipleComponent]
     public class CharacterPreviewIdleAnimator : MonoBehaviour
     {

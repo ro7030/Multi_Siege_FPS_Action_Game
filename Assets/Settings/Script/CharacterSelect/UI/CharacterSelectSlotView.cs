@@ -3,9 +3,7 @@ using UnityEngine;
 
 namespace ProjectM.CharacterSelect
 {
-    /// <summary>
-    /// 3D 슬롯 World Space 이름표 + Ready 뱃지 + 프리뷰 앵커.
-    /// </summary>
+    // 3D 슬롯 World Space 이름표 + Ready 뱃지 + 프리뷰 앵커.
     public class CharacterSelectSlotView : MonoBehaviour
     {
         [SerializeField] private int slotIndex;

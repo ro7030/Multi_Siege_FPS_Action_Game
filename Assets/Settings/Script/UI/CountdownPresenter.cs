@@ -6,17 +6,15 @@ using TMPro;
 
 namespace ProjectM.UI
 {
-    /// <summary>
-    /// Gameplay 씬 진입 직후 카운트다운 오버레이를 표시한다.
-    /// countdownDuration 이 끝나면 패널을 숨기고 OnCountdownFinished 이벤트를 발생시킨다.
-    /// MatchBootstrapper 가 이 이벤트를 받아 매치를 시작한다.
-    ///
-    /// [Inspector 설정]
-    ///  - countdownDuration  : 카운트다운 시간 (초) — 에디터에서 자유롭게 조절
-    ///  - countdownPanel     : 전체화면 패널 (없으면 자동 생성)
-    ///  - backgroundImage    : 이미지 슬롯 — 원하는 Sprite 를 여기에 연결
-    ///  - countdownText      : 숫자 텍스트 (없으면 자동 생성)
-    /// </summary>
+    // Gameplay 씬 진입 직후 카운트다운 오버레이를 표시한다.
+    // countdownDuration 이 끝나면 패널을 숨기고 OnCountdownFinished 이벤트를 발생시킨다.
+    // MatchBootstrapper 가 이 이벤트를 받아 매치를 시작한다.
+
+    // [Inspector 설정]
+    // - countdownDuration  : 카운트다운 시간 (초) — 에디터에서 자유롭게 조절
+    // - countdownPanel     : 전체화면 패널 (없으면 자동 생성)
+    // - backgroundImage    : 이미지 슬롯 — 원하는 Sprite 를 여기에 연결
+    // - countdownText      : 숫자 텍스트 (없으면 자동 생성)
     public class CountdownPresenter : MonoBehaviour
     {
         [Header("카운트다운 설정")]
@@ -27,10 +25,10 @@ namespace ProjectM.UI
         [SerializeField] private Image backgroundImage;   // 이미지를 넣을 슬롯
         [SerializeField] private TMP_Text countdownText;
 
-        /// <summary>카운트다운 완료 시 발생. MatchBootstrapper 가 구독한다.</summary>
+        // 카운트다운 완료 시 발생. MatchBootstrapper 가 구독한다.
         public event Action OnCountdownFinished;
 
-        /// <summary>남은 시간 (읽기 전용). HUD 등 외부에서 참조 가능.</summary>
+        // 남은 시간 (읽기 전용). HUD 등 외부에서 참조 가능.
         public float Remaining { get; private set; }
 
         // ─────────────────────────────────────────────────────────────
@@ -67,7 +65,7 @@ namespace ProjectM.UI
         }
 
         // ─────────────────────────────────────────────────────────────
-        /// <summary>Inspector 에서 연결하지 않은 요소를 자동으로 생성한다.</summary>
+        // Inspector 에서 연결하지 않은 요소를 자동으로 생성한다.
         private void EnsureUI()
         {
             // 패널 없으면 생성

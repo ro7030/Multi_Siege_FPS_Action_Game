@@ -4,9 +4,7 @@ using Unity.Netcode;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// CharacterSelect → GamePlay 씬 전환 후에도 유지되는 캐릭터 선택 스냅샷.
-    /// </summary>
+    // CharacterSelect → GamePlay 씬 전환 후에도 유지되는 캐릭터 선택 스냅샷.
     public static class MatchLoadoutContext
     {
         private static readonly Dictionary<ulong, int> CharacterIndexByClient = new();

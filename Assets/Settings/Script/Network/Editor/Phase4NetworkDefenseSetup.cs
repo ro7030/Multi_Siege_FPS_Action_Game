@@ -12,10 +12,8 @@ using ProjectM.Player;
 
 namespace ProjectM.Network.Editor
 {
-    /// <summary>
-    /// Phase 4: 방어/밭/게이트/지갑 NGO 동기화 컴포넌트 연결.
-    /// 메뉴: ProjectM/Setup Phase 4 Network Defense & Economy
-    /// </summary>
+    // Phase 4: 방어/밭/게이트/지갑 NGO 동기화 컴포넌트 연결.
+    // 메뉴: ProjectM/Setup Phase 4 Network Defense & Economy
     public static class Phase4NetworkDefenseSetup
     {
         private const string DefaultNetworkPrefabsPath = "Assets/DefaultNetworkPrefabs.asset";
@@ -205,7 +203,7 @@ namespace ProjectM.Network.Editor
             Debug.Log($"[Phase4] 씬 DefenseObject NGO 적용: {count}개 (비활성 포함)");
         }
 
-        /// <summary>GateInstaller가 참조하는 Gate Body(비활성)에 NGO HP 브릿지를 붙인다.</summary>
+        // GateInstaller가 참조하는 Gate Body(비활성)에 NGO HP 브릿지를 붙인다.
         private static void SetupGateDefenseBodies()
         {
             int count = 0;

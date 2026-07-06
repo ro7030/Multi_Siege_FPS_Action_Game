@@ -4,9 +4,7 @@ using ProjectM.Player;
 
 namespace ProjectM.Audio
 {
-    /// <summary>
-    /// 로컬 플레이어 근접 공격 시 1인칭 검격 SFX를 재생한다.
-    /// </summary>
+    // 로컬 플레이어 근접 공격 시 1인칭 검격 SFX를 재생한다.
     [DisallowMultipleComponent]
     [RequireComponent(typeof(MeleeWeapon))]
     public class PlayerMeleeAudio : MonoBehaviour

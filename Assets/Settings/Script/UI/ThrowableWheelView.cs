@@ -5,11 +5,9 @@ using ProjectM.Player;
 
 namespace ProjectM.UI
 {
-    /// <summary>
-    /// 투척무기 선택 라디얼 휠. ThrowableEquipper 의 선택 상태를 폴링하여 표시한다.
-    /// 4번키를 누르고 있는 동안만 표시. 위=수류탄 / 좌하=화염병 / 우하=섬광탄.
-    /// 자동 생성형. (KitWheelView 와 동일 패턴)
-    /// </summary>
+    // 투척무기 선택 라디얼 휠. ThrowableEquipper 의 선택 상태를 폴링하여 표시한다.
+    // 4번키를 누르고 있는 동안만 표시. 위=수류탄 / 좌하=화염병 / 우하=섬광탄.
+    // 자동 생성형. (KitWheelView 와 동일 패턴)
     public class ThrowableWheelView : MonoBehaviour
     {
         [SerializeField] private ThrowableEquipper equipper;

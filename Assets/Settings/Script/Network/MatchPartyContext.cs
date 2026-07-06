@@ -3,9 +3,7 @@ using UnityEngine;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// 매치 종료 후 Retry/Home/rematch 조율에 쓰는 세션 컨텍스트 (ClientRpc 미러 + UI).
-    /// </summary>
+    // 매치 종료 후 Retry/Home/rematch 조율에 쓰는 세션 컨텍스트 (ClientRpc 미러 + UI).
     public static class MatchPartyContext
     {
         public static string RematchGroupId { get; private set; } = string.Empty;

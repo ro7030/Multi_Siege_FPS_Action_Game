@@ -20,19 +20,17 @@ namespace ProjectM.UI
         public Sprite selected;
     }
 
-    /// <summary>
-    /// 하단 무기/키트 슬롯바. 활성 슬롯은 <see cref="WeaponKitSlot"/> 이 normal/selected 스프라이트로 교체한다.
-    ///
-    ///   primarySlot   : 주 무기(총) — ActiveSlot == Primary 일 때 강조 + 탄약
-    ///   secondarySlot : 보조(근접) — ActiveSlot == Secondary 일 때 강조
-    ///   슬롯 3 : 키트 (3번 홀드로 휠 선택) — 키트 장착 시 강조 + 개수
-    ///   슬롯 4 : 힐 키트 아이콘 — 힐 키트를 보유 중일 때만 표시
-    ///
-    /// 사용법
-    ///   1) Canvas 에 슬롯 이미지를 직접 디자인 (아이콘은 고정 이미지)
-    ///   2) 각 슬롯에 WeaponKitSlot 붙이고 infoText/highlight/tintTarget 연결
-    ///   3) 이 컴포넌트의 슬롯들에 드래그
-    /// </summary>
+    // 하단 무기/키트 슬롯바. 활성 슬롯은 <see cref="WeaponKitSlot"/> 이 normal/selected 스프라이트로 교체한다.
+
+    // primarySlot   : 주 무기(총) — ActiveSlot == Primary 일 때 강조 + 탄약
+    // secondarySlot : 보조(근접) — ActiveSlot == Secondary 일 때 강조
+    // 슬롯 3 : 키트 (3번 홀드로 휠 선택) — 키트 장착 시 강조 + 개수
+    // 슬롯 4 : 힐 키트 아이콘 — 힐 키트를 보유 중일 때만 표시
+
+    // 사용법
+    // 1) Canvas 에 슬롯 이미지를 직접 디자인 (아이콘은 고정 이미지)
+    // 2) 각 슬롯에 WeaponKitSlot 붙이고 infoText/highlight/tintTarget 연결
+    // 3) 이 컴포넌트의 슬롯들에 드래그
     public class WeaponKitHUD : MonoBehaviour
     {
         [Header("참조 (자동 탐색)")]

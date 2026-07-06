@@ -3,10 +3,8 @@ using UnityEngine.AI;
 
 namespace ProjectM.Defense
 {
-    /// <summary>
-    /// 게이트. 파괴되면 NavMeshObstacle을 비활성화하여 적의 통행을 허용한다.
-    /// 같은 GameObject에 NavMeshObstacle(Carve=true)을 두면 살아있을 때 적의 경로를 막는다.
-    /// </summary>
+    // 게이트. 파괴되면 NavMeshObstacle을 비활성화하여 적의 통행을 허용한다.
+    // 같은 GameObject에 NavMeshObstacle(Carve=true)을 두면 살아있을 때 적의 경로를 막는다.
     [RequireComponent(typeof(DefenseObject))]
     public class GateController : MonoBehaviour
     {
@@ -35,7 +33,7 @@ namespace ProjectM.Defense
 
         private void HandleDestroyed(DefenseObject _) => ApplyState(true);
 
-        /// <summary>재설치 시 NavMesh·비주얼을 살아있는 상태로 되돌린다.</summary>
+        // 재설치 시 NavMesh·비주얼을 살아있는 상태로 되돌린다.
         public void RestoreAliveState() => ApplyState(false);
 
         private void ApplyState(bool destroyed)

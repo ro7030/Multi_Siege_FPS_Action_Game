@@ -10,10 +10,8 @@ using ProjectM.Player;
 
 namespace ProjectM.Data
 {
-    /// <summary>
-    /// 매치 종료 시 결과 DTO를 MySQL(1차) 또는 REST API로 저장.
-    /// NGO 세션에서는 Host만 업로드. 실패 시 로컬 JSON 큐에 저장.
-    /// </summary>
+    // 매치 종료 시 결과 DTO를 MySQL(1차) 또는 REST API로 저장.
+    // NGO 세션에서는 Host만 업로드. 실패 시 로컬 JSON 큐에 저장.
     public class ResultUploader : MonoBehaviour
     {
         [SerializeField] private GameSessionManager session;

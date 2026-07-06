@@ -11,12 +11,10 @@ using ProjectM.Network;
 
 namespace ProjectM.Enemy
 {
-    /// <summary>
-    /// NavMeshAgent 기반 적 AI.
-    /// 감지 범위 안: 플레이어 > 게이트 > 밭 > 베이스 (동티어 최단 표면거리).
-    /// 범위 안 후보 없음: 전역 fallback — 플레이어 제외, 게이트·밭·베이스만(공성 march).
-    /// Host(서버)만 시뮬레이션한다.
-    /// </summary>
+    // NavMeshAgent 기반 적 AI.
+    // 감지 범위 안: 플레이어 > 게이트 > 밭 > 베이스 (동티어 최단 표면거리).
+    // 범위 안 후보 없음: 전역 fallback — 플레이어 제외, 게이트·밭·베이스만(공성 march).
+    // Host(서버)만 시뮬레이션한다.
     [RequireComponent(typeof(NavMeshAgent))]
     [RequireComponent(typeof(HealthSystem))]
     public class EnemyAIController : MonoBehaviour, IStunnable
@@ -346,7 +344,7 @@ namespace ProjectM.Enemy
             }
         }
 
-        /// <summary>감지 범위 안 더 높은 티어 후보가 있으면 즉시 재탐색.</summary>
+        // 감지 범위 안 더 높은 티어 후보가 있으면 즉시 재탐색.
         private bool ShouldForceRetarget()
         {
             if (stats == null) return false;

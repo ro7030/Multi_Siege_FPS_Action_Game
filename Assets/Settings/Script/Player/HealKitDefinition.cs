@@ -2,10 +2,8 @@ using UnityEngine;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// 힐킷 1단계의 데이터. ScriptableObject 라서 Unity 에서 자유롭게 추가/삭제 가능.
-    /// 단계는 HealKitProgression 의 리스트 순서로 정의된다.
-    /// </summary>
+    // 힐킷 1단계의 데이터. ScriptableObject 라서 Unity 에서 자유롭게 추가/삭제 가능.
+    // 단계는 HealKitProgression 의 리스트 순서로 정의된다.
     [CreateAssetMenu(menuName = "ProjectM/Player/HealKitDefinition", fileName = "HealKitDef")]
     public class HealKitDefinition : ScriptableObject
     {

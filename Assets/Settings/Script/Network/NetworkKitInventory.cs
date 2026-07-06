@@ -4,9 +4,7 @@ using ProjectM.Player;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// 플레이어 키트 보유량을 서버 권한으로 NGO 동기화한다.
-    /// </summary>
+    // 플레이어 키트 보유량을 서버 권한으로 NGO 동기화한다.
     [RequireComponent(typeof(KitInventory))]
     public class NetworkKitInventory : NetworkBehaviour
     {
@@ -169,7 +167,7 @@ namespace ProjectM.Network
             kitEquipper?.ApplyNetworkHealTier(netHealTier.Value);
         }
 
-        /// <summary>서버 로컬 인벤이 net보다 앞서 있으면 net을 맞춘다 (스폰 직후 desync 방지).</summary>
+        // 서버 로컬 인벤이 net보다 앞서 있으면 net을 맞춘다 (스폰 직후 desync 방지).
         private void ReconcileNetFromLocal(KitType type)
         {
             int local = inventory.GetCount(type);
@@ -222,7 +220,7 @@ namespace ProjectM.Network
         private void HandleHealTierChanged(int _, int value) =>
             kitEquipper?.ApplyNetworkHealTier(value);
 
-        /// <summary>Owner 클라이언트 힐킷 사용 요청.</summary>
+        // Owner 클라이언트 힐킷 사용 요청.
         public void RequestUseHealKitFromOwner(float amount)
         {
             if (!IsOwner)

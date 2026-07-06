@@ -3,9 +3,7 @@ using UnityEngine;
 
 namespace ProjectM.Defense
 {
-    /// <summary>
-    /// Phase 5 임시 디버그 UI. 씬 안의 모든 DefenseObject / FarmPlot 상태를 표시한다.
-    /// </summary>
+    // Phase 5 임시 디버그 UI. 씬 안의 모든 DefenseObject / FarmPlot 상태를 표시한다.
     public class DefenseDebugUI : MonoBehaviour
     {
         private readonly List<DefenseObject> defenses = new();

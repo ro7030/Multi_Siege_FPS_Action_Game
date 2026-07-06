@@ -4,9 +4,7 @@ using UnityEngine;
 
 namespace ProjectM.Economy
 {
-    /// <summary>
-    /// 상점 탭(대분류/소분류)에 맞는 목록 항목을 만든다.
-    /// </summary>
+    // 상점 탭(대분류/소분류)에 맞는 목록 항목을 만든다.
     public static class ShopCatalogBuilder
     {
         public static IReadOnlyList<ShopSubTab> GetSubTabsForTop(ShopTopTab top)

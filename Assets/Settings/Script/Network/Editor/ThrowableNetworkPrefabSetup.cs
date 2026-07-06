@@ -7,9 +7,7 @@ using ProjectM.Player;
 
 namespace ProjectM.Network.Editor
 {
-    /// <summary>
-    /// 투척 투사체 prefab에 NGO 컴포넌트를 추가하고 DefaultNetworkPrefabs에 등록한다.
-    /// </summary>
+    // 투척 투사체 prefab에 NGO 컴포넌트를 추가하고 DefaultNetworkPrefabs에 등록한다.
     public static class ThrowableNetworkPrefabSetup
     {
         private const string DefaultNetworkPrefabsPath = "Assets/DefaultNetworkPrefabs.asset";

@@ -5,11 +5,9 @@ using ProjectM.UI;
 
 namespace ProjectM.Core
 {
-    /// <summary>
-    /// Gameplay 씬 진입 시 매치 자동 진행. 디버그 UI 없이 게임이 흘러가도록 한다.
-    /// 흐름: (CountdownPresenter 카운트다운) → Lobby → (자동) StartMatch → Preparation N초 → StartWave → ...
-    /// CountdownPresenter 가 씬에 없으면 startDelay 로 폴백한다.
-    /// </summary>
+    // Gameplay 씬 진입 시 매치 자동 진행. 디버그 UI 없이 게임이 흘러가도록 한다.
+    // 흐름: (CountdownPresenter 카운트다운) → Lobby → (자동) StartMatch → Preparation N초 → StartWave → ...
+    // CountdownPresenter 가 씬에 없으면 startDelay 로 폴백한다.
     public class MatchBootstrapper : MonoBehaviour
     {
         [SerializeField] private GameSessionManager session;
@@ -27,15 +25,15 @@ namespace ProjectM.Core
         [SerializeField] private float preparationRemaining;
         [SerializeField] private float preparationTotal;
 
-        /// <summary>현재 준비 구간 남은 시간(초). UI 카운트다운용.</summary>
+        // 현재 준비 구간 남은 시간(초). UI 카운트다운용.
         public float PreparationRemaining => preparationRemaining;
 
-        /// <summary>현재 준비 구간 전체 시간(초). 시작 시점 기준.</summary>
+        // 현재 준비 구간 전체 시간(초). 시작 시점 기준.
         public float PreparationTotal => preparationTotal;
 
         public float PreparationDuration => preparationDuration;
 
-        /// <summary>준비 시간 카운트다운이 진행 중일 때 true.</summary>
+        // 준비 시간 카운트다운이 진행 중일 때 true.
         public bool IsPreparationCounting => preparationRemaining > 0f;
 
         private void Awake()

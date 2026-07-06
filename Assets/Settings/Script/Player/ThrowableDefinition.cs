@@ -5,9 +5,7 @@ namespace ProjectM.Player
     public enum ThrowableType { None, Grenade, Molotov, Flash }
     public enum ThrowableEffect { Damage, Fire, Stun }
 
-    /// <summary>
-    /// 투척무기 1종 데이터. 기획서 9-4 기준. Unity 에서 자유롭게 추가/삭제 가능.
-    /// </summary>
+    // 투척무기 1종 데이터. 기획서 9-4 기준. Unity 에서 자유롭게 추가/삭제 가능.
     [CreateAssetMenu(menuName = "ProjectM/Weapon/ThrowableDefinition", fileName = "ThrowableDef")]
     public class ThrowableDefinition : ScriptableObject
     {

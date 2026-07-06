@@ -4,9 +4,7 @@ using ProjectM.Network;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// 서버/로컬 공통 투척무기 투사체 생성.
-    /// </summary>
+    // 서버/로컬 공통 투척무기 투사체 생성.
     public static class ThrowableSpawner
     {
         public static bool SpawnProjectile(

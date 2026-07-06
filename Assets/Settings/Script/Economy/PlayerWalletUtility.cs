@@ -5,9 +5,7 @@ using ProjectM.Player;
 
 namespace ProjectM.Economy
 {
-    /// <summary>
-    /// 멀티플레이 골드 지급/지갑 탐색 유틸. 서버 권한 전용.
-    /// </summary>
+    // 멀티플레이 골드 지급/지갑 탐색 유틸. 서버 권한 전용.
     public static class PlayerWalletUtility
     {
         public static void ServerAddToAllPlayers(int amount, string reason = null)

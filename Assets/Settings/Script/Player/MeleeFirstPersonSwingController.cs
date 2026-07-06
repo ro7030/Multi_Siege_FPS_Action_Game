@@ -3,10 +3,8 @@ using UnityEngine;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// Owner 1인칭 검 공격 시 매 타 좌→우 수평 베기를 적용한다.
-    /// PlayerFirstPersonWeaponAligner(0) 이후 LateUpdate에서 idle 포즈 위에 델타를 더한다.
-    /// </summary>
+    // Owner 1인칭 검 공격 시 매 타 좌→우 수평 베기를 적용한다.
+    // PlayerFirstPersonWeaponAligner(0) 이후 LateUpdate에서 idle 포즈 위에 델타를 더한다.
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(100)]
     public class MeleeFirstPersonSwingController : MonoBehaviour

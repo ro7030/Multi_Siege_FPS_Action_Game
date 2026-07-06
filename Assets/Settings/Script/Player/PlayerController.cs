@@ -5,10 +5,8 @@ using ProjectM.UI;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// 1인칭 캐릭터 이동/시점 컨트롤. CharacterController 기반.
-    /// Input System 1.19의 Keyboard/Mouse를 직접 폴링한다 (InputAction asset 의존 없음).
-    /// </summary>
+    // 1인칭 캐릭터 이동/시점 컨트롤. CharacterController 기반.
+    // Input System 1.19의 Keyboard/Mouse를 직접 폴링한다 (InputAction asset 의존 없음).
     [RequireComponent(typeof(CharacterController))]
     public class PlayerController : MonoBehaviour
     {

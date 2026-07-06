@@ -6,10 +6,8 @@ using UnityEngine;
 
 namespace ProjectM.Data
 {
-    /// <summary>
-    /// MySqlConnector 직접 연결 테스트 (로컬 개발/프로토타입용).
-    /// DB 작업은 백그라운드 스레드에서 실행하고, Unity 메인 스레드는 코루틴으로 대기한다.
-    /// </summary>
+    // MySqlConnector 직접 연결 테스트 (로컬 개발/프로토타입용).
+    // DB 작업은 백그라운드 스레드에서 실행하고, Unity 메인 스레드는 코루틴으로 대기한다.
     public class MySqlConnectionTester : MonoBehaviour
     {
         [SerializeField] private MySqlConnectionSettings settings;

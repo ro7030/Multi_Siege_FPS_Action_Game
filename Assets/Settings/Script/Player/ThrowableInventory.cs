@@ -4,10 +4,8 @@ using ProjectM.Network;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// 투척무기 보유량. 상점 구매 시 증가, 던질 때 1개 소모.
-    /// 기본 지급: 수류탄 1, 섬광탄 1 (기획서 10-5)
-    /// </summary>
+    // 투척무기 보유량. 상점 구매 시 증가, 던질 때 1개 소모.
+    // 기본 지급: 수류탄 1, 섬광탄 1 (기획서 10-5)
     [DefaultExecutionOrder(-100)]
     public class ThrowableInventory : MonoBehaviour
     {
@@ -27,7 +25,7 @@ namespace ProjectM.Player
         public int MolotovCount => molotovCount;
         public int FlashCount => flashCount;
 
-        /// <summary>(타입, 새 보유량)</summary>
+        // (타입, 새 보유량)
         public event Action<ThrowableType, int> OnCountChanged;
 
         private void Awake() => ApplyStartingCounts();
@@ -45,7 +43,7 @@ namespace ProjectM.Player
         public bool HasAny() =>
             grenadeCount > 0 || molotovCount > 0 || flashCount > 0;
 
-        /// <summary>스폰 시점에 starting 값이 반드시 적용되도록 보장한다.</summary>
+        // 스폰 시점에 starting 값이 반드시 적용되도록 보장한다.
         internal void ApplyStartingCounts()
         {
             if (startingCountsApplied)
@@ -88,7 +86,7 @@ namespace ProjectM.Player
             return TryConsumeLocal(type);
         }
 
-        /// <summary>서버/네트워크 동기화용. 카운트 갱신 + 이벤트 발행.</summary>
+        // 서버/네트워크 동기화용. 카운트 갱신 + 이벤트 발행.
         public void NotifyCount(ThrowableType type, int value)
         {
             value = Mathf.Max(0, value);
@@ -103,7 +101,7 @@ namespace ProjectM.Player
             OnCountChanged?.Invoke(type, value);
         }
 
-        /// <summary>스폰 직후 클라이언트 스냅샷 일괄 적용.</summary>
+        // 스폰 직후 클라이언트 스냅샷 일괄 적용.
         public void NotifyAllCounts(int grenade, int molotov, int flash)
         {
             NotifyCount(ThrowableType.Grenade, grenade);

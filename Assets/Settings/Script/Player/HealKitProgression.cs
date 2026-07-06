@@ -3,12 +3,10 @@ using UnityEngine;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// 힐킷 단계 진행표. 리스트 순서가 곧 단계.
-    ///   tiers[0]   = 기본 지급 힐킷
-    ///   tiers[1..] = 업그레이드 단계
-    /// Unity 에서 HealKitDefinition 을 리스트에 추가/제거하면 단계가 늘거나 준다.
-    /// </summary>
+    // 힐킷 단계 진행표. 리스트 순서가 곧 단계.
+    // tiers[0]   = 기본 지급 힐킷
+    // tiers[1..] = 업그레이드 단계
+    // Unity 에서 HealKitDefinition 을 리스트에 추가/제거하면 단계가 늘거나 준다.
     [CreateAssetMenu(menuName = "ProjectM/Player/HealKitProgression", fileName = "HealKitProgression")]
     public class HealKitProgression : ScriptableObject
     {

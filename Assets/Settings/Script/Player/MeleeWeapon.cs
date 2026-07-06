@@ -7,11 +7,9 @@ using ProjectM.UI;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// 근접 무기(칼). 좌클릭으로 정면 부채꼴(AOE 슬래시) 범위 안 모든 적을 타격한다.
-    /// WeaponDefinition(kind=Melee) 으로 수치가 주입된다. PlayerArsenal 이 IsActive 를 토글.
-    /// 방어 오브젝트는 플레이어 공격으로 파괴 불가 (총과 동일 규칙).
-    /// </summary>
+    // 근접 무기(칼). 좌클릭으로 정면 부채꼴(AOE 슬래시) 범위 안 모든 적을 타격한다.
+    // WeaponDefinition(kind=Melee) 으로 수치가 주입된다. PlayerArsenal 이 IsActive 를 토글.
+    // 방어 오브젝트는 플레이어 공격으로 파괴 불가 (총과 동일 규칙).
     public class MeleeWeapon : MonoBehaviour
     {
         [Header("기준 카메라")]
@@ -141,7 +139,7 @@ namespace ProjectM.Player
 
         public bool CanAttack() => Time.time >= nextAttackTime;
 
-        /// <summary>부채꼴 범위 내 모든 적에게 데미지(AOE 슬래시).</summary>
+        // 부채꼴 범위 내 모든 적에게 데미지(AOE 슬래시).
         public void Attack()
         {
             nextAttackTime = Time.time + Mathf.Max(0.1f, attackInterval);
@@ -163,7 +161,7 @@ namespace ProjectM.Player
             ApplyDamageToTargetsInArc(origin, fwd, hitTargets);
         }
 
-        /// <summary>OverlapSphere + 부채꼴 필터로 범위 안 모든 IDamageable에 데미지.</summary>
+        // OverlapSphere + 부채꼴 필터로 범위 안 모든 IDamageable에 데미지.
         private void ApplyDamageToTargetsInArc(Vector3 origin, Vector3 fwd, HashSet<IDamageable> hitTargets)
         {
             var cols = Physics.OverlapSphere(origin, meleeRange, hitMask, QueryTriggerInteraction.Ignore);
@@ -187,7 +185,7 @@ namespace ProjectM.Player
             }
         }
 
-        /// <summary>카메라 정면 레이로 근접 miss 보완(OverlapSphere 전 1타 우선).</summary>
+        // 카메라 정면 레이로 근접 miss 보완(OverlapSphere 전 1타 우선).
         private void TryRayAssistHit(Vector3 origin, Vector3 fwd, HashSet<IDamageable> hitTargets)
         {
             var ray = new Ray(viewCamera.transform.position, viewCamera.transform.forward);

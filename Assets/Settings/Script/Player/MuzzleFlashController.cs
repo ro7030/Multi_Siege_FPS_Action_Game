@@ -4,10 +4,8 @@ using UnityEngine.VFX;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// 주무기 발사 시 1인칭 화면에서만 보이는 총구 화염(VFX Graph)을 재생한다.
-    /// 원격 플레이어에게는 동기화하지 않는다(요청 범위: Owner 로컬 전용).
-    /// </summary>
+    // 주무기 발사 시 1인칭 화면에서만 보이는 총구 화염(VFX Graph)을 재생한다.
+    // 원격 플레이어에게는 동기화하지 않는다(요청 범위: Owner 로컬 전용).
     [DisallowMultipleComponent]
     [RequireComponent(typeof(WeaponController))]
     public class MuzzleFlashController : MonoBehaviour
@@ -85,12 +83,10 @@ namespace ProjectM.Player
                 flashVfx.initialEventName = string.Empty;
         }
 
-        /// <summary>
-        /// 이펙트 인스턴스를 총구 Transform의 자식으로 붙여 매 프레임 위치를 자동 추적하게 하되,
-        /// 실제 표시 위치/방향은 발사 순간 실제 탄도 레이(카메라 정면) 기준으로 재계산한다.
-        /// 무기 모델의 로컬 정면 축이 실제 조준 방향과 미세하게 어긋나 있어도 이펙트가 항상
-        /// 크로스헤어가 향하는 방향(=탄이 나가는 방향)을 보도록 하기 위함.
-        /// </summary>
+        // 이펙트 인스턴스를 총구 Transform의 자식으로 붙여 매 프레임 위치를 자동 추적하게 하되,
+        // 실제 표시 위치/방향은 발사 순간 실제 탄도 레이(카메라 정면) 기준으로 재계산한다.
+        // 무기 모델의 로컬 정면 축이 실제 조준 방향과 미세하게 어긋나 있어도 이펙트가 항상
+        // 크로스헤어가 향하는 방향(=탄이 나가는 방향)을 보도록 하기 위함.
         private void PositionAtMuzzle(Transform muzzle, Vector3 localOffset, Vector3 localEuler)
         {
             var flashTransform = flashInstance.transform;
@@ -107,10 +103,8 @@ namespace ProjectM.Player
                 Quaternion.LookRotation(fireDir, muzzle.up));
         }
 
-        /// <summary>
-        /// 실제 히트스캔 레이 방향(카메라 정면)을 우선 사용하고, 카메라를 찾을 수 없으면
-        /// 총구 로컬 정면 축(muzzleLocalEuler 반영)으로 대체한다.
-        /// </summary>
+        // 실제 히트스캔 레이 방향(카메라 정면)을 우선 사용하고, 카메라를 찾을 수 없으면
+        // 총구 로컬 정면 축(muzzleLocalEuler 반영)으로 대체한다.
         private Vector3 ResolveFireDirection(Transform muzzle, Vector3 localEuler)
         {
             var cam = weaponController != null ? weaponController.ViewCamera : null;
@@ -120,10 +114,8 @@ namespace ProjectM.Player
             return muzzle.TransformDirection(Quaternion.Euler(localEuler) * Vector3.forward);
         }
 
-        /// <summary>
-        /// 부착 무기 모드에서는 현재 표시 중인 주무기 인스턴스를, 레거시 모드에서는 카메라 소켓 뷰모델을 반환한다.
-        /// 주무기가 화면에 없으면(다른 슬롯 표시 중 등) null.
-        /// </summary>
+        // 부착 무기 모드에서는 현재 표시 중인 주무기 인스턴스를, 레거시 모드에서는 카메라 소켓 뷰모델을 반환한다.
+        // 주무기가 화면에 없으면(다른 슬롯 표시 중 등) null.
         private Transform ResolveMuzzleTransform(out Vector3 localOffset, out Vector3 localEuler)
         {
             localOffset = Vector3.zero;

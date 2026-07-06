@@ -6,10 +6,8 @@ using ProjectM.Player;
 
 namespace ProjectM.Network.Editor
 {
-    /// <summary>
-    /// Phase 3: NetworkPlayer에 NetworkDamageBridge(HP 동기화) + 부활 상호작용 콜라이더 추가.
-    /// 메뉴: ProjectM/Setup Phase 3 Network Player Health
-    /// </summary>
+    // Phase 3: NetworkPlayer에 NetworkDamageBridge(HP 동기화) + 부활 상호작용 콜라이더 추가.
+    // 메뉴: ProjectM/Setup Phase 3 Network Player Health
     public static class Phase3NetworkPlayerHealthSetup
     {
         private const string NetworkPlayerPrefabPath = "Assets/Prefab/Network/NetworkPlayer.prefab";

@@ -11,10 +11,8 @@ using ProjectM.Wave;
 
 namespace ProjectM.Network.Editor
 {
-    /// <summary>
-    /// Phase 2: 적 프리팹 NGO 등록 + GamePlay NetworkMatchDirector 연결.
-    /// 메뉴: ProjectM/Setup Phase 2 Network Enemies
-    /// </summary>
+    // Phase 2: 적 프리팹 NGO 등록 + GamePlay NetworkMatchDirector 연결.
+    // 메뉴: ProjectM/Setup Phase 2 Network Enemies
     public static class Phase2NetworkEnemySetup
     {
         private const string DefaultNetworkPrefabsPath = "Assets/DefaultNetworkPrefabs.asset";

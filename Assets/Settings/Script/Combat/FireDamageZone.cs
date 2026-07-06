@@ -5,9 +5,7 @@ using ProjectM.Player;
 
 namespace ProjectM.Combat
 {
-    /// <summary>
-    /// 서버 전용 화염 장판. duration 동안 tickInterval마다 반경 내 적에게 tickDamage를 적용한다.
-    /// </summary>
+    // 서버 전용 화염 장판. duration 동안 tickInterval마다 반경 내 적에게 tickDamage를 적용한다.
     public class FireDamageZone : MonoBehaviour
     {
         public static void Spawn(

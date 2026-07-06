@@ -4,9 +4,7 @@ using UnityEngine;
 
 namespace ProjectM.CharacterSelect
 {
-    /// <summary>
-    /// 온라인 세션이면 NetworkRoomService, 아니면 LocalRoomService를 활성화한다.
-    /// </summary>
+    // 온라인 세션이면 NetworkRoomService, 아니면 LocalRoomService를 활성화한다.
     [DefaultExecutionOrder(-100)]
     public class RoomServiceBootstrapper : MonoBehaviour
     {

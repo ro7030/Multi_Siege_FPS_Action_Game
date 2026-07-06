@@ -4,10 +4,8 @@ using UnityEngine;
 
 namespace ProjectM.Network
 {
-    /// <summary>
-    /// 서버(Host)가 계산한 적 Animator 파라미터를 NetworkVariable로 복제한다.
-    /// 적은 Owner가 아닌 서버가 시뮬레이션 권한을 가지므로 Write 권한은 Server.
-    /// </summary>
+    // 서버(Host)가 계산한 적 Animator 파라미터를 NetworkVariable로 복제한다.
+    // 적은 Owner가 아닌 서버가 시뮬레이션 권한을 가지므로 Write 권한은 Server.
     [DisallowMultipleComponent]
     public class NetworkEnemyAnimationBridge : NetworkBehaviour
     {
@@ -47,7 +45,7 @@ namespace ProjectM.Network
         public float SyncedVerticalSpeed => netVerticalSpeed.Value;
 
         public event Action OnSyncedStateChanged;
-        /// <summary>서버가 Attack 상태에 진입한 순간마다 정확히 1회 발생 (클라이언트 애니메이션 트리거용).</summary>
+        // 서버가 Attack 상태에 진입한 순간마다 정확히 1회 발생 (클라이언트 애니메이션 트리거용).
         public event Action OnAttackRequested;
 
         public void Publish(float speed, bool grounded, bool sprint, float verticalSpeed)
@@ -73,7 +71,7 @@ namespace ProjectM.Network
                 netSprint.Value = sprint;
         }
 
-        /// <summary>공격 1회 이벤트를 클라이언트에 전파한다. bool과 달리 값이 매번 바뀌어 edge가 유실되지 않는다.</summary>
+        // 공격 1회 이벤트를 클라이언트에 전파한다. bool과 달리 값이 매번 바뀌어 edge가 유실되지 않는다.
         public void PublishAttack()
         {
             if (!IsSpawned || !IsServer) return;

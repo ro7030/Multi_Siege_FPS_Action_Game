@@ -6,10 +6,8 @@ using ProjectM.Network;
 
 namespace ProjectM.Enemy
 {
-    /// <summary>
-    /// 적 프리팹을 지정된 스폰 포인트에서 생성한다. WaveManager의 지시를 받는다.
-    /// 멀티에서는 서버만 스폰하고 NGO로 복제한다.
-    /// </summary>
+    // 적 프리팹을 지정된 스폰 포인트에서 생성한다. WaveManager의 지시를 받는다.
+    // 멀티에서는 서버만 스폰하고 NGO로 복제한다.
     public class EnemySpawner : MonoBehaviour
     {
         [Header("스폰 포인트")]

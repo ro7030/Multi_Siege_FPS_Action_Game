@@ -5,11 +5,9 @@ using ProjectM.Network;
 
 namespace ProjectM.Player
 {
-    /// <summary>
-    /// 모든 플레이어가 행동 불능(다운 또는 사망) 상태가 되면 매치 패배 처리.
-    /// 솔로 플레이의 경우 부활 가능한 동료가 없으므로 다운 = 즉시 패배.
-    /// 멀티 플레이는 누군가 한 명이라도 살아있으면 게임 진행 유지.
-    /// </summary>
+    // 모든 플레이어가 행동 불능(다운 또는 사망) 상태가 되면 매치 패배 처리.
+    // 솔로 플레이의 경우 부활 가능한 동료가 없으므로 다운 = 즉시 패배.
+    // 멀티 플레이는 누군가 한 명이라도 살아있으면 게임 진행 유지.
     public class PlayerWipeoutDetector : MonoBehaviour
     {
         [Header("연결 (비우면 자동 탐색)")]

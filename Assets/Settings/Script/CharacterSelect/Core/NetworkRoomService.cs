@@ -6,9 +6,7 @@ using UnityEngine.SceneManagement;
 
 namespace ProjectM.CharacterSelect
 {
-    /// <summary>
-    /// LobbyRelayService NGO 세션용 IRoomService 구현.
-    /// </summary>
+    // LobbyRelayService NGO 세션용 IRoomService 구현.
     public class NetworkRoomService : MonoBehaviour, IRoomService
     {
         [SerializeField] private string mainMenuSceneName = "MainMenu";

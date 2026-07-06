@@ -3,9 +3,7 @@ using UnityEngine;
 
 namespace ProjectM.Economy
 {
-    /// <summary>
-    /// 상점에서 판매할 아이템 카탈로그. 데이터 전용 SO.
-    /// </summary>
+    // 상점에서 판매할 아이템 카탈로그. 데이터 전용 SO.
     [CreateAssetMenu(menuName = "ProjectM/Economy/ItemCatalog", fileName = "ItemCatalog")]
     public class ItemCatalog : ScriptableObject
     {

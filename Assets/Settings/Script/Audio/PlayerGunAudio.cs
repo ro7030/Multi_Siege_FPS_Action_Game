@@ -4,9 +4,7 @@ using ProjectM.Player;
 
 namespace ProjectM.Audio
 {
-    /// <summary>
-    /// 로컬 플레이어 주무기 발사 시 1인칭 단발 SFX를 재생한다.
-    /// </summary>
+    // 로컬 플레이어 주무기 발사 시 1인칭 단발 SFX를 재생한다.
     [DisallowMultipleComponent]
     [RequireComponent(typeof(WeaponController))]
     public class PlayerGunAudio : MonoBehaviour

@@ -2,10 +2,8 @@ using System;
 
 namespace ProjectM.UI
 {
-    /// <summary>
-    /// 방 참여 UI에 한 줄로 표시되는 방 정보.
-    /// 매치메이킹/디스커버리 레이어가 채워서 JoinRoomPanelController에 넘긴다.
-    /// </summary>
+    // 방 참여 UI에 한 줄로 표시되는 방 정보.
+    // 매치메이킹/디스커버리 레이어가 채워서 JoinRoomPanelController에 넘긴다.
     [Serializable]
     public class RoomListEntry
     {
