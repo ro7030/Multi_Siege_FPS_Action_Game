@@ -155,6 +155,7 @@ namespace ProjectM.Player
             EnsureSecondaryInstance();
             EnsureKitInstance();
             EnsureThrowableInstance();
+            ApplyOwnerWeaponLayers();
             ApplyVisibility();
         }
 
@@ -257,6 +258,17 @@ namespace ProjectM.Player
                 LocalFirstPersonVisual.ApplyOwnerWeaponLayer(instance, true);
 
             return instance;
+        }
+
+        private void ApplyOwnerWeaponLayers()
+        {
+            if (!IsLocalOwner())
+                return;
+
+            LocalFirstPersonVisual.ApplyOwnerWeaponLayer(primaryInstance, true);
+            LocalFirstPersonVisual.ApplyOwnerWeaponLayer(secondaryInstance, true);
+            LocalFirstPersonVisual.ApplyOwnerWeaponLayer(kitInstance, true);
+            LocalFirstPersonVisual.ApplyOwnerWeaponLayer(throwableInstance, true);
         }
 
         private void ApplyHandOffset(Transform t, WeaponKind kind, bool useHeldOffset)

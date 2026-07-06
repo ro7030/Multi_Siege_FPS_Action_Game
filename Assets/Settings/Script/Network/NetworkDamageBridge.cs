@@ -74,7 +74,8 @@ namespace ProjectM.Network
         {
             if (IsServer)
             {
-                health.OnHpChanged -= HandleServerHpChanged;
+                if (health != null)
+                    health.OnHpChanged -= HandleServerHpChanged;
                 UnbindReviveEvents();
             }
             else

@@ -92,6 +92,8 @@ namespace ProjectM.Network
 
             if (IsOwner)
             {
+                GetComponent<PlayerAttachedWeaponVisual>()?.RefreshPresentation();
+
                 foreach (var cam in GetComponentsInChildren<Camera>(true))
                     LocalFirstPersonVisual.ConfigureLocalCamera(cam, true);
             }
