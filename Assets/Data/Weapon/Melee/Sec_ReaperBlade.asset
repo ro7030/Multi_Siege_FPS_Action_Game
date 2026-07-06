@@ -29,3 +29,6 @@ MonoBehaviour:
   attackInterval: 2.5
   meleeRange: 3.75
   meleeAngle: 115
+  attackSoundResourcePath: Sound/Melee/melee_reaper_blade
+  attackSoundVolume: 0.85
+  attackSoundPitch: 1

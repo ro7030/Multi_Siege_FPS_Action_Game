@@ -23,5 +23,9 @@ MonoBehaviour:
   fireTickInterval: 0.5
   projectilePrefab: {fileID: 1550851596296730, guid: f479314ba9f53c04eb7b54d71c34a39d, type: 3}
   heldViewModelPrefab: {fileID: 1550851596296730, guid: f479314ba9f53c04eb7b54d71c34a39d, type: 3}
-  icon: {fileID: 0}
+  attachedFpAlignOffset: {x: 0, y: 0, z: 0}
+  icon: {fileID: 21300000, guid: ab09af4f465b84989bcbf329d6e57b17, type: 3}
   price: 45
+  throwSoundResourcePath: Sound/Throw/throw_molotov
+  throwSoundVolume: 0.9
+  throwSoundPitch: 0.95

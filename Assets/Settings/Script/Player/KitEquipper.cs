@@ -97,12 +97,15 @@ namespace ProjectM.Player
         public event Action<KitType> OnEquippedChanged;
         public event Action<KitType, bool> OnKitUseAttempt;
 
+        private PlayerCombatInputGate combatInputGate;
+
         private void Awake()
         {
             if (inventory == null) inventory = GetComponent<KitInventory>();
             if (viewCamera == null) viewCamera = GetComponentInChildren<Camera>();
             if (playerHealth == null) playerHealth = GetComponent<HealthSystem>();
             if (throwableEquipper == null) throwableEquipper = GetComponent<ThrowableEquipper>();
+            if (combatInputGate == null) combatInputGate = GetComponent<PlayerCombatInputGate>();
             attachedVisual = GetComponent<PlayerAttachedWeaponVisual>();
         }
 
@@ -199,10 +202,13 @@ namespace ProjectM.Player
         private void SetEquipped(KitType type)
         {
             if (EquippedKit == type) return;
+            bool wasEquipped = EquippedKit != KitType.None;
             EquippedKit = type;
             if (type != KitType.None) throwableEquipper?.Holster(); // 투척과 배타
             SwapHeldViewModel(type);
             OnEquippedChanged?.Invoke(type);
+            if (wasEquipped && type == KitType.None)
+                combatInputGate?.Suppress();
             Debug.Log($"[Kit] 장착: {type}");
         }
 
@@ -333,6 +339,8 @@ namespace ProjectM.Player
                 KitType.FarmKit   => UseFarmKit(),
                 _ => false
             };
+            if (ok)
+                combatInputGate?.Suppress();
             OnKitUseAttempt?.Invoke(EquippedKit, ok);
         }
 

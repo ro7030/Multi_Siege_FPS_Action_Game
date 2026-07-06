@@ -31,3 +31,8 @@ MonoBehaviour:
   meleeAngle: 100
   muzzleLocalOffset: {x: 0, y: 0.02, z: 0.45}
   muzzleLocalEuler: {x: 0, y: 0, z: 0}
+  fireSoundResourcePath: Sound/Gun/gun_rust_carbine
+  fireSoundVolume: 0.8
+  reloadSoundResourcePath: Sound/Gun/gun_reload_carbine
+  reloadSoundVolume: 0.8
+  reloadSoundPitch: 1

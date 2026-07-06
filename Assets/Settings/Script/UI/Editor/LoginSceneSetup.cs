@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using ProjectM.Audio;
 using ProjectM.Auth;
 using ProjectM.UI;
 using TMPro;
@@ -58,6 +59,10 @@ namespace ProjectM.UI.Editor
             statusText.color = new Color(1f, 0.75f, 0.75f, 1f);
 
             var eventSystem = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+
+            var bgmGo = new GameObject("BackgroundMusic");
+            bgmGo.transform.SetParent(root.transform, false);
+            bgmGo.AddComponent<SceneBackgroundMusic>();
 
             var so = new SerializedObject(controller);
             so.FindProperty("uiFont").objectReferenceValue = font;

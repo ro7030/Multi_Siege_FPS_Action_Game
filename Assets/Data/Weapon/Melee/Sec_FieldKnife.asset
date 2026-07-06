@@ -29,3 +29,6 @@ MonoBehaviour:
   attackInterval: 1
   meleeRange: 3.5
   meleeAngle: 110
+  attackSoundResourcePath: Sound/Melee/melee_field_knife
+  attackSoundVolume: 0.8
+  attackSoundPitch: 1.05

@@ -39,6 +39,7 @@ namespace ProjectM.Player
         [Tooltip("키트/투척무기가 장착되어 있으면 사격을 억제. 비워두면 자동 탐색.")]
         [SerializeField] private KitEquipper kitEquipper;
         [SerializeField] private ThrowableEquipper throwableEquipper;
+        private PlayerCombatInputGate combatInputGate;
 
         public int CurrentMagazine { get; private set; }
         public int ReserveAmmo => reserveAmmo;
@@ -73,6 +74,7 @@ namespace ProjectM.Player
             if (viewCamera == null) viewCamera = GetComponentInChildren<Camera>();
             if (kitEquipper == null) kitEquipper = GetComponent<KitEquipper>();
             if (throwableEquipper == null) throwableEquipper = GetComponent<ThrowableEquipper>();
+            if (combatInputGate == null) combatInputGate = GetComponent<PlayerCombatInputGate>();
             revive = GetComponent<ReviveSystem>();
             attachedVisual = GetComponent<PlayerAttachedWeaponVisual>();
             CurrentMagazine = magazineSize;
@@ -94,7 +96,9 @@ namespace ProjectM.Player
             if (mouse == null) return;
             if (Cursor.lockState != CursorLockMode.Locked) return;
 
+            if (combatInputGate != null && combatInputGate.IsSuppressed) return;
             if (kitEquipper != null && (kitEquipper.IsSelecting || kitEquipper.IsKitEquipped)) return;
+            if (throwableEquipper != null && throwableEquipper.SuppressesWeaponFire) return;
             if (throwableEquipper != null && (throwableEquipper.IsSelecting || throwableEquipper.IsThrowableEquipped)) return;
 
             bool wantsAim = mouse.leftButton.isPressed;

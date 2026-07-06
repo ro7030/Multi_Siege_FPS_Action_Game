@@ -29,3 +29,6 @@ MonoBehaviour:
   attackInterval: 1.5
   meleeRange: 4.5
   meleeAngle: 130
+  attackSoundResourcePath: Sound/Melee/melee_zero_edge
+  attackSoundVolume: 0.95
+  attackSoundPitch: 0.92

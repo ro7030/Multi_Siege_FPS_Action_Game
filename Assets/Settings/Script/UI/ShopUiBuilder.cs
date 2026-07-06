@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using ProjectM.Audio;
 
 namespace ProjectM.UI
 {
@@ -80,6 +81,7 @@ namespace ProjectM.UI
             refs.buyButton = UIRoot.CreateButton("BuyButton", right, "구매");
             Anchor(refs.buyButton.GetComponent<RectTransform>(), 0.5f, 0, 0.5f, 0, new Vector2(-90, 20), new Vector2(90, 68));
             refs.buyButtonLabel = refs.buyButton.GetComponentInChildren<TMP_Text>(true);
+            UIButtonSfx.Ensure(refs.buyButton, UiSoundKind.Purchase);
 
             return refs;
         }

@@ -32,6 +32,8 @@ namespace ProjectM.Player
         [SerializeField] private ThrowableEquipper throwableEquipper;
         [SerializeField] private bool isLocalPlayer = true;
 
+        private PlayerCombatInputGate combatInputGate;
+
         public bool IsLocalPlayer { get => isLocalPlayer; set => isLocalPlayer = value; }
 
         [Header("전환 키 (Inspector 조절)")]
@@ -57,6 +59,7 @@ namespace ProjectM.Player
             if (meleeWeapon == null) meleeWeapon = GetComponent<MeleeWeapon>();
             if (kitEquipper == null) kitEquipper = GetComponent<KitEquipper>();
             if (throwableEquipper == null) throwableEquipper = GetComponent<ThrowableEquipper>();
+            if (combatInputGate == null) combatInputGate = GetComponent<PlayerCombatInputGate>();
         }
 
         private void OnEnable()
@@ -232,8 +235,12 @@ namespace ProjectM.Player
 
             if (holsterItems)
             {
+                bool hadKit = kitEquipper != null && kitEquipper.IsKitEquipped;
+                bool hadThrow = throwableEquipper != null && throwableEquipper.IsThrowableEquipped;
                 if (kitEquipper != null) kitEquipper.Holster();
                 if (throwableEquipper != null) throwableEquipper.Holster();
+                if ((hadKit || hadThrow) && combatInputGate != null)
+                    combatInputGate.Suppress();
             }
 
             SyncWeaponInputState();

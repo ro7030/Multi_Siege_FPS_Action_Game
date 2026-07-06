@@ -320,6 +320,11 @@ GameObject:
   - component: {fileID: 9200000000000000014}
   - component: {fileID: 185991166709721278}
   - component: {fileID: 4369407142360775183}
+  - component: {fileID: 9200000000000000015}
+  - component: {fileID: 226904117099165196}
+  - component: {fileID: 5724590863000535299}
+  - component: {fileID: 8039418613160347468}
+  - component: {fileID: 6189814548946556616}
   m_Layer: 0
   m_Name: NetworkPlayer
   m_TagString: Player
@@ -951,6 +956,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.MuzzleFlashController
   muzzleFlashPrefab: {fileID: 9119287051031445214, guid: d7ebd79bdc5610a4ea870fb4696f472b, type: 3}
   resourcesFallbackPath: Effect/GunFire/GunFire
+  rayForwardPush: 0.1
 --- !u!114 &4369407142360775183
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -965,5 +971,69 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.CharacterFallEffect
   groundImpactPrefab: {fileID: 8775978091646465560, guid: 4bcf94ca68f8d40fd8048bc91279eaa7, type: 3}
   resourcesFallbackPath: Effect/GroundImpact
-  groundImpactLifetime: 1.5
   groundOffsetY: 0.03
+--- !u!114 &9200000000000000015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8514623158254487877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4b9c3d25e6f708192a3b4c5d6e7f809, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Audio.PlayerFootstepAudio
+  walkLoopResourcePath: Sound/footstep_rocky_walk_loop
+  walkVolume: 0.55
+  moveThreshold: 0.1
+  sprintSpeedThreshold: 6.5
+  sprintPitch: 1.12
+--- !u!114 &226904117099165196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8514623158254487877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 970330235eab4ef58272858f683c5c78, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Audio.PlayerGunAudio
+--- !u!114 &5724590863000535299
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8514623158254487877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eb424a62a8e46279b75f5fee121de1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Audio.PlayerThrowAudio
+--- !u!114 &8039418613160347468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8514623158254487877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2dd34b1005f42049f34f5944395edf3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Audio.PlayerMeleeAudio
+--- !u!114 &6189814548946556616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8514623158254487877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474c9419d0254ab0ae4ade1ac4c3d349, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.PlayerCombatInputGate

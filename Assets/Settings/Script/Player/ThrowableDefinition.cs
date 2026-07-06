@@ -36,5 +36,11 @@ namespace ProjectM.Player
         public Vector3 attachedFpAlignOffset;
         public Sprite icon;
         public int price = 35;
+
+        [Header("사운드")]
+        [Tooltip("Resources 경로. 예: Sound/Throw/throw_grenade")]
+        public string throwSoundResourcePath;
+        [Range(0f, 1f)] public float throwSoundVolume = 0.85f;
+        [Range(0.5f, 1.5f)] public float throwSoundPitch = 1f;
     }
 }

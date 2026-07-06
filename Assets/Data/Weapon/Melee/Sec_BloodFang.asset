@@ -29,3 +29,6 @@ MonoBehaviour:
   attackInterval: 2
   meleeRange: 4
   meleeAngle: 120
+  attackSoundResourcePath: Sound/Melee/melee_blood_fang
+  attackSoundVolume: 0.9
+  attackSoundPitch: 0.98

@@ -31,3 +31,8 @@ MonoBehaviour:
   meleeAngle: 100
   muzzleLocalOffset: {x: 0, y: 0.02, z: 0.55}
   muzzleLocalEuler: {x: 0, y: 0, z: 0}
+  fireSoundResourcePath: Sound/Gun/gun_break_rifle
+  fireSoundVolume: 0.85
+  reloadSoundResourcePath: Sound/Gun/gun_reload_break_rifle
+  reloadSoundVolume: 0.8
+  reloadSoundPitch: 0.97

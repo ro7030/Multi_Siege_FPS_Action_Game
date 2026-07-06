@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using ProjectM.Audio;
 using ProjectM.Combat;
 using ProjectM.Defense;
 using ProjectM.Network;
@@ -36,6 +37,8 @@ namespace ProjectM.Player
         private bool exploded;
         private bool serverOnlyExplosion;
         private Coroutine throwerIgnoreRoutine;
+
+        public ThrowableType ThrowableType => def != null ? def.type : ThrowableType.None;
 
         public void Launch(
             ThrowableDefinition definition,
@@ -162,9 +165,10 @@ namespace ProjectM.Player
 
             exploded = true;
             StopProjectileMotion();
-            SpawnExplosionVfx();
 
             var center = transform.position;
+            SpawnExplosionVfx();
+            GameSoundManager.EnsureInstance().PlayThrowableEffect(def.type, center);
 
             if (def.effect == ThrowableEffect.Stun)
             {

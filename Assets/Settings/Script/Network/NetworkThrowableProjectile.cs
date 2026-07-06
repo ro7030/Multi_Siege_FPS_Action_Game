@@ -1,5 +1,6 @@
 using Unity.Netcode;
 using UnityEngine;
+using ProjectM.Audio;
 using ProjectM.Player;
 
 namespace ProjectM.Network
@@ -43,9 +44,15 @@ namespace ProjectM.Network
         /// </summary>
         private void HandleExploded()
         {
-            // 싱글플레이(비스폰 상태)에서는 RPC를 보낼 필요/자격이 없다 — 로컬에서 이미 VFX 재생 완료.
-            if (IsSpawned && NetworkSessionHelper.IsServer)
-                PlayExplosionVfxClientRpc();
+            // 싱글플레이(비스폰 상태)에서는 RPC를 보낼 필요/자격이 없다 — 로컬에서 이미 VFX·SFX 재생 완료.
+            if (!IsSpawned || !NetworkSessionHelper.IsServer)
+                return;
+
+            var position = transform.position;
+            var type = projectile != null ? projectile.ThrowableType : ThrowableType.None;
+
+            PlayExplosionVfxClientRpc();
+            PlayExplosionSfxClientRpc((int)type, position);
         }
 
         [ClientRpc]
@@ -55,6 +62,15 @@ namespace ProjectM.Network
                 return;
 
             projectile?.PlayExplosionVfxOnly();
+        }
+
+        [ClientRpc]
+        private void PlayExplosionSfxClientRpc(int typeInt, Vector3 position)
+        {
+            if (IsServer)
+                return;
+
+            GameSoundManager.EnsureInstance().PlayThrowableEffect((ThrowableType)typeInt, position);
         }
 
         public void PrepareServerLaunch(ThrowableDefinition def, GameObject thrower, Vector3 velocity)

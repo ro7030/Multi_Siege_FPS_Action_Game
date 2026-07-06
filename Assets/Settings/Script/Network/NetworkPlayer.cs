@@ -2,6 +2,7 @@ using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using ProjectM.Auth;
+using ProjectM.Audio;
 using ProjectM.CharacterSelect;
 using ProjectM.Economy;
 using ProjectM.Player;
@@ -131,6 +132,18 @@ namespace ProjectM.Network
 
             foreach (var pi in GetComponentsInChildren<PlayerInteractor>(true))
                 pi.IsLocalPlayer = local;
+
+            foreach (var footstep in GetComponentsInChildren<PlayerFootstepAudio>(true))
+                footstep.enabled = local;
+
+            foreach (var gunAudio in GetComponentsInChildren<PlayerGunAudio>(true))
+                gunAudio.enabled = local;
+
+            foreach (var throwAudio in GetComponentsInChildren<PlayerThrowAudio>(true))
+                throwAudio.enabled = local;
+
+            foreach (var meleeAudio in GetComponentsInChildren<PlayerMeleeAudio>(true))
+                meleeAudio.enabled = local;
 
             foreach (var cam in GetComponentsInChildren<Camera>(true))
             {

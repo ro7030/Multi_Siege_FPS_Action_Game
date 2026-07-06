@@ -1,5 +1,6 @@
 using Unity.Netcode;
 using UnityEngine;
+using ProjectM.Audio;
 using ProjectM.Defense;
 using ProjectM.Economy;
 
@@ -91,6 +92,20 @@ namespace ProjectM.Network
         private void RequestHarvestServerRpc(ServerRpcParams rpcParams = default)
         {
             FarmManager.Instance?.HarvestFarm(plot, rpcParams.Receive.SenderClientId);
+        }
+
+        public void BroadcastHarvestSfx(Vector3 position)
+        {
+            if (!IsServer || !IsSpawned)
+                return;
+
+            PlayFarmHarvestedClientRpc(position);
+        }
+
+        [ClientRpc]
+        private void PlayFarmHarvestedClientRpc(Vector3 position)
+        {
+            GameSoundManager.EnsureInstance().PlayDefenseAtPoint(DefenseSfxType.FarmHarvest, position);
         }
 
         private void HandleYieldChanged(int _, int __) => ApplyClientMirror();

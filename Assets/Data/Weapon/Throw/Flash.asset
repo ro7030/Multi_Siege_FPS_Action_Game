@@ -24,3 +24,6 @@ MonoBehaviour:
   attachedFpAlignOffset: {x: 0, y: 0.1, z: 0.02}
   icon: {fileID: 21300000, guid: 0576aab5a8902ab4e8144998b9097a97, type: 3}
   price: 30
+  throwSoundResourcePath: Sound/Throw/throw_flash
+  throwSoundVolume: 0.75
+  throwSoundPitch: 1.08

@@ -20,6 +20,7 @@ GameObject:
   - component: {fileID: 9100000000000000005}
   - component: {fileID: 1172932788179596545}
   - component: {fileID: 3911012979025149783}
+  - component: {fileID: 8079291373584572095}
   m_Layer: 0
   m_Name: Enemy_DPS
   m_TagString: Untagged
@@ -263,8 +264,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Player.CharacterFallEffect
   groundImpactPrefab: {fileID: 8775978091646465560, guid: 4bcf94ca68f8d40fd8048bc91279eaa7, type: 3}
   resourcesFallbackPath: Effect/GroundImpact
-  groundImpactLifetime: 1.5
   groundOffsetY: 0.03
+--- !u!114 &8079291373584572095
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9125259333789829230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09145e9b5f314cf0bb1d205d1a960a0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectM.Audio.EnemyFootstepAudio
+  walkLoopResourcePath: Sound/Enemy/footstep_dps
+  volume: 0.42
+  pitch: 1.05
+  moveThreshold: 0.05
+  minDistance: 1.5
+  maxDistance: 22
+  maxAudibleDistance: 25
 --- !u!1001 &6978537894359494772
 PrefabInstance:
   m_ObjectHideFlags: 0

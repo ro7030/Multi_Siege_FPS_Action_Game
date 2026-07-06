@@ -1,6 +1,7 @@
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using ProjectM.Audio;
 using ProjectM.Defense;
 using ProjectM.Player;
 
@@ -127,7 +128,13 @@ namespace ProjectM.Network
             NotifyInstallResultClientRpc(success, reason, clientRpcParams);
         }
 
-        private void HandleInstalledChanged(bool _, bool installed) => ApplyInstalled(installed);
+        private void HandleInstalledChanged(bool previous, bool installed)
+        {
+            if (installed && !previous)
+                GameSoundManager.EnsureInstance().PlayDefenseAtPoint(DefenseSfxType.GateInstall, transform.position);
+
+            ApplyInstalled(installed);
+        }
 
         private void ApplyInstalled(bool installed)
         {

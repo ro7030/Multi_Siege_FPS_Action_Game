@@ -1,6 +1,7 @@
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using ProjectM.Audio;
 using ProjectM.Core;
 using ProjectM.Economy;
 using ProjectM.Player;
@@ -98,6 +99,20 @@ namespace ProjectM.Network
             }
 
             NotifyPlaceFarmResult(clientId, true, "ok");
+        }
+
+        public void BroadcastFarmPlacedSfx(Vector3 position)
+        {
+            if (!IsServer || !IsSpawned)
+                return;
+
+            PlayFarmPlacedClientRpc(position);
+        }
+
+        [ClientRpc]
+        private void PlayFarmPlacedClientRpc(Vector3 position)
+        {
+            GameSoundManager.EnsureInstance().PlayDefenseAtPoint(DefenseSfxType.FarmPlace, position);
         }
 
         [ClientRpc]

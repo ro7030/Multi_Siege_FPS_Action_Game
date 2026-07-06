@@ -47,12 +47,14 @@ namespace ProjectM.Player
         private float nextAttackTime;
         private ReviveSystem revive;
         private PlayerAttachedWeaponVisual attachedVisual;
+        private PlayerCombatInputGate combatInputGate;
 
         private void Awake()
         {
             ResolveViewCamera();
             if (kitEquipper == null) kitEquipper = GetComponent<KitEquipper>();
             if (throwableEquipper == null) throwableEquipper = GetComponent<ThrowableEquipper>();
+            if (combatInputGate == null) combatInputGate = GetComponent<PlayerCombatInputGate>();
             revive = GetComponent<ReviveSystem>();
             attachedVisual = GetComponent<PlayerAttachedWeaponVisual>();
         }
@@ -128,6 +130,7 @@ namespace ProjectM.Player
             if (mouse == null) return;
             if (Cursor.lockState != CursorLockMode.Locked) return;
 
+            if (combatInputGate != null && combatInputGate.IsSuppressed) return;
             // 키트/투척 장착 중에는 좌클릭이 그쪽 용도 — 근접 공격 억제
             if (kitEquipper != null && (kitEquipper.IsSelecting || kitEquipper.IsKitEquipped)) return;
             if (throwableEquipper != null && (throwableEquipper.IsSelecting || throwableEquipper.IsThrowableEquipped)) return;

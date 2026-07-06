@@ -9,6 +9,7 @@ using ProjectM.Core;
 using ProjectM.Economy;
 using ProjectM.Network;
 using ProjectM.Player;
+using ProjectM.Audio;
 
 namespace ProjectM.UI
 {
@@ -93,6 +94,9 @@ namespace ProjectM.UI
             BindTopTabs();
             if (closeButton != null) closeButton.onClick.AddListener(Hide);
             if (buyButton != null) buyButton.onClick.AddListener(OnBuyClicked);
+            EnsureBuyButtonSound();
+            GameSoundManager.EnsureInstance();
+            UISoundBinder.RefreshActiveScene();
         }
 
         private void Start()
@@ -453,6 +457,14 @@ namespace ProjectM.UI
         {
             TryPurchaseSelected();
             RefreshAll();
+        }
+
+        private void EnsureBuyButtonSound()
+        {
+            if (buyButton == null)
+                return;
+
+            UIButtonSfx.Ensure(buyButton, UiSoundKind.Purchase);
         }
 
         private void TryPurchaseSelected()

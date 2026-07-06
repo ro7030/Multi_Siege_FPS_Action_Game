@@ -46,11 +46,26 @@ namespace ProjectM.Player
         [Tooltip("총구 이펙트 로컬 회전(도). 기본은 무기 정면 방향과 동일.")]
         public Vector3 muzzleLocalEuler = Vector3.zero;
 
+        [Header("사운드 (Ranged 전용)")]
+        [Tooltip("Resources 경로. 예: Sound/Gun/gun_rust_carbine")]
+        public string fireSoundResourcePath;
+        [Range(0f, 1f)] public float fireSoundVolume = 0.85f;
+        [Tooltip("Resources 경로. 예: Sound/Gun/gun_reload_carbine")]
+        public string reloadSoundResourcePath;
+        [Range(0f, 1f)] public float reloadSoundVolume = 0.85f;
+        [Range(0.5f, 1.5f)] public float reloadSoundPitch = 1f;
+
         [Header("근접 (Melee 전용)")]
         [Tooltip("1회 공격 사이 간격(초). 기획서 '공격 속도'.")]
         public float attackInterval = 2.5f;
         public float meleeRange = 2.5f;
         [Tooltip("정면 기준 부채꼴 각도(도). 이 안에 있는 대상만 타격.")]
         public float meleeAngle = 100f;
+
+        [Header("사운드 (Melee 전용)")]
+        [Tooltip("Resources 경로. 예: Sound/Melee/melee_field_knife")]
+        public string attackSoundResourcePath;
+        [Range(0f, 1f)] public float attackSoundVolume = 0.85f;
+        [Range(0.5f, 1.5f)] public float attackSoundPitch = 1f;
     }
 }

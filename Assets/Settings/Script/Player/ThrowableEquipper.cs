@@ -63,6 +63,9 @@ namespace ProjectM.Player
         public ThrowableType EquippedThrowable { get; private set; } = ThrowableType.None;
         public bool IsThrowableEquipped => EquippedThrowable != ThrowableType.None;
         public ThrowableType LastSelected { get; private set; } = ThrowableType.Grenade;
+        public ThrowableType LastThrownType { get; private set; } = ThrowableType.None;
+
+        public bool SuppressesWeaponFire => IsThrowableEquipped;
 
         // ── (구) 휠 호환용 — 항상 비활성. 기존 ThrowableWheelView 가 컴파일/실행은 되지만 표시되지 않음. ──
         public bool IsSelecting => false;
@@ -75,11 +78,14 @@ namespace ProjectM.Player
         /// <summary>투척이 실제로 실행(소모 확정 또는 서버 요청 전송)된 순간마다 발생 — 애니메이션 트리거용.</summary>
         public event Action OnThrown;
 
+        private PlayerCombatInputGate combatInputGate;
+
         private void Awake()
         {
             if (inventory == null) inventory = GetComponent<ThrowableInventory>();
             if (viewCamera == null) viewCamera = GetComponentInChildren<Camera>();
             if (kitEquipper == null) kitEquipper = GetComponent<KitEquipper>();
+            if (combatInputGate == null) combatInputGate = GetComponent<PlayerCombatInputGate>();
             attachedVisual = GetComponent<PlayerAttachedWeaponVisual>();
         }
 
@@ -243,6 +249,9 @@ namespace ProjectM.Player
             if (def == null) { Debug.LogWarning($"[Throw] {type} 정의 미설정"); return; }
             if (viewCamera == null) return;
 
+            combatInputGate?.Suppress();
+            LastThrownType = type;
+
             Vector3 origin = viewCamera.transform.position + viewCamera.transform.forward * spawnForward;
             Vector3 velocity = viewCamera.transform.forward * throwForce + Vector3.up * throwUpward;
 
@@ -262,7 +271,8 @@ namespace ProjectM.Player
 
             if (!inventory.TryConsume(type)) return;
 
-            ThrowableSpawner.SpawnProjectile(def, gameObject, origin, velocity);
+            if (!ThrowableSpawner.SpawnProjectile(def, gameObject, origin, velocity)) return;
+
             OnThrown?.Invoke();
             Debug.Log($"[Throw] {def.displayName} 투척");
         }

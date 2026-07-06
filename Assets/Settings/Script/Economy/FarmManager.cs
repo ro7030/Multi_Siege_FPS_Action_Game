@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using ProjectM.Audio;
 using ProjectM.Core;
 using ProjectM.Defense;
 using ProjectM.Network;
@@ -139,6 +140,7 @@ namespace ProjectM.Economy
 
             RegisterExistingFarm(plot);
             placed = plot;
+            PlayFarmPlacedSfx(plot.transform.position);
             return true;
         }
 
@@ -272,7 +274,41 @@ namespace ProjectM.Economy
                 NetworkMatchStats.Instance?.RecordHarvest(harvesterClientId);
 
             OnFarmHarvested?.Invoke(plot, yieldPerPlayer);
+            PlayFarmHarvestedSfx(plot);
             Debug.Log($"[FarmManager] 수확! +{yieldPerPlayer} × {wallets.Count}명");
+        }
+
+        private void PlayFarmPlacedSfx(Vector3 position)
+        {
+            if (NetworkSessionHelper.IsMultiplayerSession)
+            {
+                if (NetworkSessionHelper.IsServer)
+                    NetworkFarmManagerBridge.Instance?.BroadcastFarmPlacedSfx(position);
+            }
+            else
+            {
+                GameSoundManager.EnsureInstance().PlayDefenseAtPoint(DefenseSfxType.FarmPlace, position);
+            }
+        }
+
+        private void PlayFarmHarvestedSfx(FarmPlot plot)
+        {
+            if (plot == null)
+                return;
+
+            var position = plot.transform.position;
+            if (NetworkSessionHelper.IsMultiplayerSession)
+            {
+                if (NetworkSessionHelper.IsServer
+                    && plot.TryGetComponent<NetworkFarmBridge>(out var bridge))
+                {
+                    bridge.BroadcastHarvestSfx(position);
+                }
+            }
+            else
+            {
+                GameSoundManager.EnsureInstance().PlayDefenseAtPoint(DefenseSfxType.FarmHarvest, position);
+            }
         }
     }
 }

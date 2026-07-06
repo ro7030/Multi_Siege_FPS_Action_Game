@@ -42,6 +42,7 @@ namespace ProjectM.Player
         private ReviveSystem revive;
         private KitEquipper kitEquipper;
         private ThrowableEquipper throwableEquipper;
+        private PlayerCombatInputGate combatInputGate;
         private Vector3 velocity;
         private float pitch;
         private float recoilPitchOffset;
@@ -65,6 +66,7 @@ namespace ProjectM.Player
             revive = GetComponent<ReviveSystem>();
             kitEquipper = GetComponent<KitEquipper>();
             throwableEquipper = GetComponent<ThrowableEquipper>();
+            combatInputGate = GetComponent<PlayerCombatInputGate>();
             if (weaponController == null)
                 weaponController = GetComponent<WeaponController>();
             if (cameraPivot == null)
@@ -214,11 +216,18 @@ namespace ProjectM.Player
 
         private void SetCursorLocked(bool locked)
         {
+            bool wasLocked = Cursor.lockState == CursorLockMode.Locked;
             Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
             Cursor.visible = !locked;
 
             if (locked)
+            {
+                if (!wasLocked)
+                    combatInputGate?.Suppress();
                 RefreshInputDevices();
+                if (Mouse.current != null)
+                    InputSystem.ResetDevice(Mouse.current);
+            }
         }
 
         private static void RefreshInputDevices()

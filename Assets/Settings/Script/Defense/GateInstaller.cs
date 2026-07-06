@@ -1,4 +1,5 @@
 using UnityEngine;
+using ProjectM.Audio;
 using ProjectM.Network;
 using ProjectM.Player;
 
@@ -226,7 +227,11 @@ namespace ProjectM.Defense
 
         private void ApplyInstalledLocal(bool value)
         {
+            bool wasInstalled = installed;
             ApplyNetworkInstalled(value);
+
+            if (value && !wasInstalled && !NetworkSessionHelper.IsMultiplayerSession)
+                GameSoundManager.EnsureInstance().PlayDefenseAtPoint(DefenseSfxType.GateInstall, transform.position);
 
             if (TryGetComponent<NetworkGateInstaller>(out var bridge) && NetworkSessionHelper.IsServer)
                 bridge.ServerSetInstalled(value);
