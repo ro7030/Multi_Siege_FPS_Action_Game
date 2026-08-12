@@ -9,7 +9,7 @@
 
 ## 시현 영상
 
-1팀 몽키 가드 시현 영상입니다.
+몽키 가드 시현 영상입니다.
 
 https://github.com/ro7030/Multi_Siege_FPS_Action_Game/raw/main/docs/media/monkey_guard_demo.mp4
 
