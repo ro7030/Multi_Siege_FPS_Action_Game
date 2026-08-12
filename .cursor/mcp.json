@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "mysql": {
+      "command": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+      "args": [
+        "-m",
+        "mysql_mcp_server.server"
+      ],
+      "env": {
+        "MYSQL_HOST": "127.0.0.1",
+        "MYSQL_PORT": "3306",
+        "MYSQL_USER": "game_dev",
+        "MYSQL_PASSWORD": "game_dev",
+        "MYSQL_DATABASE": "multi_siege_fps"
+      },
+      "type": "stdio"
+    }
+  }
+}
